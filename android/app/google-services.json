@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "368964350199",
+    "project_id": "project-donations-33a68",
+    "storage_bucket": "project-donations-33a68.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368964350199:android:4ce9bf2d510162068ca3f2",
+        "android_client_info": {
+          "package_name": "com.example.appdonationsgestor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW3Dnk6EQFToTlZ9j-BdXvc8oSlRgkPzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
