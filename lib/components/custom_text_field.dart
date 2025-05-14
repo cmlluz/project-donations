@@ -1,56 +1,67 @@
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final TextInputType type;
-  final _formKey = GlobalKey<FormState>();
-  final bool textarea;
+class CustomTextFields extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final bool secret;
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
 
-  CustomTextField({
-    super.key,
-    required this.type,
-    required this.controller,
-    this.textarea = false,
-  });
+  const CustomTextFields({
+    Key? key,
+    required this.icon,
+    required this.label,
+    this.secret = false,
+    this.controller,
+    this.keyboardType,
+  }) : super(key: key);
 
   @override
+  State<CustomTextFields> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextFields> {
+  bool hide = false;
+  @override
+  void initState() {
+    super.initState();
+    hide = widget.secret;
+  }
+
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Material(
-              child: TextFormField(
-                controller: controller,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Digite aqui';
-                  }
-                  return null;
-                },
-                keyboardType: type,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color.fromARGB(255, 243, 243, 243),
-                  border: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      width: 0,
-                      style: BorderStyle.none,
-                    ),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              ),
-              elevation: 9.5,
-              color: Colors.transparent,
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextFormField(
+        controller: widget.controller,
+        keyboardType: widget.keyboardType,
+        obscureText: hide,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Color.fromARGB(255, 0, 0, 0),
+        ),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          prefixIcon: Icon(widget.icon),
+          suffixIcon: widget.secret
+              ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      hide = !hide;
+                    });
+                  },
+                  icon: Icon(hide ? Icons.visibility : Icons.visibility_off),
+                )
+              : null,
+          labelText: widget.label,
+          isDense: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-          ),
-        ],
+        ),
       ),
     );
   }

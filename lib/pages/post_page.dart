@@ -90,10 +90,12 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              CustomTextField(
-                type: TextInputType.multiline,
-                controller: _controller.crtlDesc,
-              ),
+              CustomTextFields(
+                  icon: Icons.description,
+                  label: 'Descrição do post',
+                  secret: false,
+                  controller: _controller.crtlDesc,
+                  keyboardType: TextInputType.text),
               const SizedBox(height: 20),
               Container(
                 width: 200.0,

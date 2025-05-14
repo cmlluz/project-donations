@@ -6,8 +6,10 @@ import 'package:appdonationsgestor/pages/login_page.dart';
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/pages/post_page.dart';
 import 'package:appdonationsgestor/resources/root_page.dart';
+import 'package:appdonationsgestor/pages/user_register_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/pages/user_type.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -21,6 +23,8 @@ class RouteNames {
   static const String postPage = "postPage";
   static const String root = "root";
   static const String popupMenuState = "popupMenuState";
+  static const String userRegisterPage = "userRegisterPage";
+  static const String userTypePage = "userTypePage";
 }
 
 class AppRountersConfiguration {
@@ -100,6 +104,23 @@ class AppRountersConfiguration {
             );
           },
         ),
+        GoRoute(
+          path: '/userRegisterPage',
+          name: RouteNames.userRegisterPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: UserRegisterPage(),
+            );
+          },
+        ),
+        GoRoute(
+            path: '/userTypePage',
+            name: RouteNames.userTypePage,
+            pageBuilder: (context, state) {
+              return const MaterialPage(
+                child: UserType(),
+              );
+            }),
       ],
     );
   }

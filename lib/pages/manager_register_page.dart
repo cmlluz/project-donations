@@ -69,20 +69,53 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Nome: ', TextInputType.text, nameController),
+                  CustomTextFields(
+                    icon: Icons.person,
+                    label: 'Nome',
+                    secret: false,
+                    controller: nameController,
+                    keyboardType: TextInputType.name,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Telefone: ', TextInputType.phone, phoneController),
+                  CustomTextFields(
+                    icon: Icons.email,
+                    label: 'Email',
+                    secret: false,
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'E-mail', TextInputType.emailAddress, emailController),
+                  CustomTextFields(
+                    icon: Icons.person_2_outlined,
+                    label: 'CPF / CNPJ',
+                    secret: false,
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Endereço: ', TextInputType.text, addressController),
+                  CustomTextFields(
+                    icon: Icons.map,
+                    label: 'Endereço',
+                    secret: false,
+                    controller: addressController,
+                    keyboardType: TextInputType.text,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel('Senha: ',
-                      TextInputType.visiblePassword, passwordController),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Senha',
+                    secret: true,
+                    controller: passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Confirme a senha',
+                    secret: true,
+                    controller: passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -108,30 +141,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextFieldWithLabel(
-      String label, TextInputType inputType, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: ConstantsColors.CorPrinciapal,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          CustomTextField(
-            type: inputType,
-            controller: controller,
-          ),
-        ],
       ),
     );
   }
