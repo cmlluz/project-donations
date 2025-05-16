@@ -42,60 +42,116 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              stops: [0.6, 1.0],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 80),
-                CustomTextFields(
-                  icon: Icons.person,
-                  label: 'Nome',
-                  secret: false,
-                ),
-                const SizedBox(height: 20),
-                CustomTextFields(
-                  icon: Icons.email,
-                  label: 'Email',
-                  secret: false,
-                ),
-                const SizedBox(height: 20),
-                CustomTextFields(
-                  icon: Icons.lock,
-                  label: 'Senha',
-                  secret: true,
-                ),
-                const SizedBox(height: 20),
-                CustomTextFields(
-                  icon: Icons.lock,
-                  label: 'Confirme sua Senha',
-                  secret: true,
-                ),
-                CustomTextFields(
-                  icon: Icons.phone,
-                  label: 'Telefone',
-                  secret: false,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica para registrar o usuário
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.CorPrinciapal.withValues(),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Queremos saber mais sobre você!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    child: Text('Registrar'),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Informe alguns dados importantes para nós',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 80),
+                  CustomTextFields(
+                    icon: Icons.person,
+                    label: 'Nome',
+                    secret: false,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.email,
+                    label: 'Email',
+                    secret: false,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.phone,
+                    label: 'Telefone',
+                    secret: false,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.person_4,
+                    label: 'CPF',
+                    secret: false,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.map,
+                    label: 'Endereço',
+                    secret: false,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Senha',
+                    secret: true,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Confirme sua Senha',
+                    secret: true,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ConstantsColors.CorPrinciapal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      GoRouter.of(context).go('/institutionProfilePage');
+                    },
+                    child: const Text(
+                      'Confirmar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      GoRouter.of(context).go('/');
+                    },
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: ConstantsColors.CorPrinciapal,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           ),
         ),

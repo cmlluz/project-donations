@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -39,69 +40,13 @@ class UserType extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 50,
-                  width: 300,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Pessoa Física',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.LetterColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(text: 'Pessoa Física', route: '/userRegisterPage'),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 50,
-                  width: 300,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Instituição',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.LetterColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(
+                    text: 'Instituição', route: '/institutionRegisterPage'),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 50,
-                  width: 300,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Gestor',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.LetterColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(text: 'Gestor', route: '/gestorRegisterPage'),
+                const SizedBox(height: 20),
               ],
             ),
           )),

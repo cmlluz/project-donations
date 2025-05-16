@@ -60,7 +60,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              stops: [0.6, 1.0],
             ),
           ),
           child: SingleChildScrollView(
@@ -68,6 +67,26 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Queremos saber mais sobre você!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Informe alguns dados importantes para nós',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   CustomTextFields(
                     icon: Icons.person,
@@ -88,6 +107,14 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   CustomTextFields(
                     icon: Icons.person_2_outlined,
                     label: 'CPF / CNPJ',
+                    secret: false,
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.phone,
+                    label: 'Telefone',
                     secret: false,
                     controller: phoneController,
                     keyboardType: TextInputType.number,
@@ -136,6 +163,25 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      GoRouter.of(context).go('/');
+                    },
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: ConstantsColors.CorPrinciapal,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

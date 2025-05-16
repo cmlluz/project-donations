@@ -95,6 +95,14 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   ),
                   const SizedBox(height: 20),
                   CustomTextFields(
+                    icon: Icons.phone,
+                    label: 'Telefone',
+                    secret: false,
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.map,
                     label: 'Endereço',
                     secret: false,
@@ -145,7 +153,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                       ),
                     ),
                     onPressed: () {
-                      GoRouter.of(context).go('/root');
+                      GoRouter.of(context).go('/');
                     },
                     child: const Text(
                       'Cancelar',
