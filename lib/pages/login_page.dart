@@ -32,7 +32,7 @@ class _LoginPage extends State<LoginPage> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                ConstantsColors.ButtonColor,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -62,7 +62,7 @@ class _LoginPage extends State<LoginPage> {
                         child: const Text(
                           'Esqueci minha senha',
                           style: TextStyle(
-                            color: ConstantsColors.CorPrinciapal,
+                            color: ConstantsColors.ButtonColor,
                             fontSize: 16,
                           ),
                         ),
@@ -73,7 +73,7 @@ class _LoginPage extends State<LoginPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.CorPrinciapal,
+                    backgroundColor: ConstantsColors.ButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

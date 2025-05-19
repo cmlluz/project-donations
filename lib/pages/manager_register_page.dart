@@ -46,7 +46,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
           fontSize: 20,
           fontFamily: 'Poppins',
         ),
-        backgroundColor: ConstantsColors.CorPrinciapal,
+        backgroundColor: ConstantsColors.ButtonColor,
       ),
       body: SizedBox.expand(
         child: Container(
@@ -56,7 +56,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                ConstantsColors.ButtonColor,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -86,7 +86,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.CorPrinciapal,
+                      backgroundColor: ConstantsColors.ButtonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -122,7 +122,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
           Text(
             label,
             style: TextStyle(
-              color: ConstantsColors.CorPrinciapal,
+              color: ConstantsColors.ButtonColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

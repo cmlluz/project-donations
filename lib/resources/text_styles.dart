@@ -11,7 +11,7 @@ class TextStylesConstants {
   static const TextStyle kTitleProfile = TextStyle(
       fontFamily: 'Poppins',
       fontSize: 18.0,
-      color: ConstantsColors.CorPrinciapal);
+      color: ConstantsColors.ButtonColor);
 
   static const TextStyle kformularyText = TextStyle(
     fontFamily: 'Poppins',

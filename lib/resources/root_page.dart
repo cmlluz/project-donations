@@ -52,7 +52,7 @@ class _RootPageState extends State<RootPage> {
             Text(
               titleList[_bottomNavIndex],
               style: const TextStyle(
-                color: ConstantsColors.CorPrinciapal,
+                color: ConstantsColors.ButtonColor,
                 fontWeight: FontWeight.w500,
                 fontSize: 24,
               ),
@@ -76,16 +76,16 @@ class _RootPageState extends State<RootPage> {
           );
         },
         child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: ConstantsColors.CorPrinciapal,
+        backgroundColor: ConstantsColors.ButtonColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.CorPrinciapal,
-        activeColor: ConstantsColors.CorPrinciapal,
-        inactiveColor: Colors.black.withOpacity(.5),
+        splashColor: ConstantsColors.ButtonColor,
+        activeColor: ConstantsColors.ButtonColor,
+        inactiveColor: ConstantsColors.ButtonColor.withOpacity(.7),
         icons: iconList,
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.center,

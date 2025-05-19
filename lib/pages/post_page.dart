@@ -103,7 +103,7 @@ class _PostPageState extends State<PostPage> {
                     // confirmar a postagem
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.CorPrinciapal,
+                    backgroundColor: ConstantsColors.ButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),

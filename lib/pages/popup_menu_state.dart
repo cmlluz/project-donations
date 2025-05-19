@@ -34,7 +34,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: ConstantsColors.CorPrinciapal,
+        backgroundColor: ConstantsColors.ButtonColor,
         elevation: 0,
         centerTitle: true,
       ),
@@ -49,7 +49,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
                 GoRouter.of(context).go('/postPage');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ConstantsColors.CorPrinciapal,
+                backgroundColor: ConstantsColors.ButtonColor,
                 fixedSize: Size(width * 0.9, 60),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -96,7 +96,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
                 GoRouter.of(context).go('/itemRegisterPage');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ConstantsColors.CorPrinciapal,
+                backgroundColor: ConstantsColors.ButtonColor,
                 fixedSize: Size(width * 0.9, 60),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),

@@ -37,7 +37,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
           fontSize: 20,
           fontFamily: 'Poppins',
         ),
-        backgroundColor: ConstantsColors.CorPrinciapal,
+        backgroundColor: ConstantsColors.ButtonColor,
       ),
       body: SizedBox.expand(
         child: Container(
@@ -47,7 +47,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                ConstantsColors.ButtonColor,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -77,7 +77,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.CorPrinciapal,
+                      backgroundColor: ConstantsColors.ButtonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -107,7 +107,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.CorPrinciapal,
+                        color: ConstantsColors.ButtonColor,
                         fontSize: 18,
                       ),
                     ),
@@ -131,7 +131,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
           Text(
             label,
             style: TextStyle(
-              color: ConstantsColors.CorPrinciapal,
+              color: ConstantsColors.ButtonColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
