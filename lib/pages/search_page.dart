@@ -2,14 +2,14 @@ import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_bar.dart';
 import 'package:flutter/material.dart';
 
-class InstitutionPage extends StatefulWidget {
-  const InstitutionPage({Key? key}) : super(key: key);
+class SearchPage extends StatefulWidget {
+  const SearchPage({Key? key}) : super(key: key);
 
   @override
-  State<InstitutionPage> createState() => _InstitutionPageState();
+  State<SearchPage> createState() => _SearchPageState();
 }
 
-class _InstitutionPageState extends State<InstitutionPage> {
+class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

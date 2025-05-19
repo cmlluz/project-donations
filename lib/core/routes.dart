@@ -1,4 +1,4 @@
-import 'package:appdonationsgestor/pages/institution_page.dart';
+import 'package:appdonationsgestor/pages/search_page.dart';
 import 'package:appdonationsgestor/pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
 import 'package:appdonationsgestor/pages/item_register_page.dart';
@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
-  static const String institutionPage = "institution_page";
+  static const String searchPage = "search_page";
   static const String itemRegisterPage = "itemRegisterPage";
   static const String itemEditPage = "itemEditPage";
   static const String institutionProfilePage = "institutionProfilePage";
@@ -66,10 +66,10 @@ class AppRountersConfiguration {
         ),
         GoRoute(
           path: '/intitution_page',
-          name: RouteNames.institutionPage,
+          name: RouteNames.searchPage,
           pageBuilder: (context, state) {
             return const MaterialPage(
-              child: InstitutionPage(),
+              child: SearchPage(),
             );
           },
         ),
