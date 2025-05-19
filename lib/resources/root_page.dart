@@ -36,9 +36,9 @@ class _RootPageState extends State<RootPage> {
 
   //Lista de titulos
   List<String> titleList = [
-    'Olá, Name',
-    'Instituições',
-    'Perfil',
+    'Olá, Name 👋',
+    'Olá, Name 👋',
+    '',
     'Configurações',
   ];
 
