@@ -48,22 +48,32 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              titleList[_bottomNavIndex],
-              style: const TextStyle(
-                color: Color.fromRGBO(47, 47, 47, 1),
-                fontWeight: FontWeight.w700,
-                fontSize: 30,
+      appBar: titleList[_bottomNavIndex] == ''
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(-20),
+              child: Container(
+                color: ConstantsColors.navigationColor,
+              ), // espaço vazio com altura 20
+            )
+          : AppBar(
+              title: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      titleList[_bottomNavIndex],
+                      style: const TextStyle(
+                        color: Color.fromRGBO(47, 47, 47, 1),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 30,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              elevation: 0.0,
             ),
-          ],
-        ),
-        elevation: 0.0,
-      ),
       body: IndexedStack(
         index: _bottomNavIndex,
         children: pages,
