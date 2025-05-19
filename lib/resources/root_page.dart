@@ -22,6 +22,7 @@ class _RootPageState extends State<RootPage> {
   List<Widget> pages = const [
     HomePage(),
     SearchPage(),
+    InstitutionRegisterPage(),
     ManagerProfilePage(),
     SettingsPage(),
   ];
@@ -30,8 +31,8 @@ class _RootPageState extends State<RootPage> {
   List<IconData> iconList = [
     Icons.home,
     Icons.list,
-    Icons.person,
-    Icons.settings,
+    Icons.favorite_outline,
+    Icons.person_outline,
   ];
 
   //Lista de titulos
@@ -52,9 +53,9 @@ class _RootPageState extends State<RootPage> {
             Text(
               titleList[_bottomNavIndex],
               style: const TextStyle(
-                color: ConstantsColors.ButtonColor,
-                fontWeight: FontWeight.w500,
-                fontSize: 24,
+                color: Color.fromRGBO(47, 47, 47, 1),
+                fontWeight: FontWeight.w700,
+                fontSize: 30,
               ),
             ),
           ],
@@ -75,17 +76,13 @@ class _RootPageState extends State<RootPage> {
             ),
           );
         },
-        child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: ConstantsColors.ButtonColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
+        child: const Icon(Icons.add, color: Color(0xFF015B7C)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.ButtonColor,
-        activeColor: ConstantsColors.ButtonColor,
-        inactiveColor: ConstantsColors.ButtonColor.withOpacity(.7),
+        splashColor: ConstantsColors.buttonColor,
+        activeColor: ConstantsColors.buttonColor,
+        inactiveColor: ConstantsColors.buttonColor.withOpacity(.5),
         icons: iconList,
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.center,

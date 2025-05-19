@@ -28,9 +28,9 @@ class _SettingsPage extends State<SettingsPage> {
                         // ir para a página de edição de perfil
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: ConstantsColors.ButtonColor,
+                        foregroundColor: ConstantsColors.buttonColor,
                         side: BorderSide(
-                          color: ConstantsColors.ButtonColor,
+                          color: ConstantsColors.buttonColor,
                           width: 2.0,
                         ),
                         shape: RoundedRectangleBorder(
@@ -40,7 +40,7 @@ class _SettingsPage extends State<SettingsPage> {
                       child: const Text(
                         'Editar Perfil',
                         style: TextStyle(
-                            color: ConstantsColors.ButtonColor, fontSize: 16),
+                            color: ConstantsColors.buttonColor, fontSize: 16),
                       ),
                     ),
                   ),
@@ -55,9 +55,9 @@ class _SettingsPage extends State<SettingsPage> {
                         // ir para a página de alteração de senha
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: ConstantsColors.ButtonColor,
+                        foregroundColor: ConstantsColors.buttonColor,
                         side: BorderSide(
-                          color: ConstantsColors.ButtonColor,
+                          color: ConstantsColors.buttonColor,
                           width: 2.0,
                         ),
                         shape: RoundedRectangleBorder(
@@ -67,7 +67,7 @@ class _SettingsPage extends State<SettingsPage> {
                       child: const Text(
                         'Alterar Senha',
                         style: TextStyle(
-                            color: ConstantsColors.ButtonColor, fontSize: 16),
+                            color: ConstantsColors.buttonColor, fontSize: 16),
                       ),
                     ),
                   ),

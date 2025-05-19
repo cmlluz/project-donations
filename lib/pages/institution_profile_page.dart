@@ -98,7 +98,7 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
             Icons.add,
             color: Colors.white,
           ),
-          backgroundColor: ConstantsColors.ButtonColor,
+          backgroundColor: ConstantsColors.buttonColor,
         ),
       ),
     );
