@@ -10,7 +10,7 @@ class Searchbar extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
+              border: Border.all(color: const Color(0xFFE0E0E0), width: 2.0),
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: TextField(

@@ -15,7 +15,7 @@ class UserType extends StatelessWidget {
             height: 320,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             decoration: const BoxDecoration(
-              color: ConstantsColors.LetterColor,
+              color: ConstantsColors.labelColor,
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(50),
               ),
@@ -33,7 +33,7 @@ class UserType extends StatelessWidget {
                     textAlign: TextAlign.center,
                     'Qual será o seu tipo de conta?',
                     style: TextStyle(
-                      color: ConstantsColors.LetterColor,
+                      color: ConstantsColors.labelColor,
                       fontSize: 30,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Courrier',

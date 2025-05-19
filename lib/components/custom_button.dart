@@ -32,7 +32,7 @@ class _CustomButtonState extends State<CustomButton> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: ConstantsColors.LetterColor,
+          backgroundColor: ConstantsColors.labelColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),

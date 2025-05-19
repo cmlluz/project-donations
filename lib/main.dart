@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme:
-            ColorScheme.fromSeed(seedColor: ConstantsColors.CorPrinciapal),
+            ColorScheme.fromSeed(seedColor: ConstantsColors.buttonColor),
         useMaterial3: true,
       ),
     );

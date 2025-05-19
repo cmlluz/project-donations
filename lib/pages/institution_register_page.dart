@@ -37,8 +37,8 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.CorPrinciapal,
-                ConstantsColors.NavigationColor
+                ConstantsColors.mainColor,
+                ConstantsColors.navigationColor
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -128,7 +128,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.LetterColor,
+                      backgroundColor: ConstantsColors.labelColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -158,7 +158,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.CorPrinciapal,
+                        color: ConstantsColors.buttonColor,
                         fontSize: 18,
                       ),
                     ),

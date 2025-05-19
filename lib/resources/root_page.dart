@@ -1,6 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
-import 'package:appdonationsgestor/pages/institution_page.dart';
+import 'package:appdonationsgestor/pages/search_page.dart';
 import 'package:appdonationsgestor/pages/institution_register_page.dart';
 import 'package:appdonationsgestor/pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
@@ -21,7 +21,8 @@ class _RootPageState extends State<RootPage> {
   //lista das paginas
   List<Widget> pages = const [
     HomePage(),
-    InstitutionPage(),
+    SearchPage(),
+    InstitutionRegisterPage(),
     ManagerProfilePage(),
     SettingsPage(),
   ];
@@ -30,15 +31,15 @@ class _RootPageState extends State<RootPage> {
   List<IconData> iconList = [
     Icons.home,
     Icons.list,
-    Icons.person,
-    Icons.settings,
+    Icons.favorite_outline,
+    Icons.person_outline,
   ];
 
   //Lista de titulos
   List<String> titleList = [
-    'Olá, Name',
-    'Instituições',
-    'Perfil',
+    'Olá, Name 👋',
+    'Olá, Name 👋',
+    '',
     'Configurações',
   ];
 
@@ -52,9 +53,9 @@ class _RootPageState extends State<RootPage> {
             Text(
               titleList[_bottomNavIndex],
               style: const TextStyle(
-                color: ConstantsColors.CorPrinciapal,
-                fontWeight: FontWeight.w500,
-                fontSize: 24,
+                color: Color.fromRGBO(47, 47, 47, 1),
+                fontWeight: FontWeight.w700,
+                fontSize: 30,
               ),
             ),
           ],
@@ -75,17 +76,13 @@ class _RootPageState extends State<RootPage> {
             ),
           );
         },
-        child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: ConstantsColors.CorPrinciapal,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
+        child: const Icon(Icons.add, color: Color(0xFF015B7C)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.CorPrinciapal,
-        activeColor: ConstantsColors.CorPrinciapal,
-        inactiveColor: Colors.black.withOpacity(.5),
+        splashColor: ConstantsColors.buttonColor,
+        activeColor: ConstantsColors.buttonColor,
+        inactiveColor: ConstantsColors.buttonColor.withOpacity(.5),
         icons: iconList,
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.center,

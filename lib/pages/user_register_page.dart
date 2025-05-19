@@ -38,7 +38,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                ConstantsColors.mainColor,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -114,7 +114,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.CorPrinciapal,
+                      backgroundColor: ConstantsColors.mainColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -144,7 +144,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.CorPrinciapal,
+                        color: ConstantsColors.mainColor,
                         fontSize: 18,
                       ),
                     ),

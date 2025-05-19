@@ -76,7 +76,7 @@ class _LoginPage extends State<LoginPage> {
                           child: const Text(
                             'Não tem uma conta? Crie uma!',
                             style: TextStyle(
-                              color: ConstantsColors.LetterColor,
+                              color: ConstantsColors.labelColor,
                               fontSize: 14,
                             ),
                           ),
@@ -87,7 +87,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.LetterColor,
+                          backgroundColor: ConstantsColors.labelColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
