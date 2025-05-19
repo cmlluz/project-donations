@@ -31,6 +31,7 @@ class _RootPageState extends State<RootPage> {
   List<IconData> iconList = [
     Icons.home,
     Icons.list,
+    Icons.add,
     Icons.favorite_outline,
     Icons.person_outline,
   ];
@@ -39,6 +40,7 @@ class _RootPageState extends State<RootPage> {
   List<String> titleList = [
     'Olá, Name 👋',
     'Olá, Name 👋',
+    '',
     '',
     'Configurações',
   ];
@@ -66,26 +68,15 @@ class _RootPageState extends State<RootPage> {
         index: _bottomNavIndex,
         children: pages,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageTransition(
-              child: const InstitutionRegisterPage(),
-              type: PageTransitionType.bottomToTop,
-            ),
-          );
-        },
-        child: const Icon(Icons.add, color: Color(0xFF015B7C)),
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.buttonColor,
+        splashColor: ConstantsColors.mainColor,
         activeColor: ConstantsColors.buttonColor,
-        inactiveColor: ConstantsColors.buttonColor.withOpacity(.5),
+        inactiveColor: ConstantsColors.buttonColor.withOpacity(.6),
         icons: iconList,
+        iconSize: 28.0,
         activeIndex: _bottomNavIndex,
-        gapLocation: GapLocation.center,
+        gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
           setState(() {
