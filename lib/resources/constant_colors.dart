@@ -6,4 +6,5 @@ class ConstantsColors {
   static const Color navigationColor = Color.fromARGB(255, 175, 223, 216);
   static const Color labelColor = Color(0xFF015B7C);
   static const Color black = Color.fromARGB(255, 0, 0, 0);
+  static const Color lightGray = Color.fromRGBO(47, 47, 47, 1);
 }

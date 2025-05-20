@@ -6,7 +6,6 @@ import 'package:appdonationsgestor/pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({Key? key}) : super(key: key);
@@ -57,14 +56,14 @@ class _RootPageState extends State<RootPage> {
             )
           : AppBar(
               title: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.only(top: 25.0, bottom: 30.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       titleList[_bottomNavIndex],
                       style: const TextStyle(
-                        color: Color.fromRGBO(47, 47, 47, 1),
+                        color: ConstantsColors.lightGray,
                         fontWeight: FontWeight.w700,
                         fontSize: 30,
                       ),
@@ -78,7 +77,6 @@ class _RootPageState extends State<RootPage> {
         index: _bottomNavIndex,
         children: pages,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
         splashColor: ConstantsColors.mainColor,
         activeColor: ConstantsColors.buttonColor,
