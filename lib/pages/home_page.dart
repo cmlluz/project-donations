@@ -19,12 +19,14 @@ class _HomePageState extends State<HomePage> {
             child: ListView.builder(
               itemCount: 12,
               itemBuilder: (context, index) => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 5.0),
+                padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 5.0),
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 8.0),
+                      padding: EdgeInsets.only(bottom: 4.0),
                       child: ListTile(
+                        contentPadding: EdgeInsets.only(left: 10.0),
+                        horizontalTitleGap: 12.0,
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(
                             "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
