@@ -15,89 +15,154 @@ class _SettingsPage extends State<SettingsPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        // ir para a página de edição de perfil
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ConstantsColors.buttonColor,
-                        side: BorderSide(
-                          color: ConstantsColors.buttonColor,
-                          width: 2.0,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Editar Perfil',
-                        style: TextStyle(
-                            color: ConstantsColors.buttonColor, fontSize: 16),
-                      ),
+              const SizedBox(height: 27),
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: ConstantsColors.black,
+                      width: 1.0,
                     ),
                   ),
-                ],
+                ),
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // ir para a página de edição de perfil
+                        },
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: const Text(
+                          'Editar Perfil',
+                          style: TextStyle(
+                              color: ConstantsColors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        // ir para a página de alteração de senha
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ConstantsColors.buttonColor,
-                        side: BorderSide(
-                          color: ConstantsColors.buttonColor,
-                          width: 2.0,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Alterar Senha',
-                        style: TextStyle(
-                            color: ConstantsColors.buttonColor, fontSize: 16),
-                      ),
+              const SizedBox(height: 27),
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: ConstantsColors.black,
+                      width: 1.0,
                     ),
                   ),
-                ],
+                ),
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // ir para a página de edição de perfil
+                        },
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize
+                              .min, // Para o row ter o tamanho do conteúdo
+                          children: [
+                            Text(
+                              'Notificações',
+                              style: TextStyle(
+                                color: ConstantsColors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            SizedBox(width: 12), // Espaço entre texto e ícone
+                            Icon(
+                              Icons.message_outlined,
+                              color: ConstantsColors.black,
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        // Sair da conta
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red.shade700,
-                        side: BorderSide(
-                          color: Colors.red.shade700,
-                          width: 2.0,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Text(
-                        'Sair da Conta',
-                        style: TextStyle(color: Colors.red, fontSize: 16),
-                      ),
+              const SizedBox(height: 27),
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: ConstantsColors.black,
+                      width: 1.0,
                     ),
                   ),
-                ],
+                ),
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // ir para a página de edição de perfil
+                        },
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: const Text(
+                          'Sair da conta',
+                          style: TextStyle(
+                              color: ConstantsColors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 27),
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: ConstantsColors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // ir para a página de edição de perfil
+                        },
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: const Text(
+                          'Deletar conta',
+                          style: TextStyle(
+                              color: ConstantsColors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

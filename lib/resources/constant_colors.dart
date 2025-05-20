@@ -7,4 +7,5 @@ class ConstantsColors {
   static const Color labelColor = Color(0xFF015B7C);
   static const Color black = Color.fromARGB(255, 0, 0, 0);
   static const Color lightGray = Color.fromRGBO(47, 47, 47, 1);
+  static const Color red = Color(0xFFEE0B0B);
 }
