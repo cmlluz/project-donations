@@ -70,43 +70,43 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 80),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.person,
                     label: 'Nome',
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.email,
                     label: 'Email',
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.phone,
                     label: 'Telefone',
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.person_4,
                     label: 'CPF',
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.map,
                     label: 'Endereço',
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.lock,
                     label: 'Senha',
                     secret: true,
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFields(
+                  const CustomTextFields(
                     icon: Icons.lock,
                     label: 'Confirme sua Senha',
                     secret: true,

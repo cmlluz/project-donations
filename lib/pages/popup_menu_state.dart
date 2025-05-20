@@ -109,7 +109,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
               ),
             ),
             const SizedBox(height: 20.0),
-            ItemCardComponent(),
+            const ItemCardComponent(),
           ],
         ),
       ),

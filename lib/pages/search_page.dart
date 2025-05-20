@@ -17,7 +17,7 @@ class _SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            Row(
+            const Row(
               children: [
                 Expanded(
                   child: Searchbar(),
@@ -29,8 +29,8 @@ class _SearchPageState extends State<SearchPage> {
               child: ListView.builder(
                 itemCount: 10,
                 itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: const [
+                  return const  Column(
+                    children: [
                       ImageCard(),
                       SizedBox(height: 16.0),
                     ],

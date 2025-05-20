@@ -141,7 +141,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: GoogleAuthButton(
                         onPressed: () {},
-                        style: AuthButtonStyle(
+                        style: const AuthButtonStyle(
                           buttonType: AuthButtonType.icon,
                         ),
                       ),
@@ -150,7 +150,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: FacebookAuthButton(
                         onPressed: () {},
-                        style: AuthButtonStyle(
+                        style: const AuthButtonStyle(
                           buttonType: AuthButtonType.icon,
                         ),
                       ),
