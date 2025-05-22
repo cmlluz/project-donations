@@ -22,8 +22,8 @@ class _RootPageState extends State<RootPage> {
     HomePage(),
     SearchPage(),
     InstitutionRegisterPage(),
-    ManagerProfilePage(),
     SettingsPage(),
+    ManagerProfilePage(),
   ];
 
   //lista de icones das paginas
@@ -40,8 +40,8 @@ class _RootPageState extends State<RootPage> {
     'Olá, Name 👋',
     'Olá, Name 👋',
     '',
-    '',
     'Configurações',
+    '',
   ];
 
   @override
@@ -49,9 +49,13 @@ class _RootPageState extends State<RootPage> {
     return Scaffold(
       appBar: titleList[_bottomNavIndex] == ''
           ? PreferredSize(
-              preferredSize: const Size.fromHeight(-20),
+              preferredSize: _bottomNavIndex != 4
+                  ? const Size.fromHeight(-20)
+                  : const Size.fromHeight(-10),
               child: Container(
-                color: ConstantsColors.navigationColor,
+                color: _bottomNavIndex != 4
+                    ? ConstantsColors.navigationColor
+                    : ConstantsColors.white,
               ), // espaço vazio com altura 20
             )
           : AppBar(
