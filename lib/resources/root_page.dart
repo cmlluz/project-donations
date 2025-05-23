@@ -1,8 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_page.dart';
-import 'package:appdonationsgestor/pages/institution_register_page.dart';
-import 'package:appdonationsgestor/pages/manager_profile_page.dart';
+import 'package:appdonationsgestor/pages/register_pages/institution_register_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';

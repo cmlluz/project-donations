@@ -31,8 +31,8 @@ class _LoginPage extends State<LoginPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 92, 147, 166),
-                Color.fromRGBO(175, 223, 216, 1),
+                ConstantsColors.mainColor,
+                ConstantsColors.navigationColor
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -60,6 +60,23 @@ class _LoginPage extends State<LoginPage> {
                       secret: true,
                       controller: passwordController,
                       keyboardType: TextInputType.visiblePassword,
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        GoRouter.of(context).go('/forgotPasswordPage');
+                      },
+                      child: const Text(
+                        'Esqueci minha senha',
+                        style: TextStyle(
+                          color: ConstantsColors.buttonColor,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
                   ],
                 ),
