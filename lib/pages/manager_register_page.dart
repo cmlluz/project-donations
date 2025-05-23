@@ -46,7 +46,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
           fontSize: 20,
           fontFamily: 'Poppins',
         ),
-        backgroundColor: ConstantsColors.CorPrinciapal,
+        backgroundColor: ConstantsColors.buttonColor,
       ),
       body: SizedBox.expand(
         child: Container(
@@ -56,11 +56,10 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                ConstantsColors.buttonColor,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              stops: [0.6, 1.0],
             ),
           ),
           child: SingleChildScrollView(
@@ -69,24 +68,85 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Nome: ', TextInputType.text, nameController),
+                  const Text(
+                    'Queremos saber mais sobre você!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Informe alguns dados importantes para nós',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Telefone: ', TextInputType.phone, phoneController),
+                  CustomTextFields(
+                    icon: Icons.person,
+                    label: 'Nome',
+                    secret: false,
+                    controller: nameController,
+                    keyboardType: TextInputType.name,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'E-mail', TextInputType.emailAddress, emailController),
+                  CustomTextFields(
+                    icon: Icons.email,
+                    label: 'Email',
+                    secret: false,
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel(
-                      'Endereço: ', TextInputType.text, addressController),
+                  CustomTextFields(
+                    icon: Icons.person_2_outlined,
+                    label: 'CPF / CNPJ',
+                    secret: false,
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                  ),
                   const SizedBox(height: 20),
-                  _buildTextFieldWithLabel('Senha: ',
-                      TextInputType.visiblePassword, passwordController),
+                  CustomTextFields(
+                    icon: Icons.phone,
+                    label: 'Telefone',
+                    secret: false,
+                    controller: phoneController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.map,
+                    label: 'Endereço',
+                    secret: false,
+                    controller: addressController,
+                    keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Senha',
+                    secret: true,
+                    controller: passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextFields(
+                    icon: Icons.lock,
+                    label: 'Confirme a senha',
+                    secret: true,
+                    controller: passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.CorPrinciapal,
+                      backgroundColor: ConstantsColors.buttonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -103,35 +163,30 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      GoRouter.of(context).go('/');
+                    },
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: ConstantsColors.mainColor,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextFieldWithLabel(
-      String label, TextInputType inputType, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: ConstantsColors.CorPrinciapal,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          CustomTextField(
-            type: inputType,
-            controller: controller,
-          ),
-        ],
       ),
     );
   }

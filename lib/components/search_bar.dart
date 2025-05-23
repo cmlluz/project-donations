@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../resources/constant_colors.dart';
 
 class Searchbar extends StatelessWidget {
   const Searchbar({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class Searchbar extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
+              border: Border.all(color: const Color(0xFFE0E0E0), width: 2.0),
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: TextField(
@@ -23,9 +24,9 @@ class Searchbar extends StatelessWidget {
                 filled: true,
                 fillColor: const Color.fromARGB(17, 238, 238, 238),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                suffixIcon: Icon(
+                suffixIcon: const Icon(
                   Icons.search,
-                  color: const Color.fromARGB(213, 0, 0, 0).withOpacity(.6),
+                  color: ConstantsColors.black,
                 ),
               ),
             ),

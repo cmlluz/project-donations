@@ -1,0 +1,2 @@
+C:/Users/luana/Codigos/project-donations/android/app/.cxx/Debug/2v6u2x3v/x86/CMakeFiles/edit_cache.dir
+C:/Users/luana/Codigos/project-donations/android/app/.cxx/Debug/2v6u2x3v/x86/CMakeFiles/rebuild_cache.dir

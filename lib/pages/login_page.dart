@@ -31,63 +31,80 @@ class _LoginPage extends State<LoginPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.CorPrinciapal,
+                Color.fromARGB(255, 92, 147, 166),
+                Color.fromRGBO(175, 223, 216, 1),
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              stops: [0.6, 1.0],
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 80),
-                _buildTextFieldWithLabel(
-                    'Login', TextInputType.emailAddress, emailController),
+                CustomTextFields(
+                  icon: Icons.email,
+                  label: 'Email',
+                  secret: false,
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
                 const SizedBox(height: 20),
                 Stack(
                   children: [
-                    _buildTextFieldWithLabel('Senha',
-                        TextInputType.visiblePassword, passwordController),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: TextButton(
+                    CustomTextFields(
+                      icon: Icons.lock,
+                      label: 'Senha',
+                      secret: true,
+                      controller: passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            GoRouter.of(context).go('/userTypePage');
+                          },
+                          child: const Text(
+                            'Não tem uma conta? Crie uma!',
+                            style: TextStyle(
+                              color: ConstantsColors.labelColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.labelColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
                         onPressed: () {
-                          // Navegar para a página de recuperação de senha
+                          GoRouter.of(context).go('/root');
                         },
                         child: const Text(
-                          'Esqueci minha senha',
+                          'Continuar',
                           style: TextStyle(
-                            color: ConstantsColors.CorPrinciapal,
-                            fontSize: 16,
+                            color: Colors.white,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.CorPrinciapal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  onPressed: () {
-                    GoRouter.of(context).go('/root');
-                  },
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -124,7 +141,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: GoogleAuthButton(
                         onPressed: () {},
-                        style: AuthButtonStyle(
+                        style: const AuthButtonStyle(
                           buttonType: AuthButtonType.icon,
                         ),
                       ),
@@ -133,7 +150,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: FacebookAuthButton(
                         onPressed: () {},
-                        style: AuthButtonStyle(
+                        style: const AuthButtonStyle(
                           buttonType: AuthButtonType.icon,
                         ),
                       ),
@@ -144,26 +161,6 @@ class _LoginPage extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextFieldWithLabel(
-      String label, TextInputType inputType, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStylesConstants.kformularyText,
-          ),
-          CustomTextField(
-            type: inputType,
-            controller: controller,
-          ),
-        ],
       ),
     );
   }
