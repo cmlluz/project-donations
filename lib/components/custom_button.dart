@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:go_router/go_router.dart';
@@ -36,7 +37,7 @@ class _CustomButtonState extends State<CustomButton> {
         ),
         child: Text(
           widget.text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          style: TextStylesConstants.kcustomButtonText,
         ),
       ),
     );

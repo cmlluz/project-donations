@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -64,9 +65,7 @@ class ItemCardComponentState extends State<ItemCardComponent> {
                             alignment: Alignment.topLeft,
                             child: Text(
                               "Agasalho",
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold),
+                              style: TextStylesConstants.kpoppinsBold,
                             ),
                           ),
                           Row(
@@ -105,9 +104,7 @@ class ItemCardComponentState extends State<ItemCardComponent> {
                                     width: 90,
                                     child: const Text(
                                       "Vestimentas",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w900,
-                                          fontFamily: 'Poppins'),
+                                      style: TextStylesConstants.kpoppinsBlack,
                                     ),
                                   ),
                                 ),

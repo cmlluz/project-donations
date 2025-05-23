@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/components/item_card.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class PopupMenuState extends StatefulWidget {
   const PopupMenuState({super.key});
@@ -17,13 +18,12 @@ class _PopupMenuStateState extends State<PopupMenuState> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Menu de Ações',
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
+          ).merge(TextStylesConstants.kpoppinsBold),
         ),
         leading: IconButton(
           icon: const Icon(

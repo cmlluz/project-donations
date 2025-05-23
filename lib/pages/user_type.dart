@@ -1,6 +1,7 @@
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class UserType extends StatelessWidget {
   const UserType({super.key});
@@ -24,29 +25,28 @@ class UserType extends StatelessWidget {
           Expanded(
               child: Container(
             color: const Color.fromARGB(255, 209, 209, 214),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(bottom: 35),
+                  padding: const EdgeInsets.only(bottom: 35),
                   child: Text(
-                    textAlign: TextAlign.center,
-                    'Qual será o seu tipo de conta?',
-                    style: TextStyle(
-                      color: ConstantsColors.labelColor,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Courrier',
-                    ),
-                  ),
+                      textAlign: TextAlign.center,
+                      'Qual será o seu tipo de conta?',
+                      style: const TextStyle(
+                        color: ConstantsColors.labelColor,
+                        fontSize: 30,
+                      ).merge(TextStylesConstants.kpoppinsBlack)),
                 ),
-                CustomButton(text: 'Pessoa Física', route: '/userRegisterPage'),
-                SizedBox(height: 20),
-                CustomButton(
+                const CustomButton(
+                    text: 'Pessoa Física', route: '/userRegisterPage'),
+                const SizedBox(height: 20),
+                const CustomButton(
                     text: 'Instituição', route: '/institutionRegisterPage'),
-                SizedBox(height: 20),
-                CustomButton(text: 'Gestor', route: '/gestorRegisterPage'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+                const CustomButton(
+                    text: 'Gestor', route: '/gestorRegisterPage'),
+                const SizedBox(height: 20),
               ],
             ),
           )),

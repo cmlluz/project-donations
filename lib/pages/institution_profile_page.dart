@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/gallery_state.dart';
 import 'package:appdonationsgestor/components/item_card.dart';
@@ -44,13 +45,11 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               const SizedBox(height: 20),
               const ProfileInfoComponent(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Detalhes",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -58,24 +57,20 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Suas Necessidades",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               const ItemCardComponent(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Visitas",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               Expanded(

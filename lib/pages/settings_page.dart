@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -38,12 +39,12 @@ class _SettingsPage extends State<SettingsPage> {
                         style: TextButton.styleFrom(
                           alignment: Alignment.centerLeft,
                         ),
-                        child: const Text(
+                        child: Text(
                           'Editar Perfil',
-                          style: TextStyle(
-                              color: ConstantsColors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400),
+                          style: const TextStyle(
+                            color: ConstantsColors.black,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsLight),
                         ),
                       ),
                     ),
@@ -71,20 +72,20 @@ class _SettingsPage extends State<SettingsPage> {
                         style: TextButton.styleFrom(
                           alignment: Alignment.centerLeft,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize
                               .min, // Para o row ter o tamanho do conteúdo
                           children: [
                             Text(
                               'Notificações',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: ConstantsColors.black,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              ).merge(TextStylesConstants.kpoppinsLight),
                             ),
-                            SizedBox(width: 12), // Espaço entre texto e ícone
-                            Icon(
+                            const SizedBox(
+                                width: 12), // Espaço entre texto e ícone
+                            const Icon(
                               Icons.message_outlined,
                               color: ConstantsColors.black,
                               size: 20,
@@ -117,13 +118,12 @@ class _SettingsPage extends State<SettingsPage> {
                         style: TextButton.styleFrom(
                           alignment: Alignment.centerLeft,
                         ),
-                        child: const Text(
+                        child: Text(
                           'Sair da conta',
-                          style: TextStyle(
-                              color: ConstantsColors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400),
-                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            color: ConstantsColors.black,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsLight),
                         ),
                       ),
                     ),
@@ -151,12 +151,12 @@ class _SettingsPage extends State<SettingsPage> {
                         style: TextButton.styleFrom(
                           alignment: Alignment.centerLeft,
                         ),
-                        child: const Text(
+                        child: Text(
                           'Deletar conta',
-                          style: TextStyle(
-                              color: ConstantsColors.red,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400),
+                          style: const TextStyle(
+                            color: ConstantsColors.red,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsLight),
                           textAlign: TextAlign.left,
                         ),
                       ),

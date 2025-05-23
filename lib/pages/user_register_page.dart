@@ -50,25 +50,21 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color.fromARGB(190, 0, 0, 0),
                       fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Informe alguns dados importantes para nós',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                  Text('Informe alguns dados importantes para nós',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color.fromARGB(190, 0, 0, 0),
+                        fontSize: 18,
+                      ).merge(TextStylesConstants.kpoppinsLight)),
                   const SizedBox(height: 80),
                   const CustomTextFields(
                     icon: Icons.person,

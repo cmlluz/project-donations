@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFields extends StatefulWidget {
@@ -35,11 +36,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         obscureText: hide,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: Color.fromARGB(255, 0, 0, 0),
-        ),
+        style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

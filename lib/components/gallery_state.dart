@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 
 class Gallery extends StatefulWidget {
@@ -64,7 +65,7 @@ class _GalleryState extends State<Gallery> {
         ),
         title: Text(
           'john.doe',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStylesConstants.kgalleryStateText,
         ),
       ));
 

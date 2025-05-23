@@ -6,6 +6,7 @@ import 'package:appdonationsgestor/pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({Key? key}) : super(key: key);
@@ -68,9 +69,8 @@ class _RootPageState extends State<RootPage> {
                       titleList[_bottomNavIndex],
                       style: const TextStyle(
                         color: ConstantsColors.lightGray,
-                        fontWeight: FontWeight.w700,
                         fontSize: 30,
-                      ),
+                      ).merge(TextStylesConstants.kpoppinsBold),
                     ),
                   ],
                 ),

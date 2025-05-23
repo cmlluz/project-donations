@@ -1,7 +1,8 @@
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class InstitutionRegisterPage extends StatefulWidget {
   const InstitutionRegisterPage({super.key});
@@ -50,24 +51,22 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color.fromARGB(190, 0, 0, 0),
                       fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Informe alguns dados importantes para nós',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color.fromARGB(190, 0, 0, 0),
                       fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsLight),
                   ),
                   const SizedBox(height: 20),
                   CustomTextFields(
