@@ -1,9 +1,7 @@
 import "package:flutter/material.dart";
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
-import 'package:appdonationsgestor/pages/login_page.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -37,8 +35,8 @@ class _UserRegisterPage extends State<UserRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 214, 212, 212),
                 ConstantsColors.mainColor,
+                ConstantsColors.navigationColor
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -49,7 +47,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   const Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -114,7 +112,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.mainColor,
+                      backgroundColor: ConstantsColors.buttonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -144,7 +142,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.mainColor,
+                        color: ConstantsColors.buttonColor,
                         fontSize: 18,
                       ),
                     ),

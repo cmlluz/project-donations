@@ -30,24 +30,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastrar gestor'),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontFamily: 'Poppins',
-        ),
-        backgroundColor: ConstantsColors.buttonColor,
-      ),
       body: SizedBox.expand(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -55,8 +37,8 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.buttonColor,
+                ConstantsColors.mainColor,
+                ConstantsColors.navigationColor
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -67,7 +49,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   const Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -176,7 +158,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.mainColor,
+                        color: ConstantsColors.buttonColor,
                         fontSize: 18,
                       ),
                     ),

@@ -49,7 +49,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   const Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -128,7 +128,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.labelColor,
+                      backgroundColor: ConstantsColors.buttonColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
