@@ -6,7 +6,6 @@ import 'package:appdonationsgestor/pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({Key? key}) : super(key: key);
@@ -23,14 +22,15 @@ class _RootPageState extends State<RootPage> {
     HomePage(),
     SearchPage(),
     InstitutionRegisterPage(),
-    ManagerProfilePage(),
     SettingsPage(),
+    ManagerProfilePage(),
   ];
 
   //lista de icones das paginas
   List<IconData> iconList = [
     Icons.home,
     Icons.list,
+    Icons.add,
     Icons.favorite_outline,
     Icons.person_outline,
   ];
@@ -41,51 +41,54 @@ class _RootPageState extends State<RootPage> {
     'Olá, Name 👋',
     '',
     'Configurações',
+    '',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              titleList[_bottomNavIndex],
-              style: const TextStyle(
-                color: Color.fromRGBO(47, 47, 47, 1),
-                fontWeight: FontWeight.w700,
-                fontSize: 30,
+      appBar: titleList[_bottomNavIndex] == ''
+          ? PreferredSize(
+              preferredSize: _bottomNavIndex != 4
+                  ? const Size.fromHeight(-20)
+                  : const Size.fromHeight(-10),
+              child: Container(
+                color: _bottomNavIndex != 4
+                    ? ConstantsColors.navigationColor
+                    : ConstantsColors.white,
+              ), // espaço vazio com altura 20
+            )
+          : AppBar(
+              title: Padding(
+                padding: const EdgeInsets.only(top: 25.0, bottom: 30.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      titleList[_bottomNavIndex],
+                      style: const TextStyle(
+                        color: ConstantsColors.lightGray,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 30,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              elevation: 0.0,
             ),
-          ],
-        ),
-        elevation: 0.0,
-      ),
       body: IndexedStack(
         index: _bottomNavIndex,
         children: pages,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageTransition(
-              child: const InstitutionRegisterPage(),
-              type: PageTransitionType.bottomToTop,
-            ),
-          );
-        },
-        child: const Icon(Icons.add, color: Color(0xFF015B7C)),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.buttonColor,
+        splashColor: ConstantsColors.mainColor,
         activeColor: ConstantsColors.buttonColor,
-        inactiveColor: ConstantsColors.buttonColor.withOpacity(.5),
+        inactiveColor: ConstantsColors.buttonColor.withOpacity(.6),
         icons: iconList,
+        iconSize: 28.0,
         activeIndex: _bottomNavIndex,
-        gapLocation: GapLocation.center,
+        gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
           setState(() {

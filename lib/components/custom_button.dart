@@ -27,16 +27,16 @@ class _CustomButtonState extends State<CustomButton> {
             );
           }
         },
-        child: Text(
-          widget.text,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: ConstantsColors.labelColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
+        ),
+        child: Text(
+          widget.text,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
       ),
     );

@@ -1,4 +1,3 @@
-import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFields extends StatefulWidget {

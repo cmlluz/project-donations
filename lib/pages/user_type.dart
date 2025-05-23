@@ -24,10 +24,10 @@ class UserType extends StatelessWidget {
           Expanded(
               child: Container(
             color: const Color.fromARGB(255, 209, 209, 214),
-            child: Column(
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 35),
                   child: Text(
                     textAlign: TextAlign.center,
@@ -41,12 +41,12 @@ class UserType extends StatelessWidget {
                   ),
                 ),
                 CustomButton(text: 'Pessoa Física', route: '/userRegisterPage'),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 CustomButton(
                     text: 'Instituição', route: '/institutionRegisterPage'),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 CustomButton(text: 'Gestor', route: '/gestorRegisterPage'),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
           )),
