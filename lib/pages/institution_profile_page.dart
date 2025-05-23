@@ -42,7 +42,7 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              ProfileInfoComponent(),
+              const ProfileInfoComponent(),
               const SizedBox(height: 20),
               const Text(
                 "Detalhes",
@@ -67,7 +67,7 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 ),
               ),
               const SizedBox(height: 8),
-              ItemCardComponent(),
+              const ItemCardComponent(),
               const SizedBox(height: 20),
               const Text(
                 "Visitas",
@@ -94,11 +94,11 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               ),
             );
           },
-          child: Icon(
+          backgroundColor: ConstantsColors.buttonColor,
+          child: const Icon(
             Icons.add,
             color: Colors.white,
           ),
-          backgroundColor: ConstantsColors.CorPrinciapal,
         ),
       ),
     );

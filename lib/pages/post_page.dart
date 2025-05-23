@@ -90,10 +90,12 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              CustomTextField(
-                type: TextInputType.multiline,
-                controller: _controller.crtlDesc,
-              ),
+              CustomTextFields(
+                  icon: Icons.description,
+                  label: 'Descrição do post',
+                  secret: false,
+                  controller: _controller.crtlDesc,
+                  keyboardType: TextInputType.text),
               const SizedBox(height: 20),
               Container(
                 width: 200.0,
@@ -103,7 +105,7 @@ class _PostPageState extends State<PostPage> {
                     // confirmar a postagem
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.CorPrinciapal,
+                    backgroundColor: ConstantsColors.buttonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),

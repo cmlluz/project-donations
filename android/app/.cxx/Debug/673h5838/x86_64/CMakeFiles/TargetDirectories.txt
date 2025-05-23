@@ -1,0 +1,2 @@
+C:/Users/luana/OneDrive/Documentos/Codigos/Udemy/project-donations/android/app/.cxx/Debug/673h5838/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/luana/OneDrive/Documentos/Codigos/Udemy/project-donations/android/app/.cxx/Debug/673h5838/x86_64/CMakeFiles/rebuild_cache.dir

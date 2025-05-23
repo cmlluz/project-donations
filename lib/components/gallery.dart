@@ -34,6 +34,6 @@ class _GalleryListState extends State<GalleryList> {
         crossAxisCount: 3,
         childAspectRatio: 0.5,
         shrinkWrap: true,
-        children: [ListTile()]);
+        children: const [ListTile()]);
   }
 }

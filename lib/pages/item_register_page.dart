@@ -74,14 +74,22 @@ class DonationItemComponent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Nome do produto'),
-            CustomTextField(
-                type: TextInputType.name,
-                controller: productRegistrationController.crtlItemName),
+            CustomTextFields(
+              icon: Icons.label,
+              label: 'Produto',
+              secret: false,
+              controller: productRegistrationController.crtlItemName,
+              keyboardType: TextInputType.name,
+            ),
             const SizedBox(height: 20),
             const Text('Descrição'),
-            CustomTextField(
-                type: TextInputType.multiline,
-                controller: productRegistrationController.crtlDesc),
+            CustomTextFields(
+              icon: Icons.edit_document,
+              label: 'Descrição',
+              secret: false,
+              controller: productRegistrationController.crtlDesc,
+              keyboardType: TextInputType.multiline,
+            ),
             const SizedBox(height: 20),
             const Text('Categoria e Quantidade'),
             Row(
@@ -98,9 +106,12 @@ class DonationItemComponent extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  child: CustomTextField(
+                  child: CustomTextFields(
+                    icon: Icons.label,
+                    label: 'Quantidade',
+                    secret: false,
                     controller: productRegistrationController.crtlQtd,
-                    type: TextInputType.number,
+                    keyboardType: TextInputType.number,
                   ),
                 ),
               ],
