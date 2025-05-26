@@ -5,7 +5,22 @@ import 'package:go_router/go_router.dart';
 class CustomButton extends StatefulWidget {
   final String text;
   final String route;
-  const CustomButton({super.key, required this.text, required this.route});
+  final Color? color;
+  final Color? textColor;
+  final double? width;
+  final double? height;
+  final double? fontSize;
+  final bool? hasMensage;
+  const CustomButton(
+      {super.key,
+      required this.text,
+      required this.route,
+      this.color,
+      this.textColor,
+      this.width,
+      this.height,
+      this.fontSize,
+      this.hasMensage = false});
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
@@ -15,11 +30,22 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
-      width: 300,
+      height: widget.height,
+      width: widget.width,
       child: ElevatedButton(
         onPressed: () {
-          if (widget.route != null) {
+          if (widget.route.isNotEmpty && widget.hasMensage == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  backgroundColor: ConstantsColors.buttonColor,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  content: Text('Cadastro realizado com sucesso!')),
+            );
+            GoRouter.of(context).go(widget.route);
+          } else if (widget.route.isNotEmpty && widget.hasMensage == false) {
             GoRouter.of(context).go(widget.route);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -28,15 +54,18 @@ class _CustomButtonState extends State<CustomButton> {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: ConstantsColors.labelColor,
-          foregroundColor: Colors.white,
+          backgroundColor: widget.color ?? ConstantsColors.buttonColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(20.0),
           ),
         ),
         child: Text(
           widget.text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            color: widget.textColor ?? Colors.white,
+            fontSize: widget.fontSize ?? 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

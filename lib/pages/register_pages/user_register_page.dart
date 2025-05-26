@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 
@@ -42,13 +42,13 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               end: Alignment.topCenter,
             ),
           ),
-          child: SingleChildScrollView(
+          child: const SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 50),
-                  const Text(
+                  SizedBox(height: 50),
+                  Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -57,8 +57,8 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'Informe alguns dados importantes para nós',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -67,87 +67,63 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const SizedBox(height: 80),
-                  const CustomTextFields(
+                  SizedBox(height: 80),
+                  CustomTextFields(
                     icon: Icons.person,
                     label: 'Nome',
                     secret: false,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.email,
                     label: 'Email',
                     secret: false,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.phone,
                     label: 'Telefone',
                     secret: false,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.person_4,
                     label: 'CPF',
                     secret: false,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.map,
                     label: 'Endereço',
                     secret: false,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.lock,
                     label: 'Senha',
                     secret: true,
                   ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
+                  SizedBox(height: 20),
+                  CustomTextFields(
                     icon: Icons.lock,
                     label: 'Confirme sua Senha',
                     secret: true,
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    child: const Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
-                    ),
+                  SizedBox(height: 20),
+                  CustomButton(
+                    text: 'Confirmar',
+                    route: '/finalizeRegistrationPage',
+                    color: ConstantsColors.buttonColor,
+                    textColor: ConstantsColors.white,
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/');
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: ConstantsColors.buttonColor,
-                        fontSize: 18,
-                      ),
-                    ),
+                  SizedBox(height: 20),
+                  CustomButton(
+                    text: 'Voltar',
+                    route: '/userTypePage',
+                    color: ConstantsColors.white,
+                    textColor: ConstantsColors.labelColor,
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 30),
                 ],
               ),
             ),

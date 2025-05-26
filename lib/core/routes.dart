@@ -6,13 +6,14 @@ import 'package:appdonationsgestor/pages/login_page.dart';
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/pages/post_page.dart';
 import 'package:appdonationsgestor/resources/root_page.dart';
-import 'package:appdonationsgestor/pages/user_register_Page.dart';
+import 'package:appdonationsgestor/pages/register_pages/user_register_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/pages/user_type.dart';
 import 'package:appdonationsgestor/pages/register_pages/institution_register_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/manager_register_page.dart';
 import 'package:appdonationsgestor/pages/forgot_password_page.dart';
+import 'package:appdonationsgestor/pages/register_pages/finalize_registration_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -31,6 +32,7 @@ class RouteNames {
   static const String gestorRegisterPage = "gestorRegisterPage";
   static const String userTypePage = "userTypePage";
   static const String forgotPasswordPage = "forgotPasswordPage";
+  static const String finalizeRegistrationPage = "finalizeRegistrationPage";
 }
 
 class AppRountersConfiguration {
@@ -155,6 +157,15 @@ class AppRountersConfiguration {
             );
           },
         ),
+        GoRoute(
+          path: '/finalizeRegistrationPage',
+          name: RouteNames.finalizeRegistrationPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: FinalizeRegistrationPage(),
+            );
+          },
+        )
       ],
     );
   }

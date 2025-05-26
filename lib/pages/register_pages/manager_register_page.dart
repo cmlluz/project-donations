@@ -1,7 +1,7 @@
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
 
 class ManagerRegisterPage extends StatefulWidget {
   const ManagerRegisterPage({super.key});
@@ -126,42 +126,18 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     keyboardType: TextInputType.visiblePassword,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    child: const Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Confirmar',
+                    route: '/finalizeRegistrationPage',
+                    color: ConstantsColors.buttonColor,
+                    textColor: ConstantsColors.white,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/');
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: ConstantsColors.buttonColor,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Voltar',
+                    route: '/userTypePage',
+                    color: ConstantsColors.white,
+                    textColor: ConstantsColors.labelColor,
                   ),
                   const SizedBox(height: 30),
                 ],
