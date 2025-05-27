@@ -8,6 +8,8 @@ class CustomTextFields extends StatefulWidget {
   final bool secret;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+  final int? maxLines;
+  final String? hintText;
 
   const CustomTextFields({
     Key? key,
@@ -16,6 +18,8 @@ class CustomTextFields extends StatefulWidget {
     this.secret = false,
     this.controller,
     this.keyboardType,
+    this.maxLines,
+    this.hintText,
   }) : super(key: key);
 
   @override
@@ -57,6 +61,11 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+          ),
+          hintText: widget.hintText,
+          hintStyle: const TextStyle(
+            fontSize: 16,
+            color: Color.fromARGB(255, 150, 150, 150),
           ),
         ),
       ),

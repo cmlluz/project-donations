@@ -1,22 +1,24 @@
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
-class ManagerRegisterPage extends StatefulWidget {
-  const ManagerRegisterPage({super.key});
+class InstitutionRegisterPage extends StatefulWidget {
+  const InstitutionRegisterPage({super.key});
 
   @override
-  State<ManagerRegisterPage> createState() => _ManagerRegisterPage();
+  State<InstitutionRegisterPage> createState() => _InstitutionRegisterPage();
 }
 
-class _ManagerRegisterPage extends State<ManagerRegisterPage> {
+class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -31,32 +33,13 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastrar gestor'),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: ConstantsColors.whiteShade900,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        titleTextStyle: const TextStyle(
-          color: ConstantsColors.whiteShade900,
-          fontSize: 20,
-        ).merge(TextStylesConstants.kpoppinsRegular),
-        backgroundColor: ConstantsColors.blueShade900,
-      ),
       body: SizedBox.expand(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.whiteShade700,
-                ConstantsColors.blueShade900,
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -67,7 +50,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -88,7 +71,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   const SizedBox(height: 20),
                   CustomTextFields(
                     icon: Icons.person,
-                    label: 'Nome',
+                    label: 'Nome da instituição',
                     secret: false,
                     controller: nameController,
                     keyboardType: TextInputType.name,
@@ -103,8 +86,8 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   ),
                   const SizedBox(height: 20),
                   CustomTextFields(
-                    icon: Icons.person_2_outlined,
-                    label: 'CPF / CNPJ',
+                    icon: Icons.apartment,
+                    label: 'CNPJ',
                     secret: false,
                     controller: phoneController,
                     keyboardType: TextInputType.number,
@@ -138,46 +121,22 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     icon: Icons.lock,
                     label: 'Confirme a senha',
                     secret: true,
-                    controller: passwordController,
+                    controller: confirmPasswordController,
                     keyboardType: TextInputType.visiblePassword,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.blueShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    child: const Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: ConstantsColors.whiteShade900,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Confirmar',
+                    route: '/finalizeRegistrationPage',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.whiteShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/');
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: ConstantsColors.blueShade500,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const SizedBox(height: 10),
+                  const CustomButton(
+                    text: 'Voltar',
+                    route: '/userTypePage',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
                   const SizedBox(height: 30),
                 ],

@@ -1,9 +1,8 @@
 import "package:flutter/material.dart";
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
-import 'package:appdonationsgestor/pages/login_page.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -37,8 +36,8 @@ class _UserRegisterPage extends State<UserRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.whiteShade700,
                 ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -49,7 +48,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -59,12 +58,15 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
                   const SizedBox(height: 8),
-                  Text('Informe alguns dados importantes para nós',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: ConstantsColors.blackShade700,
-                        fontSize: 18,
-                      ).merge(TextStylesConstants.kpoppinsLight)),
+                  const Text(
+                    'Informe alguns dados importantes para nós',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromARGB(190, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   const SizedBox(height: 80),
                   const CustomTextFields(
                     icon: Icons.person,
@@ -108,42 +110,18 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     secret: true,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.blueShade500,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    child: const Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: ConstantsColors.whiteShade900,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Confirmar',
+                    route: '/finalizeRegistrationPage',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.whiteShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/');
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: ConstantsColors.blueShade500,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Voltar',
+                    route: '/userTypePage',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
                   const SizedBox(height: 30),
                 ],

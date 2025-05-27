@@ -1,24 +1,22 @@
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
-class InstitutionRegisterPage extends StatefulWidget {
-  const InstitutionRegisterPage({super.key});
+class ManagerRegisterPage extends StatefulWidget {
+  const ManagerRegisterPage({super.key});
 
   @override
-  State<InstitutionRegisterPage> createState() => _InstitutionRegisterPage();
+  State<ManagerRegisterPage> createState() => _ManagerRegisterPage();
 }
 
-class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
+class _ManagerRegisterPage extends State<ManagerRegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
 
   @override
   void dispose() {
@@ -35,6 +33,8 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
     return Scaffold(
       body: SizedBox.expand(
         child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -50,7 +50,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
                   Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
@@ -71,7 +71,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   const SizedBox(height: 20),
                   CustomTextFields(
                     icon: Icons.person,
-                    label: 'Nome da instituição',
+                    label: 'Nome',
                     secret: false,
                     controller: nameController,
                     keyboardType: TextInputType.name,
@@ -86,8 +86,8 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   ),
                   const SizedBox(height: 20),
                   CustomTextFields(
-                    icon: Icons.apartment,
-                    label: 'CNPJ',
+                    icon: Icons.person_2_outlined,
+                    label: 'CPF / CNPJ',
                     secret: false,
                     controller: phoneController,
                     keyboardType: TextInputType.number,
@@ -121,46 +121,22 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                     icon: Icons.lock,
                     label: 'Confirme a senha',
                     secret: true,
-                    controller: confirmPasswordController,
+                    controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.blueShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    child: const Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: ConstantsColors.whiteShade900,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const CustomButton(
+                    text: 'Confirmar',
+                    route: '/finalizeRegistrationPage',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                   ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.whiteShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      GoRouter.of(context).go('/');
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: ConstantsColors.blueShade900,
-                        fontSize: 18,
-                      ),
-                    ),
+                  const SizedBox(height: 20),
+                  const CustomButton(
+                    text: 'Voltar',
+                    route: '/userTypePage',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
                   const SizedBox(height: 30),
                 ],
