@@ -27,16 +27,16 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: ConstantsColors.whiteShade900,
           elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: ConstantsColors.blackShade900),
           titleTextStyle: const TextStyle(
-            color: Colors.black,
+            color: ConstantsColors.blackShade900,
             fontWeight: FontWeight.w500,
             fontSize: 24,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: ConstantsColors.whiteShade900,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
@@ -89,10 +89,10 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               ),
             );
           },
-          backgroundColor: ConstantsColors.buttonColor,
+          backgroundColor: ConstantsColors.blueShade900,
           child: const Icon(
             Icons.add,
-            color: Colors.white,
+            color: ConstantsColors.whiteShade900,
           ),
         ),
       ),

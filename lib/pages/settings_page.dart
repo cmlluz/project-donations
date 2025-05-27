@@ -14,7 +14,7 @@ class _SettingsPage extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: ConstantsColors.whiteShade900,
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -23,7 +23,7 @@ class _SettingsPage extends State<SettingsPage> {
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: ConstantsColors.black,
+                      color: ConstantsColors.blackShade900,
                       width: 1.0,
                     ),
                   ),
@@ -42,7 +42,7 @@ class _SettingsPage extends State<SettingsPage> {
                         child: Text(
                           'Editar Perfil',
                           style: const TextStyle(
-                            color: ConstantsColors.black,
+                            color: ConstantsColors.blackShade900,
                             fontSize: 16,
                           ).merge(TextStylesConstants.kpoppinsLight),
                         ),
@@ -56,7 +56,7 @@ class _SettingsPage extends State<SettingsPage> {
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: ConstantsColors.black,
+                      color: ConstantsColors.blackShade900,
                       width: 1.0,
                     ),
                   ),
@@ -79,7 +79,7 @@ class _SettingsPage extends State<SettingsPage> {
                             Text(
                               'Notificações',
                               style: const TextStyle(
-                                color: ConstantsColors.black,
+                                color: ConstantsColors.blackShade900,
                                 fontSize: 16,
                               ).merge(TextStylesConstants.kpoppinsLight),
                             ),
@@ -87,7 +87,7 @@ class _SettingsPage extends State<SettingsPage> {
                                 width: 12), // Espaço entre texto e ícone
                             const Icon(
                               Icons.message_outlined,
-                              color: ConstantsColors.black,
+                              color: ConstantsColors.blackShade900,
                               size: 20,
                             ),
                           ],
@@ -102,7 +102,7 @@ class _SettingsPage extends State<SettingsPage> {
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: ConstantsColors.black,
+                      color: ConstantsColors.blackShade900,
                       width: 1.0,
                     ),
                   ),
@@ -121,7 +121,7 @@ class _SettingsPage extends State<SettingsPage> {
                         child: Text(
                           'Sair da conta',
                           style: const TextStyle(
-                            color: ConstantsColors.black,
+                            color: ConstantsColors.blackShade900,
                             fontSize: 16,
                           ).merge(TextStylesConstants.kpoppinsLight),
                         ),
@@ -135,7 +135,7 @@ class _SettingsPage extends State<SettingsPage> {
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: ConstantsColors.black,
+                      color: ConstantsColors.blackShade900,
                       width: 1.0,
                     ),
                   ),
@@ -154,7 +154,7 @@ class _SettingsPage extends State<SettingsPage> {
                         child: Text(
                           'Deletar conta',
                           style: const TextStyle(
-                            color: ConstantsColors.red,
+                            color: ConstantsColors.redShade800,
                             fontSize: 16,
                           ).merge(TextStylesConstants.kpoppinsLight),
                           textAlign: TextAlign.left,

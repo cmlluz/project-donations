@@ -41,10 +41,10 @@ class TextStylesConstants {
   static const TextStyle kcustomTextField = TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w600,
-      color: Color.fromARGB(255, 0, 0, 0));
+      color: ConstantsColors.blackShade900);
 
-  static const TextStyle kgalleryStateText =
-      TextStyle(color: Colors.black, fontWeight: FontWeight.w600);
+  static const TextStyle kgalleryStateText = TextStyle(
+      color: ConstantsColors.blackShade900, fontWeight: FontWeight.w600);
 
   static const TextStyle kformularyTitle = TextStyle(
     fontFamily: 'Poppins',
@@ -55,7 +55,7 @@ class TextStylesConstants {
   static const TextStyle kTitleProfile = TextStyle(
       fontFamily: 'Poppins',
       fontSize: 18.0,
-      color: ConstantsColors.buttonColor);
+      color: ConstantsColors.blueShade900);
 
   static const TextStyle kformularyText = TextStyle(
     fontFamily: 'Poppins',
@@ -63,7 +63,7 @@ class TextStylesConstants {
   );
 
   static const TextStyle kTitle = TextStyle(
-    color: ConstantsColors.black,
+    color: ConstantsColors.blackShade900,
     fontWeight: FontWeight.w500,
     fontSize: 24,
   );

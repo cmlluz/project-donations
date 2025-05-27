@@ -45,8 +45,8 @@ class _PostPageState extends State<PostPage> {
           'Criar publicação',
           style: TextStylesConstants.kformularyTitle,
         ),
-        backgroundColor: const Color.fromARGB(255, 3, 32, 106),
-        foregroundColor: Colors.white,
+        backgroundColor: ConstantsColors.blueShade950,
+        foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
@@ -66,7 +66,7 @@ class _PostPageState extends State<PostPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.0),
                     border: Border.all(
-                      color: Colors.grey.shade300,
+                      color: ConstantsColors.greyShade300,
                       width: 1,
                     ),
                     image: _selectedImg == null
@@ -105,7 +105,7 @@ class _PostPageState extends State<PostPage> {
                     // confirmar a postagem
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.buttonColor,
+                    backgroundColor: ConstantsColors.blueShade900,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -113,7 +113,8 @@ class _PostPageState extends State<PostPage> {
                   ),
                   child: const Text(
                     'Confirmar',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 18, color: ConstantsColors.whiteShade900),
                   ),
                 ),
               ),

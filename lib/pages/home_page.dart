@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
                         title: Text(
                           "Lar dos idosos",
                           style: const TextStyle(
-                            color: ConstantsColors.black,
+                            color: ConstantsColors.blackShade900,
                             fontSize: 16,
                           ).merge(TextStylesConstants.kinterSemiBold),
                         ),
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                               "Lorem ipsum dolor sit amet, consectetur adipiscing",
                               style: const TextStyle(
-                                color: ConstantsColors.lightGray,
+                                color: ConstantsColors.greyShade900,
                                 fontSize: 14,
                               ).merge(TextStylesConstants.kpoppinsMedium)),
                         ],

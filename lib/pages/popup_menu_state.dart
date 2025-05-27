@@ -21,24 +21,24 @@ class _PopupMenuStateState extends State<PopupMenuState> {
         title: Text(
           'Menu de Ações',
           style: const TextStyle(
-            color: Colors.white,
+            color: ConstantsColors.whiteShade900,
             fontSize: 22,
           ).merge(TextStylesConstants.kpoppinsBold),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: ConstantsColors.whiteShade900,
           ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: ConstantsColors.buttonColor,
+        backgroundColor: ConstantsColors.blueShade900,
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: Colors.grey[100],
+      backgroundColor: ConstantsColors.greyShade50,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -49,7 +49,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
                 GoRouter.of(context).go('/postPage');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ConstantsColors.buttonColor,
+                backgroundColor: ConstantsColors.blueShade900,
                 fixedSize: Size(width * 0.9, 60),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -58,7 +58,8 @@ class _PopupMenuStateState extends State<PopupMenuState> {
               ),
               child: const Text(
                 'Nova Publicação',
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+                style: TextStyle(
+                    color: ConstantsColors.whiteShade900, fontSize: 18.0),
               ),
             ),
             const SizedBox(height: 20.0),
@@ -87,7 +88,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.black87,
+                color: ConstantsColors.blackShade800,
               ),
             ),
             const SizedBox(height: 40.0),
@@ -96,7 +97,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
                 GoRouter.of(context).go('/itemRegisterPage');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ConstantsColors.buttonColor,
+                backgroundColor: ConstantsColors.blueShade900,
                 fixedSize: Size(width * 0.9, 60),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -105,7 +106,8 @@ class _PopupMenuStateState extends State<PopupMenuState> {
               ),
               child: const Text(
                 'Nova Necessidade',
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+                style: TextStyle(
+                    color: ConstantsColors.whiteShade900, fontSize: 18.0),
               ),
             ),
             const SizedBox(height: 20.0),

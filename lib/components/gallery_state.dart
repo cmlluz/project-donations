@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class Gallery extends StatefulWidget {
   @override
@@ -58,7 +59,7 @@ class _GalleryState extends State<Gallery> {
 
   Widget _createPhotoTitle() => Container(
       width: double.infinity,
-      color: Colors.white,
+      color: ConstantsColors.whiteShade900,
       child: const ListTile(
         leading: CircleAvatar(
           backgroundImage: NetworkImage('https://placeimg.com/640/480/people'),
@@ -71,21 +72,21 @@ class _GalleryState extends State<Gallery> {
 
   Widget _createActionBar() => Container(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
-        color: Colors.white,
+        color: ConstantsColors.whiteShade900,
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Icon(
               Icons.favorite_border,
-              color: Colors.black,
+              color: ConstantsColors.blackShade900,
             ),
             Icon(
               Icons.chat_bubble_outline_outlined,
-              color: Colors.black,
+              color: ConstantsColors.blackShade900,
             ),
             Icon(
               Icons.send,
-              color: Colors.black,
+              color: ConstantsColors.blackShade900,
             ),
           ],
         ),
@@ -140,7 +141,7 @@ class AnimatedDialogState extends State<AnimatedDialog>
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withOpacity(opacityAnimation.value),
+      color: ConstantsColors.blackShade900.withOpacity(opacityAnimation.value),
       child: Center(
         child: FadeTransition(
           opacity: scaleAnimation,

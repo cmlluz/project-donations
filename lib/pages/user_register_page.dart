@@ -37,8 +37,8 @@ class _UserRegisterPage extends State<UserRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.mainColor,
+                ConstantsColors.whiteShade700,
+                ConstantsColors.blueShade500,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -54,7 +54,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                      color: ConstantsColors.blackShade700,
                       fontSize: 28,
                     ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
@@ -62,7 +62,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                   Text('Informe alguns dados importantes para nós',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Color.fromARGB(190, 0, 0, 0),
+                        color: ConstantsColors.blackShade700,
                         fontSize: 18,
                       ).merge(TextStylesConstants.kpoppinsLight)),
                   const SizedBox(height: 80),
@@ -110,7 +110,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.mainColor,
+                      backgroundColor: ConstantsColors.blueShade500,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -121,7 +121,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     child: const Text(
                       'Confirmar',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: ConstantsColors.whiteShade900,
                         fontSize: 18,
                       ),
                     ),
@@ -129,7 +129,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: ConstantsColors.whiteShade900,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -140,7 +140,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.mainColor,
+                        color: ConstantsColors.blueShade500,
                         fontSize: 18,
                       ),
                     ),

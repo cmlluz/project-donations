@@ -55,8 +55,8 @@ class _RootPageState extends State<RootPage> {
                   : const Size.fromHeight(-10),
               child: Container(
                 color: _bottomNavIndex != 4
-                    ? ConstantsColors.navigationColor
-                    : ConstantsColors.white,
+                    ? ConstantsColors.tealShade200
+                    : ConstantsColors.whiteShade900,
               ), // espaço vazio com altura 20
             )
           : AppBar(
@@ -68,7 +68,7 @@ class _RootPageState extends State<RootPage> {
                     Text(
                       titleList[_bottomNavIndex],
                       style: const TextStyle(
-                        color: ConstantsColors.lightGray,
+                        color: ConstantsColors.greyShade900,
                         fontSize: 30,
                       ).merge(TextStylesConstants.kpoppinsBold),
                     ),
@@ -82,9 +82,9 @@ class _RootPageState extends State<RootPage> {
         children: pages,
       ),
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.mainColor,
-        activeColor: ConstantsColors.buttonColor,
-        inactiveColor: ConstantsColors.buttonColor.withOpacity(.6),
+        splashColor: ConstantsColors.blueShade500,
+        activeColor: ConstantsColors.blueShade900,
+        inactiveColor: ConstantsColors.blueShade900.withOpacity(.6),
         icons: iconList,
         iconSize: 28.0,
         activeIndex: _bottomNavIndex,

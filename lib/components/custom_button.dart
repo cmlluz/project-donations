@@ -29,8 +29,8 @@ class _CustomButtonState extends State<CustomButton> {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: ConstantsColors.labelColor,
-          foregroundColor: Colors.white,
+          backgroundColor: ConstantsColors.blueShade900,
+          foregroundColor: ConstantsColors.whiteShade900,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),

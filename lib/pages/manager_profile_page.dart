@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: ConstantsColors.whiteShade900,
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(

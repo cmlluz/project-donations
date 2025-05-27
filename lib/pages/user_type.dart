@@ -9,14 +9,14 @@ class UserType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 209, 209, 214),
+      backgroundColor: ConstantsColors.whiteShade600,
       body: Column(
         children: [
           Container(
             height: 320,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             decoration: const BoxDecoration(
-              color: ConstantsColors.labelColor,
+              color: ConstantsColors.blueShade900,
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(50),
               ),
@@ -24,7 +24,7 @@ class UserType extends StatelessWidget {
           ),
           Expanded(
               child: Container(
-            color: const Color.fromARGB(255, 209, 209, 214),
+            color: ConstantsColors.whiteShade600,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -34,7 +34,7 @@ class UserType extends StatelessWidget {
                       textAlign: TextAlign.center,
                       'Qual será o seu tipo de conta?',
                       style: const TextStyle(
-                        color: ConstantsColors.labelColor,
+                        color: ConstantsColors.blueShade900,
                         fontSize: 30,
                       ).merge(TextStylesConstants.kpoppinsBlack)),
                 ),

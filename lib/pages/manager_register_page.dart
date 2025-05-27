@@ -36,17 +36,17 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: ConstantsColors.whiteShade900,
           ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         titleTextStyle: const TextStyle(
-          color: Colors.white,
+          color: ConstantsColors.whiteShade900,
           fontSize: 20,
         ).merge(TextStylesConstants.kpoppinsRegular),
-        backgroundColor: ConstantsColors.buttonColor,
+        backgroundColor: ConstantsColors.blueShade900,
       ),
       body: SizedBox.expand(
         child: Container(
@@ -55,8 +55,8 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 214, 212, 212),
-                ConstantsColors.buttonColor,
+                ConstantsColors.whiteShade700,
+                ConstantsColors.blueShade900,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -68,11 +68,11 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                   Text(
+                  Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                      color: ConstantsColors.blackShade700,
                       fontSize: 28,
                     ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
@@ -81,7 +81,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     'Informe alguns dados importantes para nós',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                      color: ConstantsColors.blackShade700,
                       fontSize: 18,
                     ).merge(TextStylesConstants.kpoppinsLight),
                   ),
@@ -144,7 +144,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.buttonColor,
+                      backgroundColor: ConstantsColors.blueShade900,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -155,7 +155,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     child: const Text(
                       'Confirmar',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: ConstantsColors.whiteShade900,
                         fontSize: 18,
                       ),
                     ),
@@ -163,7 +163,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: ConstantsColors.whiteShade900,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -174,7 +174,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                     child: const Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: ConstantsColors.mainColor,
+                        color: ConstantsColors.blueShade500,
                         fontSize: 18,
                       ),
                     ),
