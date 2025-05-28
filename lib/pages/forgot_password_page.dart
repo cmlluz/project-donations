@@ -21,8 +21,8 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.mainColor,
-                ConstantsColors.navigationColor
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -63,7 +63,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.buttonColor,
+                    backgroundColor: ConstantsColors.blueShade900,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,
                       vertical: 8,
@@ -87,13 +87,14 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                   },
                   child: const Text(
                     'Prosseguir',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 16, color: ConstantsColors.whiteShade900),
                   ),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.white,
+                    backgroundColor: ConstantsColors.whiteShade900,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,
                       vertical: 8,
@@ -108,7 +109,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                   child: const Text(
                     'Voltar',
                     style: TextStyle(
-                      color: ConstantsColors.buttonColor,
+                      color: ConstantsColors.blueShade900,
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                     ),

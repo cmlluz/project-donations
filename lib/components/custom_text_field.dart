@@ -1,4 +1,6 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class CustomTextFields extends StatefulWidget {
   final IconData icon;
@@ -39,14 +41,10 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         obscureText: hide,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: Color.fromARGB(255, 0, 0, 0),
-        ),
+        style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: ConstantsColors.whiteShade900,
           prefixIcon: Icon(widget.icon),
           suffixIcon: widget.secret
               ? IconButton(

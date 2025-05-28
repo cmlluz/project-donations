@@ -31,8 +31,8 @@ class _LoginPage extends State<LoginPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.mainColor,
-                ConstantsColors.navigationColor
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -63,23 +63,6 @@ class _LoginPage extends State<LoginPage> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        GoRouter.of(context).go('/forgotPasswordPage');
-                      },
-                      child: const Text(
-                        'Esqueci minha senha',
-                        style: TextStyle(
-                          color: ConstantsColors.buttonColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 20),
                 Column(
                   children: [
@@ -93,7 +76,7 @@ class _LoginPage extends State<LoginPage> {
                           child: const Text(
                             'Não tem uma conta? Crie uma!',
                             style: TextStyle(
-                              color: ConstantsColors.labelColor,
+                              color: ConstantsColors.blueShade900,
                               fontSize: 14,
                             ),
                           ),
@@ -104,7 +87,7 @@ class _LoginPage extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.labelColor,
+                          backgroundColor: ConstantsColors.blueShade900,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -115,7 +98,7 @@ class _LoginPage extends State<LoginPage> {
                         child: const Text(
                           'Continuar',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ConstantsColors.whiteShade900,
                             fontSize: 18,
                           ),
                         ),
@@ -126,9 +109,9 @@ class _LoginPage extends State<LoginPage> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Divider(
-                        color: Colors.grey.shade600,
+                        color: ConstantsColors.greyShade600,
                         thickness: 1,
                       ),
                     ),
@@ -137,14 +120,14 @@ class _LoginPage extends State<LoginPage> {
                       child: Text(
                         'ou',
                         style: TextStylesConstants.kformularyText.copyWith(
-                          color: Colors.grey.shade600,
+                          color: ConstantsColors.greyShade600,
                           fontSize: 16,
                         ),
                       ),
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Divider(
-                        color: Colors.grey.shade600,
+                        color: ConstantsColors.greyShade600,
                         thickness: 1,
                       ),
                     ),

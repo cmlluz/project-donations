@@ -1,5 +1,7 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class ItemCardComponent extends StatefulWidget {
   const ItemCardComponent({
@@ -29,7 +31,7 @@ class ItemCardComponentState extends State<ItemCardComponent> {
                       borderRadius: BorderRadius.only(
                           topRight: Radius.circular(10.0),
                           bottomRight: Radius.circular(10.0)),
-                      color: Color.fromARGB(255, 24, 32, 101),
+                      color: ConstantsColors.blueShade800,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.5),
@@ -64,9 +66,7 @@ class ItemCardComponentState extends State<ItemCardComponent> {
                             alignment: Alignment.topLeft,
                             child: Text(
                               "Agasalho",
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold),
+                              style: TextStylesConstants.kpoppinsBold,
                             ),
                           ),
                           Row(
@@ -99,15 +99,12 @@ class ItemCardComponentState extends State<ItemCardComponent> {
                                       borderRadius:
                                           BorderRadius.circular(50.0)),
                                   child: Container(
-                                    color: const Color.fromARGB(
-                                        255, 237, 237, 237),
+                                    color: ConstantsColors.greyShade200,
                                     height: 25,
                                     width: 90,
                                     child: const Text(
                                       "Vestimentas",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w900,
-                                          fontFamily: 'Poppins'),
+                                      style: TextStylesConstants.kpoppinsBlack,
                                     ),
                                   ),
                                 ),

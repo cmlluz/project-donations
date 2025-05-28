@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class InstitutionRegisterPage extends StatefulWidget {
   const InstitutionRegisterPage({super.key});
@@ -37,8 +38,8 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.mainColor,
-                ConstantsColors.navigationColor
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -50,24 +51,22 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 50),
-                  const Text(
+                  Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                    style: const TextStyle(
+                      color: ConstantsColors.blackShade700,
                       fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Informe alguns dados importantes para nós',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                    style: const TextStyle(
+                      color: ConstantsColors.blackShade700,
                       fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsLight),
                   ),
                   const SizedBox(height: 20),
                   CustomTextFields(
@@ -129,15 +128,15 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                   const CustomButton(
                     text: 'Confirmar',
                     route: '/finalizeRegistrationPage',
-                    color: ConstantsColors.buttonColor,
-                    textColor: ConstantsColors.white,
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                   ),
                   const SizedBox(height: 10),
                   const CustomButton(
                     text: 'Voltar',
                     route: '/userTypePage',
-                    color: ConstantsColors.white,
-                    textColor: ConstantsColors.labelColor,
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
                   const SizedBox(height: 30),
                 ],

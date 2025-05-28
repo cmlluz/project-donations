@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/gallery_state.dart';
 import 'package:appdonationsgestor/components/item_card.dart';
@@ -26,16 +27,16 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: ConstantsColors.whiteShade900,
           elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: ConstantsColors.blackShade900),
           titleTextStyle: const TextStyle(
-            color: Colors.black,
+            color: ConstantsColors.blackShade900,
             fontWeight: FontWeight.w500,
             fontSize: 24,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: ConstantsColors.whiteShade900,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
@@ -44,13 +45,11 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               const SizedBox(height: 20),
               const ProfileInfoComponent(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Detalhes",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -58,24 +57,20 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Suas Necessidades",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               const ItemCardComponent(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Visitas",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -94,10 +89,10 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
               ),
             );
           },
-          backgroundColor: ConstantsColors.buttonColor,
+          backgroundColor: ConstantsColors.blueShade900,
           child: const Icon(
             Icons.add,
-            color: Colors.white,
+            color: ConstantsColors.whiteShade900,
           ),
         ),
       ),

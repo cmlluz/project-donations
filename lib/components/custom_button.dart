@@ -37,7 +37,7 @@ class _CustomButtonState extends State<CustomButton> {
           if (widget.route.isNotEmpty && widget.hasMensage == true) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                  backgroundColor: ConstantsColors.buttonColor,
+                  backgroundColor: ConstantsColors.blueShade900,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -54,7 +54,7 @@ class _CustomButtonState extends State<CustomButton> {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: widget.color ?? ConstantsColors.buttonColor,
+          backgroundColor: widget.color ?? ConstantsColors.blueShade900,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),

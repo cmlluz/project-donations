@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class RoundedBackgroundComponent extends StatelessWidget {
   final double height;
@@ -22,7 +23,7 @@ class RoundedBackgroundComponent extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.only(top: height),
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: ConstantsColors.whiteShade900,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),

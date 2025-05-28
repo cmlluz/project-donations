@@ -36,8 +36,8 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.mainColor,
-                ConstantsColors.navigationColor
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
@@ -71,7 +71,7 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                   GestureDetector(
                     onTap: _pickImage,
                     child: CircleAvatar(
-                      backgroundColor: ConstantsColors.mainColor,
+                      backgroundColor: ConstantsColors.blueShade500,
                       radius: 60,
                       backgroundImage:
                           _image != null ? FileImage(_image!) : null,
@@ -111,8 +111,8 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                   const CustomButton(
                     text: 'Cadastrar',
                     route: '/root',
-                    color: ConstantsColors.buttonColor,
-                    textColor: ConstantsColors.white,
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                     width: 130,
                     height: 35,
                     hasMensage: true,
@@ -121,8 +121,8 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                   const CustomButton(
                     text: 'Voltar',
                     route: '/institutionRegisterPage',
-                    color: ConstantsColors.white,
-                    textColor: ConstantsColors.labelColor,
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                     width: 130,
                     height: 35,
                     fontSize: 18,

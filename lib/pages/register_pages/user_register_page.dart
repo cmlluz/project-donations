@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -35,30 +36,29 @@ class _UserRegisterPage extends State<UserRegisterPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ConstantsColors.mainColor,
-                ConstantsColors.navigationColor
+                ConstantsColors.blueShade500,
+                ConstantsColors.tealShade200
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
             ),
           ),
-          child: const SingleChildScrollView(
+          child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
                   Text(
                     'Queremos saber mais sobre você!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
+                    style: const TextStyle(
+                      color: ConstantsColors.blackShade700,
                       fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsBlack),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'Informe alguns dados importantes para nós',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -67,63 +67,63 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(height: 80),
-                  CustomTextFields(
+                  const SizedBox(height: 80),
+                  const CustomTextFields(
                     icon: Icons.person,
                     label: 'Nome',
                     secret: false,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.email,
                     label: 'Email',
                     secret: false,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.phone,
                     label: 'Telefone',
                     secret: false,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.person_4,
                     label: 'CPF',
                     secret: false,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.map,
                     label: 'Endereço',
                     secret: false,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.lock,
                     label: 'Senha',
                     secret: true,
                   ),
-                  SizedBox(height: 20),
-                  CustomTextFields(
+                  const SizedBox(height: 20),
+                  const CustomTextFields(
                     icon: Icons.lock,
                     label: 'Confirme sua Senha',
                     secret: true,
                   ),
-                  SizedBox(height: 20),
-                  CustomButton(
+                  const SizedBox(height: 20),
+                  const CustomButton(
                     text: 'Confirmar',
                     route: '/finalizeRegistrationPage',
-                    color: ConstantsColors.buttonColor,
-                    textColor: ConstantsColors.white,
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
                   ),
-                  SizedBox(height: 20),
-                  CustomButton(
+                  const SizedBox(height: 20),
+                  const CustomButton(
                     text: 'Voltar',
                     route: '/userTypePage',
-                    color: ConstantsColors.white,
-                    textColor: ConstantsColors.labelColor,
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
