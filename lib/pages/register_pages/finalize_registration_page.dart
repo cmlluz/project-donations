@@ -116,6 +116,7 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                     width: 130,
                     height: 35,
                     hasMensage: true,
+                    mensage: 'Cadastro realizado com sucesso!',
                   ),
                   const SizedBox(height: 10),
                   const CustomButton(
@@ -126,7 +127,7 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                     width: 130,
                     height: 35,
                     fontSize: 18,
-                  )
+                  ),
                 ],
               ),
             ),

@@ -6,6 +6,7 @@ class CustomTextFields extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool secret;
+  final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final int? maxLines;
@@ -16,6 +17,7 @@ class CustomTextFields extends StatefulWidget {
     required this.icon,
     required this.label,
     this.secret = false,
+    this.labelColor,
     this.controller,
     this.keyboardType,
     this.maxLines,
@@ -44,7 +46,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
-          fillColor: ConstantsColors.whiteShade900,
+          fillColor: widget.labelColor ?? ConstantsColors.whiteShade900,
           prefixIcon: Icon(widget.icon),
           suffixIcon: widget.secret
               ? IconButton(
