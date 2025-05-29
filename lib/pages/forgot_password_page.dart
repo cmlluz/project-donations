@@ -80,7 +80,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                         ),
                         behavior: SnackBarBehavior.floating,
-                        backgroundColor: ConstantsColors.buttonColor,
+                        backgroundColor: ConstantsColors.blueShade900,
                         dismissDirection: DismissDirection.horizontal,
                       ),
                     );
