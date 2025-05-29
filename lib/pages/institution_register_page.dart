@@ -19,6 +19,9 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+  String errorMessage = '';
+
   @override
   void dispose() {
     nameController.dispose();

@@ -1,6 +1,8 @@
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
@@ -13,9 +15,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPage extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
+  final firebaseAuth = AuthService();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  String errorMessage = '';
   @override
   void dispose() {
     emailController.dispose();
@@ -23,6 +27,13 @@ class _LoginPage extends State<LoginPage> {
     super.dispose();
   }
 
+  void signIn() async {
+    try {
+      await authService.value.signIn(email: emailController.text, password: passwordController.text)
+    } on FirebaseAuthException catch (e) {
+      errorMessage = e.message ?? 'Erro  ao tentar fazer login';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +151,9 @@ class _LoginPage extends State<LoginPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: GoogleAuthButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          await firebaseAuth.loginWithGoogle();
+                        },
                         style: const AuthButtonStyle(
                           buttonType: AuthButtonType.icon,
                         ),
