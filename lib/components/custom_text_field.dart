@@ -1,4 +1,6 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class CustomTextFields extends StatefulWidget {
   final IconData icon;
@@ -6,6 +8,8 @@ class CustomTextFields extends StatefulWidget {
   final bool secret;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+  final int? maxLines;
+  final String? hintText;
 
   const CustomTextFields({
     Key? key,
@@ -14,6 +18,8 @@ class CustomTextFields extends StatefulWidget {
     this.secret = false,
     this.controller,
     this.keyboardType,
+    this.maxLines,
+    this.hintText,
   }) : super(key: key);
 
   @override
@@ -35,14 +41,10 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         obscureText: hide,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: Color.fromARGB(255, 0, 0, 0),
-        ),
+        style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: ConstantsColors.whiteShade900,
           prefixIcon: Icon(widget.icon),
           suffixIcon: widget.secret
               ? IconButton(
@@ -59,6 +61,11 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+          ),
+          hintText: widget.hintText,
+          hintStyle: const TextStyle(
+            fontSize: 16,
+            color: Color.fromARGB(255, 150, 150, 150),
           ),
         ),
       ),

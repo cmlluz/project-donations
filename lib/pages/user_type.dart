@@ -8,14 +8,14 @@ class UserType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 209, 209, 214),
+      backgroundColor: ConstantsColors.whiteShade600,
       body: Column(
         children: [
           Container(
             height: 320,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             decoration: const BoxDecoration(
-              color: ConstantsColors.labelColor,
+              color: ConstantsColors.blueShade900,
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(50),
               ),
@@ -23,7 +23,7 @@ class UserType extends StatelessWidget {
           ),
           Expanded(
               child: Container(
-            color: const Color.fromARGB(255, 209, 209, 214),
+            color: ConstantsColors.whiteShade600,
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -33,19 +33,30 @@ class UserType extends StatelessWidget {
                     textAlign: TextAlign.center,
                     'Qual será o seu tipo de conta?',
                     style: TextStyle(
-                      color: ConstantsColors.labelColor,
+                      color: ConstantsColors.blueShade900,
                       fontSize: 30,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Courrier',
                     ),
                   ),
                 ),
-                CustomButton(text: 'Pessoa Física', route: '/userRegisterPage'),
+                CustomButton(
+                    height: 50,
+                    width: 300,
+                    text: 'Pessoa Física',
+                    route: '/userRegisterPage'),
                 SizedBox(height: 20),
                 CustomButton(
-                    text: 'Instituição', route: '/institutionRegisterPage'),
+                    height: 50,
+                    width: 300,
+                    text: 'Instituição',
+                    route: '/institutionRegisterPage'),
                 SizedBox(height: 20),
-                CustomButton(text: 'Gestor', route: '/gestorRegisterPage'),
+                CustomButton(
+                    height: 50,
+                    width: 300,
+                    text: 'Gestor',
+                    route: '/gestorRegisterPage'),
                 SizedBox(height: 20),
               ],
             ),

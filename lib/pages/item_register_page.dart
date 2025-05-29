@@ -4,6 +4,7 @@ import 'package:appdonationsgestor/controllers/product_registration_controller.d
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class ItemRegisterPage extends StatelessWidget {
   ItemRegisterPage({Key? key}) : super(key: key);
@@ -25,12 +26,12 @@ class ItemRegisterPage extends StatelessWidget {
           'Criar nova necessidade',
           style: TextStylesConstants.kformularyTitle,
         ),
-        backgroundColor: const Color.fromARGB(255, 3, 32, 106),
-        foregroundColor: Colors.white,
+        backgroundColor: ConstantsColors.blueShade950,
+        foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: ConstantsColors.whiteShade900,
       body: RoundedBackgroundComponent(
         height: MediaQuery.of(context).size.height * 0.02,
         child: Container(
@@ -128,14 +129,15 @@ class DonationItemComponent extends StatelessWidget {
                       GoRouter.of(context).go('/institutionProfilePage');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo.shade900,
+                      backgroundColor: ConstantsColors.indigoShade900,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                     ),
                     child: const Text(
                       'Continuar',
-                      style: TextStyle(color: Colors.white, fontSize: 20.0),
+                      style: TextStyle(
+                          color: ConstantsColors.whiteShade900, fontSize: 20.0),
                     ),
                   ),
                 ),
