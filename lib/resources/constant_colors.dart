@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class ConstantsColors {
   // 🔵 Blue Shades
   static const Color blueShade900 =
-      Color(0xFF015B7C); // buttonColor, labelColor
-  static const Color blueShade500 = Color(0xFF5C93A6); // mainColor
+      Color.fromRGBO(1, 91, 124, 1); // buttonColor, labelColor
+  static const Color blueShade500 = Color.fromRGBO(92, 147, 166, 1); // mainColor
   static const Color blueShade800 =
-      Color.fromARGB(255, 24, 32, 101); // darkBlue
+      Color.fromRGBO(24, 32, 101, 1); // darkBlue
   static const Color blueShade950 =
-      Color.fromARGB(255, 3, 32, 106); // darkerBlue
-  static const Color indigoShade900 = Color.fromARGB(255, 26, 35, 126);
+      Color.fromRGBO(3, 32, 106, 1); // darkerBlue
+  static const Color indigoShade900 = Color.fromRGBO(26, 35, 126, 1);
 
   // ⚫ Black & grey Shades
   static const Color blackShade900 = Color(0xFF000000); // black
