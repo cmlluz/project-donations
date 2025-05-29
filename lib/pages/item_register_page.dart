@@ -5,6 +5,7 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/components/custom_button.dart';
 
 class ItemRegisterPage extends StatelessWidget {
   ItemRegisterPage({Key? key}) : super(key: key);
@@ -26,27 +27,35 @@ class ItemRegisterPage extends StatelessWidget {
           'Criar nova necessidade',
           style: TextStylesConstants.kformularyTitle,
         ),
-        backgroundColor: ConstantsColors.blueShade950,
+        backgroundColor: ConstantsColors.blueShade900,
         foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: ConstantsColors.whiteShade900,
-      body: RoundedBackgroundComponent(
-        height: MediaQuery.of(context).size.height * 0.02,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DonationItemComponent(
-                  productRegistrationController: _controller,
-                ),
-                const Row(),
-              ],
+      backgroundColor: ConstantsColors.blueShade900,
+      body: Container(
+        decoration: const BoxDecoration(
+          color: ConstantsColors.whiteShade900,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(35),
+          ),
+        ),
+        child: RoundedBackgroundComponent(
+          height: MediaQuery.of(context).size.height * 0.02,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DonationItemComponent(
+                    productRegistrationController: _controller,
+                  ),
+                  const Row(),
+                ],
+              ),
             ),
           ),
         ),
@@ -117,32 +126,22 @@ class DonationItemComponent extends StatelessWidget {
                 ),
               ],
             ),
-            Align(
+            const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(top: 180.0),
-                child: SizedBox(
-                  height: 70,
-                  width: 400,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      GoRouter.of(context).go('/institutionProfilePage');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstantsColors.indigoShade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                          color: ConstantsColors.whiteShade900, fontSize: 20.0),
-                    ),
-                  ),
+                padding: EdgeInsets.only(top: 180.0),
+                child: CustomButton(
+                  height: 50,
+                  width: 200,
+                  text: 'Publicar',
+                  route: '/root',
+                  color: ConstantsColors.blueShade900,
+                  textColor: ConstantsColors.whiteShade900,
+                  hasMensage: true,
+                  mensage: 'Publicado com sucesso!',
                 ),
               ),
-            )
+            ),
           ],
         );
       },
