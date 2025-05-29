@@ -2,6 +2,12 @@ import 'package:appdonationsgestor/components/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/todos_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/doacao_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/necessidade_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/instituicao_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
