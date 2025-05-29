@@ -73,12 +73,17 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                     ),
                   ),
                   onPressed: () {
-                    String email = emailController.text;
-                    if (email.isNotEmpty) {
-                      print('Sending recovery link to $email');
-                    } else {
-                      print('Please enter a valid email address');
-                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Link de recuperação enviado!'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: ConstantsColors.buttonColor,
+                        dismissDirection: DismissDirection.horizontal,
+                      ),
+                    );
                   },
                   child: const Text(
                     'Prosseguir',
