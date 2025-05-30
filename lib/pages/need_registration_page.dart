@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 
-class ItemRegisterPage extends StatelessWidget {
-  ItemRegisterPage({Key? key}) : super(key: key);
+class NeedRegistrationPage extends StatelessWidget {
+  NeedRegistrationPage({Key? key}) : super(key: key);
 
   final ProductRegistrationController _controller =
       ProductRegistrationController();
@@ -86,19 +86,21 @@ class DonationItemComponent extends StatelessWidget {
             const Text('Nome do produto'),
             CustomTextFields(
               icon: Icons.label,
-              label: 'Produto',
               secret: false,
               controller: productRegistrationController.crtlItemName,
               keyboardType: TextInputType.name,
+              labelColor: ConstantsColors.greyShade200,
+              hintText: 'Digite o produto',
             ),
             const SizedBox(height: 20),
             const Text('Descrição'),
             CustomTextFields(
               icon: Icons.edit_document,
-              label: 'Descrição',
+              hintText: 'Descreva sua necessidade',
               secret: false,
               controller: productRegistrationController.crtlDesc,
               keyboardType: TextInputType.multiline,
+              labelColor: ConstantsColors.greyShade200,
             ),
             const SizedBox(height: 20),
             const Text('Categoria e Quantidade'),
@@ -122,24 +124,36 @@ class DonationItemComponent extends StatelessWidget {
                     secret: false,
                     controller: productRegistrationController.crtlQtd,
                     keyboardType: TextInputType.number,
+                    labelColor: ConstantsColors.greyShade200,
                   ),
                 ),
               ],
             ),
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.only(top: 180.0),
-                child: CustomButton(
-                  height: 50,
-                  width: 200,
-                  text: 'Publicar',
-                  route: '/root',
-                  color: ConstantsColors.blueShade900,
-                  textColor: ConstantsColors.whiteShade900,
-                  hasMensage: true,
-                  mensage: 'Publicado com sucesso!',
-                ),
+            const Padding(
+              padding: EdgeInsets.only(top: 120.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Publicar',
+                    route: '/root',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
+                    hasMensage: true,
+                    mensage: 'Publicado com sucesso!',
+                  ),
+                  SizedBox(width: 20),
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Voltar',
+                    route: '/root',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
+                  ),
+                ],
               ),
             ),
           ],
@@ -153,6 +167,7 @@ class CustomDropDownButtonComponent extends StatelessWidget {
   final String? selected;
   final List<String?> items;
   final String hint;
+  final Color? color;
   final void Function(String?)? onChanged;
 
   const CustomDropDownButtonComponent({
@@ -161,6 +176,7 @@ class CustomDropDownButtonComponent extends StatelessWidget {
     required this.items,
     required this.onChanged,
     required this.hint,
+    this.color = ConstantsColors.greyShade200,
   }) : super(key: key);
 
   @override

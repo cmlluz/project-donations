@@ -1,7 +1,7 @@
 import 'package:appdonationsgestor/pages/search_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
-import 'package:appdonationsgestor/pages/item_register_page.dart';
+import 'package:appdonationsgestor/pages/need_registration_page.dart';
 import 'package:appdonationsgestor/pages/login_page.dart';
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/pages/post_page.dart';
@@ -18,7 +18,7 @@ import 'package:appdonationsgestor/pages/register_pages/finalize_registration_pa
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
   static const String searchPage = "search_page";
-  static const String itemRegisterPage = "itemRegisterPage";
+  static const String needRegistrationPage = "needRegistrationPage";
   static const String itemEditPage = "itemEditPage";
   static const String institutionProfilePage = "institutionProfilePage";
   static const String homePage = "homePage";
@@ -59,11 +59,11 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-          path: '/itemRegisterPage',
-          name: RouteNames.itemRegisterPage,
+          path: '/needRegistrationPage',
+          name: RouteNames.needRegistrationPage,
           pageBuilder: (context, state) {
             return MaterialPage(
-              child: ItemRegisterPage(),
+              child: NeedRegistrationPage(),
             );
           },
         ),

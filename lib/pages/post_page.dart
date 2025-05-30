@@ -60,7 +60,7 @@ class _PostPageState extends State<PostPage> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -69,8 +69,7 @@ class _PostPageState extends State<PostPage> {
                   pickImageFromGallery();
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(
-                      top: 30, bottom: 30, left: 20, right: 20),
+                  margin: const EdgeInsets.only(left: 20, right: 20),
                   alignment: Alignment.center,
                   width: 400,
                   height: 300,
@@ -111,24 +110,30 @@ class _PostPageState extends State<PostPage> {
                 labelColor: ConstantsColors.greyShade200,
               ),
               const SizedBox(height: 20),
-              const CustomButton(
-                height: 45,
-                width: 180,
-                text: 'Publicar',
-                route: '/root',
-                color: ConstantsColors.blueShade900,
-                textColor: ConstantsColors.whiteShade900,
-                hasMensage: true,
-                mensage: 'Publicado com sucesso!',
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Publicar',
+                    route: '/root',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
+                    hasMensage: true,
+                    mensage: 'Publicado com sucesso!',
+                  ),
+                  SizedBox(width: 20),
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Voltar',
+                    route: '/root',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              const CustomButton(
-                  text: 'Cancelar',
-                  route: '/popupMenuState',
-                  color: ConstantsColors.greyShade200,
-                  textColor: ConstantsColors.blueShade900,
-                  height: 45,
-                  width: 180),
             ],
           ),
         ),
