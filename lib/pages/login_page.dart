@@ -63,6 +63,24 @@ class _LoginPage extends State<LoginPage> {
                     ),
                   ],
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        GoRouter.of(context).go('/forgotPasswordPage');
+                      },
+                      child: Text(
+                        'Esqueci minha senha',
+                        style: TextStylesConstants.kformularyText.copyWith(
+                          color: ConstantsColors.blueShade900,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 Column(
                   children: [

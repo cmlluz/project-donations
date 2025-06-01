@@ -11,6 +11,7 @@ class CustomButton extends StatefulWidget {
   final double? height;
   final double? fontSize;
   final bool? hasMensage;
+  final String? mensage;
   const CustomButton(
       {super.key,
       required this.text,
@@ -20,7 +21,8 @@ class CustomButton extends StatefulWidget {
       this.width,
       this.height,
       this.fontSize,
-      this.hasMensage = false});
+      this.hasMensage = false,
+      this.mensage});
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
@@ -36,13 +38,13 @@ class _CustomButtonState extends State<CustomButton> {
         onPressed: () {
           if (widget.route.isNotEmpty && widget.hasMensage == true) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                   backgroundColor: ConstantsColors.blueShade900,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  content: Text('Cadastro realizado com sucesso!')),
+                  content: Text(widget.mensage ?? '')),
             );
             GoRouter.of(context).go(widget.route);
           } else if (widget.route.isNotEmpty && widget.hasMensage == false) {

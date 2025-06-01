@@ -4,23 +4,25 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class CustomTextFields extends StatefulWidget {
   final IconData icon;
-  final String label;
+  final String? label;
   final bool secret;
+  final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final int? maxLines;
   final String? hintText;
 
   const CustomTextFields({
-    Key? key,
+    super.key,
     required this.icon,
-    required this.label,
+    this.label,
     this.secret = false,
+    this.labelColor,
     this.controller,
     this.keyboardType,
     this.maxLines,
     this.hintText,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomTextFields> createState() => _CustomTextFieldState();
@@ -34,6 +36,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
     hide = widget.secret;
   }
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -44,7 +47,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
-          fillColor: ConstantsColors.whiteShade900,
+          fillColor: widget.labelColor ?? ConstantsColors.whiteShade900,
           prefixIcon: Icon(widget.icon),
           suffixIcon: widget.secret
               ? IconButton(
