@@ -8,7 +8,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 
 class NeedRegistrationPage extends StatelessWidget {
-  NeedRegistrationPage({Key? key}) : super(key: key);
+  NeedRegistrationPage({super.key});
 
   final ProductRegistrationController _controller =
       ProductRegistrationController();
@@ -68,9 +68,9 @@ class DonationItemComponent extends StatelessWidget {
   final ProductRegistrationController productRegistrationController;
 
   const DonationItemComponent({
-    Key? key,
+    super.key,
     required this.productRegistrationController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -171,13 +171,13 @@ class CustomDropDownButtonComponent extends StatelessWidget {
   final void Function(String?)? onChanged;
 
   const CustomDropDownButtonComponent({
-    Key? key,
+    super.key,
     required this.selected,
     required this.items,
     required this.onChanged,
     required this.hint,
     this.color = ConstantsColors.greyShade200,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

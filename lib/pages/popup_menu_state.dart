@@ -94,7 +94,7 @@ class _PopupMenuStateState extends State<PopupMenuState> {
             const SizedBox(height: 40.0),
             ElevatedButton(
               onPressed: () {
-                GoRouter.of(context).go('/itemRegisterPage');
+                GoRouter.of(context).go('/needRegistrationPage');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: ConstantsColors.blueShade900,
