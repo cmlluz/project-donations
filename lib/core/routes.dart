@@ -1,4 +1,4 @@
-import 'package:appdonationsgestor/pages/search_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
 import 'package:appdonationsgestor/pages/need_registration_page.dart';

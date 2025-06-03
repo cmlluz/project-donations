@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/todos_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/doacao_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/necessidade_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/filter_pages/instituicao_page.dart';
+
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -19,12 +24,12 @@ class _SearchPageState extends State<SearchPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 10.0, right: 10.0),
+            padding: const EdgeInsets.only(top: 16.0, left: 5.0, right: 5.0),
             child: Column(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: 60.0, bottom: 30.0, left: 10.0),
+                      top: 30.0, bottom: 30.0, left: 10.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -57,35 +62,8 @@ class _SearchPageState extends State<SearchPage> {
                 const SizedBox(height: 10.0),
                 SizedBox(
                   height: constraints.maxHeight - 260,
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(2.0),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10.0,
-                      crossAxisSpacing: 15.0,
-                      childAspectRatio: 1,
-                    ),
-                    itemCount: 12,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                        color: Colors.white,
-                        child: Center(
-                          child: Text(
-                            'Item ${index + 1}',
-                            style: const TextStyle(
-                              color: ConstantsColors.greyShade900,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  child:
+                      getSelectedPage(), // novo método que retorna o widget da página
                 ),
               ],
             ),
@@ -127,5 +105,20 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
     );
+  }
+
+  Widget getSelectedPage() {
+    switch (selectedButton) {
+      case 'Todos':
+        return const TodosPage();
+      case 'Doação':
+        return const DoacaoPage();
+      case 'Necessidade':
+        return const NecessidadePage();
+      case 'Instituição':
+        return const InstituicaoPage();
+      default:
+        return const Center(child: Text('Página não encontrada'));
+    }
   }
 }
