@@ -1,7 +1,6 @@
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:appdonationsgestor/components/item_card.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class PopupMenuState extends StatefulWidget {
@@ -111,7 +110,6 @@ class _PopupMenuStateState extends State<PopupMenuState> {
               ),
             ),
             const SizedBox(height: 20.0),
-            const ItemCardComponent(),
           ],
         ),
       ),

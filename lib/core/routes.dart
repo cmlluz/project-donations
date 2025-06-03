@@ -14,6 +14,7 @@ import 'package:appdonationsgestor/pages/register_pages/institution_register_pag
 import 'package:appdonationsgestor/pages/register_pages/manager_register_page.dart';
 import 'package:appdonationsgestor/pages/forgot_password_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/finalize_registration_page.dart';
+import 'package:appdonationsgestor/pages/favorites_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -33,6 +34,7 @@ class RouteNames {
   static const String userTypePage = "userTypePage";
   static const String forgotPasswordPage = "forgotPasswordPage";
   static const String finalizeRegistrationPage = "finalizeRegistrationPage";
+  static const String favoritesPage = "favoritesPage";
 }
 
 class AppRountersConfiguration {
@@ -163,6 +165,15 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: FinalizeRegistrationPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/favoritesPage',
+          name: RouteNames.favoritesPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: FavoritesPage(),
             );
           },
         )

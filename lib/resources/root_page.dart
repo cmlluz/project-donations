@@ -1,8 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_page.dart';
 import 'package:appdonationsgestor/pages/popup_menu_state.dart';
-import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +23,8 @@ class _RootPageState extends State<RootPage> {
     HomePage(),
     SearchPage(),
     PopupMenuState(),
+    FavoritesPage(),
     SettingsPage(),
-    ManagerProfilePage(),
   ];
 
   //lista de icones das paginas
