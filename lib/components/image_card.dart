@@ -27,7 +27,6 @@ class ImageCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           child: Stack(
             children: [
-              // Imagem de fundo
               Image.asset(
                 imageUrl,
                 width: double.infinity,
@@ -38,13 +37,11 @@ class ImageCard extends StatelessWidget {
                 },
               ),
 
-              // Texto com background blur + drop shadow
               Positioned(
                 bottom: 10,
                 left: 5,
                 right: 5,
                 child: ClipRRect(
-                  // necessário para aplicar o blur apenas ao container
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(15),
                     topLeft: Radius.circular(15),
