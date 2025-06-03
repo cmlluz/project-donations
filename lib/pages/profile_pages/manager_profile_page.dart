@@ -110,6 +110,116 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                           fontSize: 14.0, color: ConstantsColors.greyShade600),
                     ),
                   ),
+                  const SizedBox(height: 30),
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Doações',
+                            style: TextStylesConstants.kpoppinsMedium.merge(
+                              const TextStyle(fontSize: 20.0),
+                            ),
+                          ),
+                          TextButton(
+                            child: Text(
+                              'ver todas',
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                    fontSize: 13.0,
+                                    color: ConstantsColors.greyShade600),
+                              ),
+                            ),
+                            onPressed: () => {},
+                          ),
+                        ],
+                      ),
+                      Card(
+                        elevation: 3,
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: const Border(
+                              right: BorderSide(
+                                color: ConstantsColors.blueShade900,
+                                width: 5,
+                              ),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Agasalho',
+                                  style: TextStylesConstants.kpoppinsMedium
+                                      .merge(const TextStyle(fontSize: 15))),
+                              const SizedBox(height: 6),
+                              Text('Quantidade: 3',
+                                  style: TextStylesConstants.kinterRegular
+                                      .merge(const TextStyle(
+                                          fontSize: 12,
+                                          color:
+                                              ConstantsColors.greyShade600))),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_pin,
+                                    color: ConstantsColors.greyShade600,
+                                    size: 15,
+                                  ),
+                                  Text('Barbalho, Salvador',
+                                      style: TextStylesConstants.kinterRegular
+                                          .merge(const TextStyle(
+                                              fontSize: 12,
+                                              color: ConstantsColors
+                                                  .greyShade600))),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('10 de Abril de 2024',
+                                      style: TextStylesConstants.kinterRegular
+                                          .merge(const TextStyle(
+                                              fontSize: 12,
+                                              color: ConstantsColors
+                                                  .greyShade600))),
+                                  TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 0),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      'Vestimentas',
+                                      style: TextStylesConstants.kinterRegular
+                                          .merge(
+                                        const TextStyle(
+                                          fontSize: 12,
+                                          color: ConstantsColors.greyShade600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
