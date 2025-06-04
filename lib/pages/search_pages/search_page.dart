@@ -63,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
                 SizedBox(
                   height: constraints.maxHeight - 260,
                   child:
-                      getSelectedPage(), // novo método que retorna o widget da página
+                      getSelectedPage(),
                 ),
               ],
             ),
