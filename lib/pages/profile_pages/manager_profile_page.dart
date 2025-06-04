@@ -1,3 +1,4 @@
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -147,7 +148,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                 style: TextStylesConstants.kinterRegular.merge(
                                   const TextStyle(
                                       fontSize: 13.0,
-                                      color: ConstantsColors.greyShade600),
+                                      color: ConstantsColors.greyShade900),
                                 ),
                               ),
                               onPressed: () => {},
@@ -193,6 +194,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                       color: ConstantsColors.greyShade600,
                                       size: 15,
                                     ),
+                                    const SizedBox(width: 3),
                                     Text('Barbalho, Salvador',
                                         style: TextStylesConstants.kinterRegular
                                             .merge(const TextStyle(
@@ -201,7 +203,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                                     .greyShade600))),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -215,10 +217,17 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                     TextButton(
                                       onPressed: () {},
                                       style: TextButton.styleFrom(
-                                        padding: EdgeInsets.zero,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0, vertical: 2.0),
                                         minimumSize: const Size(0, 0),
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
+                                        backgroundColor:
+                                            ConstantsColors.greyShade300,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
                                       ),
                                       child: Text(
                                         'Vestimentas',
@@ -226,7 +235,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                             .merge(
                                           const TextStyle(
                                             fontSize: 12,
-                                            color: ConstantsColors.greyShade600,
+                                            color: ConstantsColors.greyShade900,
                                           ),
                                         ),
                                       ),
