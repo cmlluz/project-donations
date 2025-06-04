@@ -3,7 +3,6 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/gallery_state.dart';
-import 'package:appdonationsgestor/components/favorite_card.dart';
 import 'package:appdonationsgestor/components/profile_info_component.dart';
 import 'package:page_transition/page_transition.dart';
 

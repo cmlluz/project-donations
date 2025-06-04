@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class ItemModel {
   final String name;
@@ -96,7 +97,7 @@ class FavoriteCard extends StatelessWidget {
                         width: 120,
                         child: ElevatedButton(
                           onPressed: () {
-                            // ação visitar perfil
+                            GoRouter.of(context).go('/managerProfilePage');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ConstantsColors.greyShade200,

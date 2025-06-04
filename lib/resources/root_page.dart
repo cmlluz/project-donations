@@ -2,14 +2,14 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
-import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class RootPage extends StatefulWidget {
-  const RootPage({Key? key}) : super(key: key);
+  const RootPage({super.key});
 
   @override
   State<RootPage> createState() => _RootPageState();
@@ -22,7 +22,7 @@ class _RootPageState extends State<RootPage> {
   List<Widget> pages = const [
     HomePage(),
     SearchPage(),
-    PopupMenuState(),
+    SizedBox.shrink(),
     FavoritesPage(),
     SettingsPage(),
   ];
@@ -91,10 +91,112 @@ class _RootPageState extends State<RootPage> {
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
-          setState(() {
-            _bottomNavIndex = index;
-          });
+          if (index == 2) {
+            _showBottomMenu(context); // 👈 aqui você chama o menu modal
+          } else {
+            setState(() {
+              _bottomNavIndex = index;
+            });
+          }
         },
+      ),
+    );
+  }
+
+  void _showBottomMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 205, 239, 251),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: ConstantsColors.blueShade900,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              const Text(
+                'Comece a postar',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: ConstantsColors.blueShade900),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _BottomMenuOption(
+                    icon: Icons.add_box_outlined,
+                    label: 'Criar necessidade',
+                    onTap: () {
+                      GoRouter.of(context).go("/needRegistrationPage");
+                    },
+                  ),
+                  _BottomMenuOption(
+                    icon: Icons.post_add,
+                    label: 'Criar publicação',
+                    onTap: () {
+                      GoRouter.of(context).go("/postPage");
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BottomMenuOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _BottomMenuOption({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Material(
+            elevation: 10,
+            shape: const CircleBorder(),
+            child: CircleAvatar(
+              backgroundColor: const Color.fromARGB(255, 205, 239, 251),
+              radius: 28,
+              child: Icon(icon, size: 28, color: ConstantsColors.blueShade900),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+                fontSize: 14, color: ConstantsColors.blueShade900),
+          ),
+        ],
       ),
     );
   }
