@@ -1,4 +1,3 @@
-import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
@@ -79,15 +78,7 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              PageTransition(
-                child: const PopupMenuState(),
-                type: PageTransitionType.bottomToTop,
-              ),
-            );
-          },
+          onPressed: () {},
           backgroundColor: ConstantsColors.blueShade900,
           child: const Icon(
             Icons.add,

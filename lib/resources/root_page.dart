@@ -112,9 +112,9 @@ class _RootPageState extends State<RootPage> {
         return Container(
           decoration: const BoxDecoration(
             color: Color.fromARGB(255, 205, 239, 251),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -139,19 +139,27 @@ class _RootPageState extends State<RootPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _BottomMenuOption(
-                    icon: Icons.add_box_outlined,
-                    label: 'Criar necessidade',
-                    onTap: () {
-                      GoRouter.of(context).go("/needRegistrationPage");
-                    },
+                  Container(
+                    padding:
+                        const EdgeInsets.only(bottom: 30, left: 15, right: 15),
+                    child: _BottomMenuOption(
+                      icon: Icons.volunteer_activism_outlined,
+                      label: 'Criar Necessidade/Doação',
+                      onTap: () {
+                        GoRouter.of(context).go("/itemPostPage");
+                      },
+                    ),
                   ),
-                  _BottomMenuOption(
-                    icon: Icons.post_add,
-                    label: 'Criar publicação',
-                    onTap: () {
-                      GoRouter.of(context).go("/postPage");
-                    },
+                  Container(
+                    padding:
+                        const EdgeInsets.only(bottom: 30, left: 15, right: 15),
+                    child: _BottomMenuOption(
+                      icon: Icons.post_add,
+                      label: 'Criar publicação',
+                      onTap: () {
+                        GoRouter.of(context).go("/postPage");
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -182,12 +190,13 @@ class _BottomMenuOption extends StatelessWidget {
       child: Column(
         children: [
           Material(
-            elevation: 10,
+            elevation: 8,
             shape: const CircleBorder(),
+            shadowColor: ConstantsColors.blackShade900,
             child: CircleAvatar(
+              radius: 30,
               backgroundColor: const Color.fromARGB(255, 205, 239, 251),
-              radius: 28,
-              child: Icon(icon, size: 28, color: ConstantsColors.blueShade900),
+              child: Icon(icon, size: 28, color: ConstantsColors.greyShade900),
             ),
           ),
           const SizedBox(height: 8),
