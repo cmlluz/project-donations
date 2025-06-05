@@ -12,8 +12,23 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPage extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Expanded(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Configurações'),
+          backgroundColor: ConstantsColors.whiteShade900,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: ConstantsColors.blueShade900),
+          titleTextStyle:
+              TextStylesConstants.kinterSemiBold.merge(const TextStyle(
+            color: ConstantsColors.blueShade900,
+            fontSize: 24,
+          )),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         backgroundColor: ConstantsColors.whiteShade900,
         body: SingleChildScrollView(
           child: Column(
@@ -83,8 +98,7 @@ class _SettingsPage extends State<SettingsPage> {
                                 fontSize: 16,
                               ).merge(TextStylesConstants.kpoppinsLight),
                             ),
-                            const SizedBox(
-                                width: 12), // Espaço entre texto e ícone
+                            const SizedBox(width: 12),
                             const Icon(
                               Icons.message_outlined,
                               color: ConstantsColors.blackShade900,
