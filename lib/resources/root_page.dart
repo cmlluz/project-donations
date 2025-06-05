@@ -2,7 +2,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
-import 'package:appdonationsgestor/pages/settings_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +24,7 @@ class _RootPageState extends State<RootPage> {
     SearchPage(),
     SizedBox.shrink(),
     FavoritesPage(),
-    SettingsPage(),
+    ManagerProfilePage(),
   ];
 
   //lista de icones das paginas
@@ -92,7 +92,7 @@ class _RootPageState extends State<RootPage> {
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
           if (index == 2) {
-            _showBottomMenu(context); 
+            _showBottomMenu(context);
           } else {
             setState(() {
               _bottomNavIndex = index;
