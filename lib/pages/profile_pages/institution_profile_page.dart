@@ -1,9 +1,7 @@
-import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/gallery_state.dart';
-import 'package:appdonationsgestor/components/item_card.dart';
 import 'package:appdonationsgestor/components/profile_info_component.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:appdonationsgestor/pages/settings_page.dart';

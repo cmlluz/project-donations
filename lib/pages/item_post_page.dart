@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/rounded_background_component.dart';
+import 'package:appdonationsgestor/controllers/post_type_controller.dart';
 import 'package:appdonationsgestor/controllers/product_registration_controller.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +8,12 @@ import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 
-class NeedRegistrationPage extends StatelessWidget {
-  NeedRegistrationPage({Key? key}) : super(key: key);
+class ItemPostPage extends StatelessWidget {
+  ItemPostPage({super.key});
 
   final ProductRegistrationController _controller =
       ProductRegistrationController();
+  final PostTypeController _controller1 = PostTypeController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +22,11 @@ class NeedRegistrationPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            GoRouter.of(context).go('/popupMenuState');
+            GoRouter.of(context).go('/root');
           },
         ),
         title: const Text(
-          'Criar nova necessidade',
+          'Criar nova divulgação',
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
@@ -52,6 +54,7 @@ class NeedRegistrationPage extends StatelessWidget {
                 children: [
                   DonationItemComponent(
                     productRegistrationController: _controller,
+                    postTypeController: _controller1,
                   ),
                   const Row(),
                 ],
@@ -66,11 +69,13 @@ class NeedRegistrationPage extends StatelessWidget {
 
 class DonationItemComponent extends StatelessWidget {
   final ProductRegistrationController productRegistrationController;
+  final PostTypeController postTypeController;
 
   const DonationItemComponent({
-    Key? key,
+    super.key,
     required this.productRegistrationController,
-  }) : super(key: key);
+    required this.postTypeController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,20 +88,20 @@ class DonationItemComponent extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Nome do produto'),
+            const Text('Nome do item'),
             CustomTextFields(
               icon: Icons.label,
               secret: false,
               controller: productRegistrationController.crtlItemName,
               keyboardType: TextInputType.name,
               labelColor: ConstantsColors.greyShade200,
-              hintText: 'Digite o produto',
+              hintText: 'Digite o item',
             ),
             const SizedBox(height: 20),
             const Text('Descrição'),
             CustomTextFields(
               icon: Icons.edit_document,
-              hintText: 'Descreva sua necessidade',
+              hintText: 'Descreva a sua necessidade/doação',
               secret: false,
               controller: productRegistrationController.crtlDesc,
               keyboardType: TextInputType.multiline,
@@ -105,9 +110,10 @@ class DonationItemComponent extends StatelessWidget {
             const SizedBox(height: 20),
             const Text('Categoria e Quantidade'),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(15.0),
+                  padding: const EdgeInsets.only(right: 15),
                   child: CustomDropDownButtonComponent(
                     selected: productRegistrationController
                         .selectedValueCategory.value,
@@ -128,6 +134,14 @@ class DonationItemComponent extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const Text('Tipo de divulgação'),
+            CustomDropDownButtonComponent(
+              selected: postTypeController.selectedValueCategory.value,
+              items: postTypeController.category,
+              hint: 'Selecione uma opção',
+              onChanged: (item) =>
+                  productRegistrationController.selectedItemCategory = item,
             ),
             const Padding(
               padding: EdgeInsets.only(top: 120.0),
@@ -171,29 +185,33 @@ class CustomDropDownButtonComponent extends StatelessWidget {
   final void Function(String?)? onChanged;
 
   const CustomDropDownButtonComponent({
-    Key? key,
+    super.key,
     required this.selected,
     required this.items,
     required this.onChanged,
     required this.hint,
     this.color = ConstantsColors.greyShade200,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String?>(
-      value: selected,
-      hint: Text(hint),
-      items: items
-          .map((item) => DropdownMenuItem<String?>(
-                value: item,
-                child: Text(
-                  item!,
-                  style: const TextStyle(fontSize: 24),
-                ),
-              ))
-          .toList(),
-      onChanged: onChanged,
+    return Container(
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+      child: DropdownButton<String?>(
+        value: selected,
+        hint: Text(hint),
+        items: items
+            .map((item) => DropdownMenuItem<String?>(
+                  value: item,
+                  child: Text(
+                    item!,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ))
+            .toList(),
+        onChanged: onChanged,
+      ),
     );
   }
 }

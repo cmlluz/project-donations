@@ -39,7 +39,7 @@ class _PostPageState extends State<PostPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            GoRouter.of(context).go('/popupMenuState');
+            GoRouter.of(context).go('/root');
           },
         ),
         title: const Text(
