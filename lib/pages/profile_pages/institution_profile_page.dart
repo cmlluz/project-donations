@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/gallery_state.dart';
 import 'package:appdonationsgestor/components/profile_info_component.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:appdonationsgestor/pages/settings_page.dart';
 import 'package:appdonationsgestor/components/post_card.dart';
 
 class InstitutionProfilePage extends StatefulWidget {

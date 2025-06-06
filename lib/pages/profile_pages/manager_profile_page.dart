@@ -2,7 +2,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/pages/settings_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/components/post_card.dart';
 
 class ManagerProfilePage extends StatefulWidget {
