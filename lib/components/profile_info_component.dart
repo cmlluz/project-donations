@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class ProfileInfoComponent extends StatelessWidget {
   const ProfileInfoComponent({
@@ -25,16 +26,14 @@ class ProfileInfoComponent extends StatelessWidget {
             ),
           ),
         ),
-        const Column(
+        Column(
           children: [
             Align(
               child: Text(
                 "Lar dos idosos",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBold),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -42,33 +41,31 @@ class ProfileInfoComponent extends StatelessWidget {
               alignment: Alignment.bottomRight,
               child: Text(
                 "Contato",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Poppins',
-                ),
+                ).merge(TextStylesConstants.kpoppinsBlack),
               ),
             ),
-            Row(
+            const Row(
               children: [
                 Icon(Icons.phone_in_talk_outlined),
                 Opacity(
                     opacity: 0.7,
                     child: Text(
                       "(71)1234-5678",
-                      style: TextStyle(fontFamily: 'Poppins'),
+                      style: TextStylesConstants.kpoppinsRegular,
                       textAlign: TextAlign.left,
                     ))
               ],
             ),
-            Row(
+            const Row(
               children: [
                 Icon(Icons.email_outlined),
                 Opacity(
                     opacity: 0.7,
                     child: Text(
                       "@gmail.com",
-                      style: TextStyle(fontFamily: 'Poppins'),
+                      style: TextStylesConstants.kpoppinsRegular,
                       textAlign: TextAlign.left,
                     ))
               ],

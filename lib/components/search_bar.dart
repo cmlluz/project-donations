@@ -11,7 +11,8 @@ class Searchbar extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE0E0E0), width: 2.0),
+              border:
+                  Border.all(color: ConstantsColors.whiteShade500, width: 2.0),
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: TextField(
@@ -22,11 +23,11 @@ class Searchbar extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: const Color.fromARGB(17, 238, 238, 238),
+                fillColor: ConstantsColors.greyShade100,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
                 suffixIcon: const Icon(
                   Icons.search,
-                  color: ConstantsColors.black,
+                  color: ConstantsColors.blackShade900,
                 ),
               ),
             ),

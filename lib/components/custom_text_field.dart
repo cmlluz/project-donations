@@ -1,22 +1,30 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class CustomTextFields extends StatefulWidget {
   final IconData icon;
-  final String label;
+  final String? label;
   final bool secret;
+  final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
+  final int? maxLines;
+  final String? hintText;
 
   const CustomTextFields({
-    Key? key,
+    super.key,
     required this.icon,
-    required this.label,
+    this.label,
     this.secret = false,
+    this.labelColor,
     this.controller,
     this.keyboardType,
     this.validator,
-  }) : super(key: key);
+    this.maxLines,
+    this.hintText,
+  });
 
   @override
   State<CustomTextFields> createState() => _CustomTextFieldState();
@@ -30,6 +38,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
     hide = widget.secret;
   }
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -38,14 +47,10 @@ class _CustomTextFieldState extends State<CustomTextFields> {
         keyboardType: widget.keyboardType,
         obscureText: hide,
         validator: widget.validator,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: Color.fromARGB(255, 0, 0, 0),
-        ),
+        style: TextStylesConstants.kcustomTextField,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: widget.labelColor ?? ConstantsColors.whiteShade900,
           prefixIcon: Icon(widget.icon),
           suffixIcon: widget.secret
               ? IconButton(
@@ -62,6 +67,11 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+          ),
+          hintText: widget.hintText,
+          hintStyle: const TextStyle(
+            fontSize: 16,
+            color: Color.fromARGB(255, 150, 150, 150),
           ),
         ),
       ),
