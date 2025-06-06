@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
             if (index == 0) {
               return Padding(
                 padding:
-                    const EdgeInsets.only(top: 10.0, bottom: 15.0, left: 10.0),
+                    const EdgeInsets.only(top: 30.0, bottom: 30.0, left: 10.0),
                 child: Text(
                   'Olá, Name 👋',
                   style: const TextStyle(
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
             }
 
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              padding: const EdgeInsets.only(bottom: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -1,9 +1,8 @@
-import 'package:appdonationsgestor/pages/search_page.dart';
+import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
-import 'package:appdonationsgestor/pages/item_register_page.dart';
+import 'package:appdonationsgestor/pages/item_post_page.dart';
 import 'package:appdonationsgestor/pages/login_page.dart';
-import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/pages/post_page.dart';
 import 'package:appdonationsgestor/resources/root_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/user_register_Page.dart';
@@ -14,11 +13,14 @@ import 'package:appdonationsgestor/pages/register_pages/institution_register_pag
 import 'package:appdonationsgestor/pages/register_pages/manager_register_page.dart';
 import 'package:appdonationsgestor/pages/forgot_password_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/finalize_registration_page.dart';
+import 'package:appdonationsgestor/pages/favorites_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
   static const String searchPage = "search_page";
-  static const String itemRegisterPage = "itemRegisterPage";
+  static const String itemPostPage = "itemPostPage";
   static const String itemEditPage = "itemEditPage";
   static const String institutionProfilePage = "institutionProfilePage";
   static const String homePage = "homePage";
@@ -33,6 +35,8 @@ class RouteNames {
   static const String userTypePage = "userTypePage";
   static const String forgotPasswordPage = "forgotPasswordPage";
   static const String finalizeRegistrationPage = "finalizeRegistrationPage";
+  static const String favoritesPage = "favoritesPage";
+  static const String managerProfilePage = "managerProfilePage";
 }
 
 class AppRountersConfiguration {
@@ -59,11 +63,11 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-          path: '/itemRegisterPage',
-          name: RouteNames.itemRegisterPage,
+          path: '/itemPostPage',
+          name: RouteNames.itemPostPage,
           pageBuilder: (context, state) {
             return MaterialPage(
-              child: ItemRegisterPage(),
+              child: ItemPostPage(),
             );
           },
         ),
@@ -91,15 +95,6 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return MaterialPage(
               child: ItemEditPage(),
-            );
-          },
-        ),
-        GoRoute(
-          path: '/popupMenuState',
-          name: RouteNames.popupMenuState,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: PopupMenuState(),
             );
           },
         ),
@@ -165,7 +160,31 @@ class AppRountersConfiguration {
               child: FinalizeRegistrationPage(),
             );
           },
-        )
+        ),
+        GoRoute(
+          path: '/favoritesPage',
+          name: RouteNames.favoritesPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: FavoritesPage(),
+            );
+          },
+        ),
+        GoRoute(
+            path: '/managerProfilePage',
+            name: RouteNames.managerProfilePage,
+            pageBuilder: (context, state) {
+              return const MaterialPage(
+                child: ManagerProfilePage(),
+              );
+            }),
+        GoRoute(
+          path: '/removeAccountPage',
+          name: 'removeAccountPage',
+          pageBuilder: (context, state) => const MaterialPage(
+            child: RemoveAccountPage(),
+          ),
+        ),
       ],
     );
   }

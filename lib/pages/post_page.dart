@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -34,25 +34,33 @@ class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ConstantsColors.blueShade900,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            GoRouter.of(context).go('/popupMenuState');
+            GoRouter.of(context).go('/root');
           },
         ),
         title: const Text(
-          'Criar publicação',
+          'Criar Publicação',
           style: TextStylesConstants.kformularyTitle,
         ),
-        backgroundColor: ConstantsColors.blueShade950,
+        backgroundColor: ConstantsColors.blueShade900,
         foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
-      body: SafeArea(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: ConstantsColors.whiteShade900,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(35.0),
+          ),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -61,13 +69,15 @@ class _PostPageState extends State<PostPage> {
                   pickImageFromGallery();
                 },
                 child: Container(
-                  width: double.infinity,
-                  height: 350,
+                  margin: const EdgeInsets.only(left: 20, right: 20),
+                  alignment: Alignment.center,
+                  width: 400,
+                  height: 300,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(25.0),
                     border: Border.all(
                       color: ConstantsColors.greyShade300,
-                      width: 1,
+                      width: 2,
                     ),
                     image: _selectedImg == null
                         ? const DecorationImage(
@@ -82,41 +92,47 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Descreva a postagem:",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                  color: ConstantsColors.blueShade900,
+                ).merge(TextStylesConstants.kpoppinsBold),
               ),
-              const SizedBox(height: 10),
-              CustomTextFields(
-                  icon: Icons.description,
-                  label: 'Descrição do post',
-                  secret: false,
-                  controller: _controller.crtlDesc,
-                  keyboardType: TextInputType.text),
               const SizedBox(height: 20),
-              Container(
-                width: 200.0,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // confirmar a postagem
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.blueShade900,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+              CustomTextFields(
+                icon: Icons.description,
+                label: 'Legenda',
+                hintText: 'Escreva uma descrição para o post',
+                secret: false,
+                controller: _controller.crtlDesc,
+                keyboardType: TextInputType.text,
+                labelColor: ConstantsColors.greyShade200,
+              ),
+              const SizedBox(height: 20),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Publicar',
+                    route: '/root',
+                    color: ConstantsColors.blueShade900,
+                    textColor: ConstantsColors.whiteShade900,
+                    hasMensage: true,
+                    mensage: 'Publicado com sucesso!',
                   ),
-                  child: const Text(
-                    'Confirmar',
-                    style: TextStyle(
-                        fontSize: 18, color: ConstantsColors.whiteShade900),
+                  SizedBox(width: 20),
+                  CustomButton(
+                    height: 50,
+                    width: 150,
+                    text: 'Voltar',
+                    route: '/root',
+                    color: ConstantsColors.whiteShade900,
+                    textColor: ConstantsColors.blueShade900,
                   ),
-                ),
+                ],
               ),
             ],
           ),

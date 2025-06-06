@@ -1,6 +1,7 @@
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class UserType extends StatelessWidget {
   const UserType({super.key});
@@ -12,6 +13,7 @@ class UserType extends StatelessWidget {
       body: Column(
         children: [
           Container(
+            alignment: Alignment.topLeft,
             height: 320,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             decoration: const BoxDecoration(
@@ -19,6 +21,13 @@ class UserType extends StatelessWidget {
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(50),
               ),
+            ),
+            child: IconButton(
+              onPressed: () {
+                GoRouter.of(context).go('/');
+              },
+              icon: const Icon(Icons.arrow_back,
+                  color: ConstantsColors.whiteShade600),
             ),
           ),
           Expanded(
