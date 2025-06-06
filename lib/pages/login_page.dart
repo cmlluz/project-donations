@@ -29,11 +29,13 @@ class _LoginPage extends State<LoginPage> {
 
   void signIn() async {
     try {
-      await authService.value.signIn(email: emailController.text, password: passwordController.text)
+      await authService.value.signIn(
+          email: emailController.text, password: passwordController.text);
     } on FirebaseAuthException catch (e) {
       errorMessage = e.message ?? 'Erro  ao tentar fazer login';
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
