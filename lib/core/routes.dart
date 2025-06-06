@@ -15,6 +15,7 @@ import 'package:appdonationsgestor/pages/forgot_password_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/finalize_registration_page.dart';
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -177,6 +178,13 @@ class AppRountersConfiguration {
                 child: ManagerProfilePage(),
               );
             }),
+        GoRoute(
+          path: '/removeAccountPage',
+          name: 'removeAccountPage',
+          pageBuilder: (context, state) => const MaterialPage(
+            child: RemoveAccountPage(),
+          ),
+        ),
       ],
     );
   }

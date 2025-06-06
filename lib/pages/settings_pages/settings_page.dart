@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -62,12 +63,7 @@ class _SettingsPage extends State<SettingsPage> {
                 title: 'Deletar conta',
                 textColor: ConstantsColors.redShade800,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RemoveAccountPage(),
-                    ),
-                  );
+                  GoRouter.of(context).pushNamed('removeAccountPage');
                 },
               ),
             ],
