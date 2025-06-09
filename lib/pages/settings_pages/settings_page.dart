@@ -14,60 +14,58 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPage extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Configurações'),
-          backgroundColor: ConstantsColors.whiteShade900,
-          elevation: 0,
-          iconTheme: const IconThemeData(color: ConstantsColors.blueShade900),
-          titleTextStyle: TextStylesConstants.kinterSemiBold.merge(
-            const TextStyle(
-              color: ConstantsColors.blueShade900,
-              fontSize: 24,
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Configurações'),
+        backgroundColor: ConstantsColors.whiteShade900,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: ConstantsColors.blueShade900),
+        titleTextStyle: TextStylesConstants.kinterSemiBold.merge(
+          const TextStyle(
+            color: ConstantsColors.blueShade900,
+            fontSize: 24,
           ),
         ),
-        backgroundColor: ConstantsColors.whiteShade900,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 27),
-              _buildSettingOption(
-                title: 'Editar Perfil',
-                onTap: () {
-                  // TODO: Navegar para edição de perfil
-                },
-              ),
-              const SizedBox(height: 27),
-              _buildSettingOption(
-                title: 'Notificações',
-                icon: Icons.message_outlined,
-                onTap: () {
-                  // TODO: Navegar para notificações
-                },
-              ),
-              const SizedBox(height: 27),
-              _buildSettingOption(
-                title: 'Sair da conta',
-                onTap: () {
-                  // TODO: Implementar logout
-                },
-              ),
-              const SizedBox(height: 27),
-              _buildSettingOption(
-                title: 'Deletar conta',
-                textColor: ConstantsColors.redShade800,
-                onTap: () {
-                  GoRouter.of(context).pushNamed('removeAccountPage');
-                },
-              ),
-            ],
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      backgroundColor: ConstantsColors.whiteShade900,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 27),
+            _buildSettingOption(
+              title: 'Editar Perfil',
+              onTap: () {
+                // TODO: Navegar para edição de perfil
+              },
+            ),
+            const SizedBox(height: 27),
+            _buildSettingOption(
+              title: 'Notificações',
+              icon: Icons.message_outlined,
+              onTap: () {
+                // TODO: Navegar para notificações
+              },
+            ),
+            const SizedBox(height: 27),
+            _buildSettingOption(
+              title: 'Sair da conta',
+              onTap: () {
+                GoRouter.of(context).pushNamed('loginPage');
+              },
+            ),
+            const SizedBox(height: 27),
+            _buildSettingOption(
+              title: 'Deletar conta',
+              textColor: ConstantsColors.redShade800,
+              onTap: () {
+                GoRouter.of(context).pushNamed('removeAccountPage');
+              },
+            ),
+          ],
         ),
       ),
     );

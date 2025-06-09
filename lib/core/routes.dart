@@ -37,6 +37,7 @@ class RouteNames {
   static const String finalizeRegistrationPage = "finalizeRegistrationPage";
   static const String favoritesPage = "favoritesPage";
   static const String managerProfilePage = "managerProfilePage";
+  static const String removeAccountPage = 'removeAccountPage';
 }
 
 class AppRountersConfiguration {
@@ -180,7 +181,7 @@ class AppRountersConfiguration {
             }),
         GoRoute(
           path: '/removeAccountPage',
-          name: 'removeAccountPage',
+          name: RouteNames.removeAccountPage,
           pageBuilder: (context, state) => const MaterialPage(
             child: RemoveAccountPage(),
           ),

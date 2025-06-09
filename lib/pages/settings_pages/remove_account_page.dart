@@ -96,7 +96,7 @@ class _RemoveAccountPage extends State<RemoveAccountPage> {
                                 ),
                               ),
                               onPressed: () {
-                                // context.go('/');
+                                // GoRouter.of(context).pushNamed('loginPage');
                               },
                               child: Text(
                                 'Deletar permanentemente',
