@@ -1,4 +1,5 @@
-import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
+// import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
+// import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -39,7 +40,7 @@ class _SettingsPage extends State<SettingsPage> {
             _buildSettingOption(
               title: 'Editar Perfil',
               onTap: () {
-                // TODO: Navegar para edição de perfil
+                GoRouter.of(context).pushNamed('editProfilePage');
               },
             ),
             const SizedBox(height: 27),
