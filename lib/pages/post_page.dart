@@ -110,10 +110,10 @@ class _PostPageState extends State<PostPage> {
                 labelColor: ConstantsColors.greyShade200,
               ),
               const SizedBox(height: 20),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomButton(
+                  const CustomButton(
                     height: 50,
                     width: 150,
                     text: 'Publicar',
@@ -123,14 +123,35 @@ class _PostPageState extends State<PostPage> {
                     hasMensage: true,
                     mensage: 'Publicado com sucesso!',
                   ),
-                  SizedBox(width: 20),
-                  CustomButton(
+                  const SizedBox(width: 20),
+                  const CustomButton(
                     height: 50,
                     width: 150,
                     text: 'Voltar',
                     route: '/root',
                     color: ConstantsColors.whiteShade900,
                     textColor: ConstantsColors.blueShade900,
+                  ),
+                  Container(
+                    width: 200.0,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // confirmar a postagem
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ConstantsColors.blueShade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      ),
+                      child: const Text(
+                        'Confirmar',
+                        style: TextStyle(
+                            fontSize: 18, color: ConstantsColors.whiteShade900),
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -58,14 +58,16 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                               const SizedBox(height: 5),
                               Text(
                                 'Lucia Fontes ',
-                                style: TextStylesConstants.kinterSemiBold
-                                    .merge(const TextStyle(fontSize: 20.0)),
+                                style: TextStylesConstants.kinterSemiBold.merge(
+                                  const TextStyle(fontSize: 20.0),
+                                ),
                               ),
                               const SizedBox(height: 3),
                               Text(
                                 'Contato: ',
-                                style: TextStylesConstants.kinterBold
-                                    .merge(const TextStyle(fontSize: 15.0)),
+                                style: TextStylesConstants.kinterBold.merge(
+                                  const TextStyle(fontSize: 15.0),
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Row(
@@ -76,8 +78,10 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                   const SizedBox(width: 6),
                                   Text(
                                     '(71)12345-6789',
-                                    style: TextStylesConstants.kinterRegular
-                                        .merge(const TextStyle(fontSize: 15.0)),
+                                    style:
+                                        TextStylesConstants.kinterRegular.merge(
+                                      const TextStyle(fontSize: 15.0),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -90,8 +94,10 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                   const SizedBox(width: 6),
                                   Text(
                                     'Luciafontes@gmail.com',
-                                    style: TextStylesConstants.kinterRegular
-                                        .merge(const TextStyle(fontSize: 15.0)),
+                                    style:
+                                        TextStylesConstants.kinterRegular.merge(
+                                      const TextStyle(fontSize: 15.0),
+                                    ),
                                   ),
                                 ],
                               ),

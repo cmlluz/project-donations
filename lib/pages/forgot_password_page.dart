@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
-import 'package:appdonationsgestor/components/custom_button.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -61,20 +61,60 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
-                const CustomButton(
-                  text: "Prosseguir",
-                  route: '/forgotPasswordPage',
-                  hasMensage: true,
-                  mensage:
-                      'Link de recuperação enviado para o e-mail informado.',
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ConstantsColors.blueShade900,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Link de recuperação enviado!'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: ConstantsColors.blueShade900,
+                        dismissDirection: DismissDirection.horizontal,
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Prosseguir',
+                    style: TextStyle(
+                        fontSize: 16, color: ConstantsColors.whiteShade900),
+                  ),
                 ),
                 const SizedBox(height: 10),
-                const CustomButton(
-                  text: "Voltar",
-                  route: '/',
-                  color: ConstantsColors.whiteShade900,
-                  textColor: ConstantsColors.blueShade900,
-                )
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ConstantsColors.whiteShade900,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    GoRouter.of(context).go('/');
+                  },
+                  child: const Text(
+                    'Voltar',
+                    style: TextStyle(
+                      color: ConstantsColors.blueShade900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

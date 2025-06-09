@@ -8,6 +8,7 @@ class ConstantsColors {
       Color.fromRGBO(92, 147, 166, 1); // mainColor
   static const Color blueShade800 = Color.fromRGBO(24, 32, 101, 1); // darkBlue
   static const Color blueShade950 = Color.fromRGBO(3, 32, 106, 1); // darkerBlue
+
   static const Color indigoShade900 = Color.fromRGBO(26, 35, 126, 1);
 
   // ⚫ Black & grey Shades
@@ -38,7 +39,6 @@ class ConstantsColors {
   // 🔴 Red Shade
   static const Color redShade800 = Color(0xFFEE0B0B); // red
   static const Color redShade900 = Color(0xFF7C0101); // red
-
   // 🟢 Teal Shade
   static const Color tealShade200 = Color(0xFFAFDFD8); // navigationColor
 }

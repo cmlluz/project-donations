@@ -9,6 +9,7 @@ class CustomTextFields extends StatefulWidget {
   final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+
   final String? Function(String?)? validator;
   final int? maxLines;
   final String? hintText;

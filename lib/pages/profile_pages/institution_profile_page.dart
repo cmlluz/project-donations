@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/pages/popup_menu_state.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,9 @@ import 'package:appdonationsgestor/components/gallery_state.dart';
 import 'package:appdonationsgestor/components/profile_info_component.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:appdonationsgestor/components/post_card.dart';
+import 'package:appdonationsgestor/components/item_card.dart';
+import 'package:appdonationsgestor/components/profile_info_component.dart';
+import 'package:page_transition/page_transition.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
   const InstitutionProfilePage({super.key});
@@ -15,7 +19,6 @@ class InstitutionProfilePage extends StatefulWidget {
 
 class InstitutionProfilePageState extends State<InstitutionProfilePage> {
   bool isFavorite = false;
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(

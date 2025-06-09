@@ -15,11 +15,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPage extends State<LoginPage> {
-  final firebaseAuth = AuthService();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
+  final AuthService firebaseAuth = AuthService();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   String errorMessage = '';
+  bool isLoading = false;
+
   @override
   void dispose() {
     emailController.dispose();
@@ -27,12 +30,28 @@ class _LoginPage extends State<LoginPage> {
     super.dispose();
   }
 
-  void signIn() async {
+  Future<void> signIn() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
     try {
-      await authService.value.signIn(
-          email: emailController.text, password: passwordController.text);
+      await firebaseAuth.signIn(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      if (mounted) {
+        GoRouter.of(context).go('/root');
+      }
     } on FirebaseAuthException catch (e) {
-      errorMessage = e.message ?? 'Erro  ao tentar fazer login';
+      setState(() {
+        errorMessage = e.message ?? 'Erro ao tentar fazer login';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -53,20 +72,21 @@ class _LoginPage extends State<LoginPage> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 80),
-                CustomTextFields(
-                  icon: Icons.email,
-                  label: 'Email',
-                  secret: false,
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 20),
-                Stack(
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const SizedBox(height: 80),
+                    CustomTextFields(
+                      icon: Icons.email,
+                      label: 'Email',
+                      secret: false,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 20),
                     CustomTextFields(
                       icon: Icons.lock,
                       label: 'Senha',
@@ -74,29 +94,13 @@ class _LoginPage extends State<LoginPage> {
                       controller: passwordController,
                       keyboardType: TextInputType.visiblePassword,
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        GoRouter.of(context).go('/forgotPasswordPage');
-                      },
-                      child: Text(
-                        'Esqueci minha senha',
-                        style: TextStylesConstants.kformularyText.copyWith(
-                          color: ConstantsColors.blueShade900,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.end,
+                    const SizedBox(height: 20),
+                    if (errorMessage.isNotEmpty)
+                      Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Column(
-                  children: [
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -123,74 +127,84 @@ class _LoginPage extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        onPressed: () {
-                          GoRouter.of(context).go('/root');
-                        },
-                        child: const Text(
-                          'Continuar',
-                          style: TextStyle(
-                            color: ConstantsColors.whiteShade900,
-                            fontSize: 18,
+                        onPressed: isLoading ? null : signIn,
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Continuar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: Colors.grey.shade600,
+                            thickness: 1,
                           ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'ou',
+                            style: TextStylesConstants.kformularyText.copyWith(
+                              color: Colors.grey.shade600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: Colors.grey.shade600,
+                            thickness: 1,
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: GoogleAuthButton(
+                            onPressed: () async {
+                              await firebaseAuth.loginWithGoogle();
+                            },
+                            style: const AuthButtonStyle(
+                              buttonType: AuthButtonType.icon,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: FacebookAuthButton(
+                            onPressed: () {
+                              // Futuro: implementar login com Facebook
+                            },
+                            style: const AuthButtonStyle(
+                              buttonType: AuthButtonType.icon,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Divider(
-                        color: ConstantsColors.greyShade600,
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        'ou',
-                        style: TextStylesConstants.kformularyText.copyWith(
-                          color: ConstantsColors.greyShade600,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        color: ConstantsColors.greyShade600,
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: GoogleAuthButton(
-                        onPressed: () async {
-                          await firebaseAuth.loginWithGoogle();
-                        },
-                        style: const AuthButtonStyle(
-                          buttonType: AuthButtonType.icon,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: FacebookAuthButton(
-                        onPressed: () {},
-                        style: const AuthButtonStyle(
-                          buttonType: AuthButtonType.icon,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
