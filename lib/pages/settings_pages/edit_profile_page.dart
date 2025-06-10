@@ -113,13 +113,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                CustomTextFields(
-                  icon: Icons.info_outline,
-                  label: 'Biografia',
-                  controller: bioController,
-                  keyboardType: TextInputType.multiline,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                SizedBox(
+                  height: 120,
+                  child: TextFormField(
+                    controller: bioController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: InputDecoration(
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(bottom: 55),
+                        child: Icon(
+                          Icons.info_outline,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      labelText: 'Biografia',
+                      alignLabelWithHint: true,
+                      filled: true,
+                      fillColor: ConstantsColors.whiteShade900,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: 'Digite sua biografia...',
+                      hintStyle: const TextStyle(
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 150, 150, 150),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -148,13 +170,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   onPressed: () {
                     GoRouter.of(context).go('/root');
                   },
-                  child: const Text(
+                  child: Text(
                     'Cancelar',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: ConstantsColors.blueShade900,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                    ),
+                    ).merge(TextStylesConstants.kpoppinsSemiBold),
                   ),
                 ),
               ],
