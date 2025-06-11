@@ -13,6 +13,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPage extends State<SettingsPage> {
+  bool isNotificationOn = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,9 +48,18 @@ class _SettingsPage extends State<SettingsPage> {
             const SizedBox(height: 27),
             _buildSettingOption(
               title: 'Notificações',
-              icon: Icons.message_outlined,
+              icon: isNotificationOn
+                  ? Icons.toggle_on
+                  : Icons.toggle_off_outlined,
+              iconColor: isNotificationOn
+                  ? ConstantsColors.blueShade900
+                  : ConstantsColors.blueShade900,
+              iconSize: 32,
+              alignment: MainAxisAlignment.spaceBetween,
               onTap: () {
-                // TODO: Navegar para notificações
+                setState(() {
+                  isNotificationOn = !isNotificationOn;
+                });
               },
             ),
             const SizedBox(height: 27),
@@ -76,7 +87,10 @@ class _SettingsPage extends State<SettingsPage> {
     required String title,
     IconData? icon,
     Color textColor = ConstantsColors.blackShade900,
+    Color iconColor = ConstantsColors.blackShade900,
+    double iconSize = 28,
     required VoidCallback onTap,
+    MainAxisAlignment alignment = MainAxisAlignment.start,
   }) {
     return Container(
       decoration: const BoxDecoration(
@@ -89,6 +103,7 @@ class _SettingsPage extends State<SettingsPage> {
       ),
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
+        mainAxisAlignment: alignment,
         children: [
           Expanded(
             child: TextButton(
@@ -97,7 +112,7 @@ class _SettingsPage extends State<SettingsPage> {
                 alignment: Alignment.centerLeft,
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: alignment,
                 children: [
                   Text(
                     title,
@@ -106,10 +121,11 @@ class _SettingsPage extends State<SettingsPage> {
                       fontSize: 16,
                     ).merge(TextStylesConstants.kpoppinsLight),
                   ),
-                  if (icon != null) ...[
-                    const SizedBox(width: 12),
-                    Icon(icon, color: textColor, size: 20),
-                  ]
+                  Icon(
+                    icon,
+                    color: iconColor,
+                    size: iconSize, // ← controla o tamanho do ícone
+                  ),
                 ],
               ),
             ),
