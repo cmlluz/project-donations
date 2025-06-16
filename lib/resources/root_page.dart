@@ -6,7 +6,7 @@ import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -36,47 +36,9 @@ class _RootPageState extends State<RootPage> {
     Icons.person_outline,
   ];
 
-  //Lista de titulos
-  // List<String> titleList = [
-  //   'Olá, Name 👋',
-  //   'Olá, Name 👋',
-  //   '',
-  //   'Configurações',
-  //   '',
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: titleList[_bottomNavIndex] == ''
-      //     ? PreferredSize(
-      //         preferredSize: _bottomNavIndex != 4
-      //             ? const Size.fromHeight(-20)
-      //             : const Size.fromHeight(-10),
-      //         child: Container(
-      //           color: _bottomNavIndex != 4
-      //               ? ConstantsColors.tealShade200
-      //               : ConstantsColors.whiteShade900,
-      //         ), // espaço vazio com altura 20
-      //       )
-      //     : AppBar(
-      //         title: Padding(
-      //           padding: const EdgeInsets.only(top: 25.0, bottom: 30.0),
-      //           child: Row(
-      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //             children: [
-      //               Text(
-      //                 titleList[_bottomNavIndex],
-      //                 style: const TextStyle(
-      //                   color: ConstantsColors.greyShade900,
-      //                   fontSize: 30,
-      //                 ).merge(TextStylesConstants.kpoppinsBold),
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-      //         elevation: 0.0,
-      //       ),
       body: IndexedStack(
         index: _bottomNavIndex,
         children: pages,
@@ -128,12 +90,11 @@ class _RootPageState extends State<RootPage> {
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
-              const Text(
+              Text(
                 'Comece a postar',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: ConstantsColors.blueShade900),
+                style: const TextStyle(
+                        fontSize: 20, color: ConstantsColors.blueShade900)
+                    .merge(TextStylesConstants.kinterSemiBold),
               ),
               const SizedBox(height: 24),
               Row(
@@ -203,7 +164,8 @@ class _BottomMenuOption extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-                fontSize: 14, color: ConstantsColors.blueShade900),
+                    fontSize: 14, color: ConstantsColors.blueShade900)
+                .merge(TextStylesConstants.kinterRegular),
           ),
         ],
       ),

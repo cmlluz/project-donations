@@ -16,6 +16,7 @@ import 'package:appdonationsgestor/pages/register_pages/finalize_registration_pa
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -37,6 +38,8 @@ class RouteNames {
   static const String finalizeRegistrationPage = "finalizeRegistrationPage";
   static const String favoritesPage = "favoritesPage";
   static const String managerProfilePage = "managerProfilePage";
+  static const String removeAccountPage = "removeAccountPage";
+  static const String editProfilePage = "editProfilePage";
 }
 
 class AppRountersConfiguration {
@@ -180,9 +183,16 @@ class AppRountersConfiguration {
             }),
         GoRoute(
           path: '/removeAccountPage',
-          name: 'removeAccountPage',
+          name: RouteNames.removeAccountPage,
           pageBuilder: (context, state) => const MaterialPage(
             child: RemoveAccountPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/editProfilePage',
+          name: RouteNames.editProfilePage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: EditProfilePage(),
           ),
         ),
       ],
