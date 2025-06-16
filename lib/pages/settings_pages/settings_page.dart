@@ -1,6 +1,9 @@
 // import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 // import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/auth/app_data.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +17,23 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPage extends State<SettingsPage> {
   bool isNotificationOn = false;
+  final formKey = GlobalKey<FormState>();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  String errorMessage = '';
+
+  void logout() async {
+    try {
+      await authService.value.signOut();
+      AppData.navBarCurrentIndexNotifier.value = 0;
+      AppData.onboardingCurrentIndexNotifier.value = 0;
+      if (context.mounted) {
+        context.go('/');
+      }
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +86,7 @@ class _SettingsPage extends State<SettingsPage> {
             _buildSettingOption(
               title: 'Sair da conta',
               onTap: () {
-                GoRouter.of(context).pushNamed('loginPage');
+                logout();
               },
             ),
             const SizedBox(height: 27),
