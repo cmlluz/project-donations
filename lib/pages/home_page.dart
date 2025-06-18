@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   //   WidgetsBinding.instance.addPostFrameCallback((_) {
   //     showDialog(
   //       context: context,
+  //       barrierDismissible: false,
   //       builder: (context) {
   //         final screenWidth = MediaQuery.of(context).size.width;
   //         final dialogWidth = screenWidth * 0.9;

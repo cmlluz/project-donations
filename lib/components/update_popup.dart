@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class UpdatePopup extends StatefulWidget {
-  final String? reminderButton;
+  final bool? reminderButton;
 
   const UpdatePopup({
     super.key,
@@ -57,38 +58,42 @@ class _UpdatePopupState extends State<UpdatePopup> {
                     borderRadius: BorderRadius.circular(6.0),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  GoRouter.of(context).go('/editProfilePage');
+                },
                 child: Text(
                   "Atualizar agora",
                   style: TextStylesConstants.kpoppinsBold.merge(
                     const TextStyle(
-                      fontSize: 12.0,
-                      color: ConstantsColors.whiteShade900, // cor do texto
+                        fontSize: 12.0, color: ConstantsColors.whiteShade900),
+                  ),
+                ),
+              ),
+              if (widget.reminderButton ?? true)
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: ConstantsColors.greyShade300,
+                    minimumSize: const Size(130, 35),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 6.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "Me lembre mais tarde",
+                    style: TextStylesConstants.kpoppinsRegular.merge(
+                      const TextStyle(
+                          fontSize: 12.0, color: ConstantsColors.blackShade900),
                     ),
                   ),
                 ),
-              ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: ConstantsColors.greyShade300,
-                  minimumSize: const Size(130, 35),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0, vertical: 6.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                ),
-                onPressed: () => {},
-                child: Text(
-                  "Me lembre mais tarde",
-                  style: TextStylesConstants.kpoppinsRegular.merge(
-                      const TextStyle(
-                          fontSize: 12.0,
-                          color: ConstantsColors.blackShade900)),
-                ),
-              ),
             ],
-          )
+          ),
         ],
       ),
     );
