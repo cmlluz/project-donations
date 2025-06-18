@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/components/card_item.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/components/update_popup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,6 +12,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+
+  // Display do popup de atualização cadastral
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         final screenWidth = MediaQuery.of(context).size.width;
+  //         final dialogWidth = screenWidth * 0.9;
+
+  //         return AlertDialog(
+  //           backgroundColor: ConstantsColors.blueShade400,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20),
+  //           ),
+  //           content: SizedBox(
+  //             width: dialogWidth,
+  //             child: const UpdatePopup(),
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
