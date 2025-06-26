@@ -17,6 +17,7 @@ import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/pages/necessity_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -40,6 +41,7 @@ class RouteNames {
   static const String managerProfilePage = "managerProfilePage";
   static const String removeAccountPage = "removeAccountPage";
   static const String editProfilePage = "editProfilePage";
+  static const String necessityPage = "necessityPage";
 }
 
 class AppRountersConfiguration {
@@ -193,6 +195,13 @@ class AppRountersConfiguration {
           name: RouteNames.editProfilePage,
           pageBuilder: (context, state) => const MaterialPage(
             child: EditProfilePage(),
+          ),
+        ),
+        GoRoute(
+          path: '/necessityPage',
+          name: RouteNames.necessityPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: NecessityPage(),
           ),
         ),
       ],

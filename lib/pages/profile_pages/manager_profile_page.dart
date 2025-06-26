@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/components/post_card.dart';
+import 'package:go_router/go_router.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({Key? key}) : super(key: key);
@@ -151,7 +152,9 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                       color: ConstantsColors.greyShade900),
                                 ),
                               ),
-                              onPressed: () => {},
+                              onPressed: () {
+                                GoRouter.of(context).push('/necessityPage');
+                              },
                             ),
                           ],
                         ),
