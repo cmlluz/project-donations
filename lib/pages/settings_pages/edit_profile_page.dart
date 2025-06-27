@@ -2,6 +2,8 @@ import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,6 +21,64 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController pixController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  void updateProfile() async {
+    final updatedData = {
+      if (nameController.text.trim().isNotEmpty)
+        'name': nameController.text.trim(),
+      if (emailController.text.trim().isNotEmpty)
+        'email': emailController.text.trim(),
+      if (phoneController.text.trim().isNotEmpty)
+        'phone': phoneController.text.trim(),
+      if (pixController.text.trim().isNotEmpty)
+        'pix': pixController.text.trim(),
+      if (bioController.text.trim().isNotEmpty)
+        'bio': bioController.text.trim(),
+      if (passwordController.text.trim().isNotEmpty)
+        'password': passwordController.text.trim(),
+    };
+
+    if (updatedData.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nenhum campo foi alterado.')),
+      );
+      return;
+    }
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception('Usuário não autenticado.');
+      }
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update(updatedData);
+
+      if (updatedData.containsKey('email')) {
+        if (updatedData['email'] != null) {
+          await user.updateEmail(updatedData['email'] as String);
+        }
+      }
+
+      if (updatedData['password'] != null) {
+        await user.updatePassword(updatedData['password'] as String);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+      );
+
+      GoRouter.of(context).go('/root');
+    } catch (e, stackTrace) {
+      print('Erro ao atualizar perfil: $e');
+      print('Stack trace: $stackTrace');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao atualizar perfil: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,15 +216,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const CustomButton(
+                CustomButton(
                   height: 50,
                   width: double.infinity,
                   text: 'Confirmar',
-                  route: '/root',
+                  onPressed: updateProfile,
                   color: ConstantsColors.blueShade900,
                   textColor: ConstantsColors.whiteShade900,
-                  hasMensage: true,
-                  mensage: 'Perfil atualizado com sucesso!',
                 ),
                 TextButton(
                   onPressed: () {

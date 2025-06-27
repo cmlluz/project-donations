@@ -1,7 +1,10 @@
+import 'package:appdonationsgestor/auth/app_data.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 // import 'package:appdonationsgestor/core/routes.dart';
 
@@ -21,6 +24,20 @@ class _RemoveAccountPage extends State<RemoveAccountPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  void deleteAccount() async {
+    try {
+      await authService.value.deleteAccount(
+          email: emailController.text, password: passwordController.text);
+      AppData.navBarCurrentIndexNotifier.value = 0;
+      AppData.onboardingCurrentIndexNotifier.value = 0;
+      if (context.mounted) {
+        context.go('/');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -96,7 +113,7 @@ class _RemoveAccountPage extends State<RemoveAccountPage> {
                                 ),
                               ),
                               onPressed: () {
-                                // GoRouter.of(context).pushNamed('loginPage');
+                                deleteAccount();
                               },
                               child: Text(
                                 'Deletar permanentemente',
