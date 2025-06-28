@@ -18,6 +18,7 @@ class _HystoryPage extends State<HystoryPage> {
       'local': 'Barbalho, Salvador',
       'data': '10 de Abril de 2024',
       'categoria': 'Vestimentas',
+      'donated': true,
     },
     {
       'instituicao': 'Casa da Criança',
@@ -26,6 +27,7 @@ class _HystoryPage extends State<HystoryPage> {
       'local': 'Cabula, Salvador',
       'data': '15 de Abril de 2024',
       'categoria': 'Alimentos',
+      'donated': false,
     },
     {
       'instituicao': 'Abrigo Esperança',
@@ -34,6 +36,7 @@ class _HystoryPage extends State<HystoryPage> {
       'local': 'Federação, Salvador',
       'data': '20 de Abril de 2024',
       'categoria': 'Higiene',
+      'donated': true,
     },
   ];
 
@@ -60,45 +63,94 @@ class _HystoryPage extends State<HystoryPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: necessidades.map((necessidade) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.only(bottom: 50.0),
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Text(
-                    necessidade['instituicao'],
-                    style: TextStylesConstants.kpoppinsMedium.merge(
-                      const TextStyle(fontSize: 15.0),
+                  Positioned(
+                    bottom: -30,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.only(top: 16, left: 12),
+                      decoration: BoxDecoration(
+                        color: ConstantsColors.blueShade500.withOpacity(0.38),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            offset: const Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          necessidade['donated'] == true
+                              ? const Icon(Icons.check_circle,
+                                  color: Colors.green, size: 20)
+                              : const Icon(Icons.close,
+                                  color: Colors.red, size: 20),
+                          const SizedBox(width: 6),
+                          Text(
+                            necessidade['donated'] == true
+                                ? 'Doação confirmada'
+                                : 'Doação não confirmada',
+                            style: TextStylesConstants.kpoppinsMedium.merge(
+                              const TextStyle(
+                                  fontSize: 13,
+                                  color: ConstantsColors.blackShade900),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
                   Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: const Border(
-                          right: BorderSide(
-                            color: ConstantsColors.blueShade900,
-                            width: 5,
-                          ),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(16),
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            necessidade['item'],
-                            style: TextStylesConstants.kpoppinsMedium.merge(
-                              const TextStyle(fontSize: 15),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                necessidade['item'],
+                                style: TextStylesConstants.kpoppinsSemiBold
+                                    .merge(const TextStyle(fontSize: 16)),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  'ver mais',
+                                  style:
+                                      TextStylesConstants.kinterRegular.merge(
+                                    const TextStyle(
+                                      fontSize: 13,
+                                      color: ConstantsColors.greyShade900,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -143,34 +195,24 @@ class _HystoryPage extends State<HystoryPage> {
                                   ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                    vertical: 2.0,
-                                  ),
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  backgroundColor: ConstantsColors.greyShade300,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: ConstantsColors.greyShade300,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   necessidade['categoria'],
-                                  style:
-                                      TextStylesConstants.kinterRegular.merge(
-                                    const TextStyle(
-                                      fontSize: 12,
-                                      color: ConstantsColors.greyShade900,
-                                    ),
-                                  ),
+                                  style: TextStylesConstants.kpoppinsMedium
+                                      .merge(const TextStyle(
+                                    fontSize: 12,
+                                    color: ConstantsColors.blackShade900,
+                                  )),
                                 ),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
