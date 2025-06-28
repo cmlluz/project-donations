@@ -16,13 +16,20 @@ class TodosPage extends StatelessWidget {
       ),
       itemCount: 12,
       itemBuilder: (context, index) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        return InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.pushNamed(
+                context, '/paginaDestino'); // ou context.go('/rota')
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 4,
+            color: Colors.white,
+            child: const ImageCard(imageUrl: 'assets/instituicao.png'),
           ),
-          elevation: 4,
-          color: Colors.white,
-          child: const ImageCard(imageUrl: 'assets/instituicao.png'),
         );
       },
     );
