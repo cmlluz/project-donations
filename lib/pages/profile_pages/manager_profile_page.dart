@@ -153,7 +153,7 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                 ),
                               ),
                               onPressed: () {
-                                GoRouter.of(context).push('/necessityPage');
+                                GoRouter.of(context).push('/hystoryPage');
                               },
                             ),
                           ],

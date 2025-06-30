@@ -2,7 +2,6 @@ import 'dart:ui'; // necessário para BackdropFilter
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ImageCard extends StatelessWidget {
   final String imageUrl;
@@ -36,7 +35,6 @@ class ImageCard extends StatelessWidget {
                   return const Icon(Icons.broken_image);
                 },
               ),
-
               Positioned(
                 bottom: 10,
                 left: 5,
