@@ -11,11 +11,11 @@ class PostTypeController {
 
   ValueNotifier<int> itemQtdValue = ValueNotifier<int>(0);
 
-  set selectedItemCategory(String? item) => selectedValueCategory.value = item;
+  set selectedPostCategory(String? item) => selectedValueCategory.value = item;
 
   set itemQtd(int qtd) => itemQtdValue.value = qtd;
 
-  String? get selectedItemCategory => selectedValueCategory.value;
+  String? get selectedPostCategory => selectedValueCategory.value;
 
   int get itemQtd => itemQtdValue.value;
 

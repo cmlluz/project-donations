@@ -82,7 +82,9 @@ class DonationItemComponent extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([
         productRegistrationController.selectedValueCategory,
-        productRegistrationController.itemQtdValue
+        productRegistrationController.itemQtdValue,
+        postTypeController.selectedValueCategory,
+        postTypeController.itemQtdValue,
       ]),
       builder: (_, __) {
         return Column(
@@ -141,7 +143,7 @@ class DonationItemComponent extends StatelessWidget {
               items: postTypeController.category,
               hint: 'Selecione uma opção',
               onChanged: (item) =>
-                  productRegistrationController.selectedItemCategory = item,
+                  postTypeController.selectedPostCategory = item,
             ),
             const Padding(
               padding: EdgeInsets.only(top: 120.0),
