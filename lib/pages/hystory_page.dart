@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'nota_fiscal_page.dart'; // Importe a página de nota fiscal
 
 class HystoryPage extends StatefulWidget {
   const HystoryPage({Key? key}) : super(key: key);
@@ -112,108 +113,129 @@ class _HystoryPage extends State<HystoryPage> {
                       ),
                     ),
                   ),
-                  Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                necessidade['item'],
-                                style: TextStylesConstants.kpoppinsSemiBold
-                                    .merge(const TextStyle(fontSize: 16)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => NotaFiscalPage(
+                            items: [
+                              Item(
+                                description: necessidade['item'],
+                                quantity: necessidade['quantidade'],
                               ),
-                              TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  necessidade['item'],
+                                  style: TextStylesConstants.kpoppinsSemiBold
+                                      .merge(const TextStyle(fontSize: 16)),
                                 ),
-                                child: Text(
-                                  'ver mais',
-                                  style:
-                                      TextStylesConstants.kinterRegular.merge(
-                                    const TextStyle(
-                                      fontSize: 13,
-                                      color: ConstantsColors.greyShade900,
+                                TextButton(
+                                  onPressed: () {},
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'ver mais',
+                                    style:
+                                        TextStylesConstants.kinterRegular.merge(
+                                      const TextStyle(
+                                        fontSize: 13,
+                                        color: ConstantsColors.greyShade900,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Quantidade: ${necessidade['quantidade']}',
-                            style: TextStylesConstants.kinterRegular.merge(
-                              const TextStyle(
-                                fontSize: 12,
-                                color: ConstantsColors.greyShade600,
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Quantidade: ${necessidade['quantidade']}',
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                  fontSize: 12,
+                                  color: ConstantsColors.greyShade600,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_pin,
-                                color: ConstantsColors.greyShade600,
-                                size: 15,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                necessidade['local'],
-                                style: TextStylesConstants.kinterRegular.merge(
-                                  const TextStyle(
-                                    fontSize: 12,
-                                    color: ConstantsColors.greyShade600,
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_pin,
+                                  color: ConstantsColors.greyShade600,
+                                  size: 15,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  necessidade['local'],
+                                  style:
+                                      TextStylesConstants.kinterRegular.merge(
+                                    const TextStyle(
+                                      fontSize: 12,
+                                      color: ConstantsColors.greyShade600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                necessidade['data'],
-                                style: TextStylesConstants.kinterRegular.merge(
-                                  const TextStyle(
-                                    fontSize: 12,
-                                    color: ConstantsColors.greyShade600,
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  necessidade['data'],
+                                  style:
+                                      TextStylesConstants.kinterRegular.merge(
+                                    const TextStyle(
+                                      fontSize: 12,
+                                      color: ConstantsColors.greyShade600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: ConstantsColors.greyShade300,
-                                  borderRadius: BorderRadius.circular(8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: ConstantsColors.greyShade300,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    necessidade['categoria'],
+                                    style: TextStylesConstants.kpoppinsMedium
+                                        .merge(
+                                      const TextStyle(
+                                        fontSize: 12,
+                                        color: ConstantsColors.blackShade900,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  necessidade['categoria'],
-                                  style: TextStylesConstants.kpoppinsMedium
-                                      .merge(const TextStyle(
-                                    fontSize: 12,
-                                    color: ConstantsColors.blackShade900,
-                                  )),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
