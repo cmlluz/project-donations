@@ -157,7 +157,9 @@ class AppRountersConfiguration {
           name: RouteNames.forgotPasswordPage,
           pageBuilder: (context, state) {
             return const MaterialPage(
-              child: ForgotPasswordPage(),
+              child: ForgotPasswordPage(
+                email: '',
+              ),
             );
           },
         ),

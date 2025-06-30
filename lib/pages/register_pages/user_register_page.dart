@@ -1,8 +1,11 @@
+import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:go_router/go_router.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -12,20 +15,63 @@ class UserRegisterPage extends StatefulWidget {
 }
 
 class _UserRegisterPage extends State<UserRegisterPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController cpfCnpjController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+  String errorMessage = '';
+
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
     nameController.dispose();
-    phoneNumberController.dispose();
+    cpfCnpjController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    addressController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void registerUser() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      setState(() {
+        errorMessage = 'As senhas não coincidem';
+      });
+      return;
+    }
+
+    try {
+      await authService.value.createAccount(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      if (mounted) {
+        GoRouter.of(context).go('/finalizeRegistrationPage');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        if (e.code == 'weak-password') {
+          errorMessage = 'A senha deve ter pelo menos 8 caracteres.';
+        } else if (e.code == 'email-already-in-use') {
+          errorMessage =
+              'Este e-mail já está em uso. Tente outro ou faça login.';
+        } else if (e.code == 'invalid-email') {
+          errorMessage = 'O formato do e-mail é inválido.';
+        } else {
+          errorMessage =
+              e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.';
+        }
+      });
+    }
   }
 
   @override
@@ -46,85 +92,126 @@ class _UserRegisterPage extends State<UserRegisterPage> {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 50),
-                  Text(
-                    'Queremos saber mais sobre você!',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: ConstantsColors.blackShade700,
-                      fontSize: 28,
-                    ).merge(TextStylesConstants.kpoppinsBlack),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Informe alguns dados importantes para nós',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(190, 0, 0, 0),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 50),
+                    Text(
+                      'Queremos saber mais sobre você!',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: ConstantsColors.blackShade700,
+                        fontSize: 28,
+                      ).merge(TextStylesConstants.kpoppinsBlack),
                     ),
-                  ),
-                  const SizedBox(height: 80),
-                  const CustomTextFields(
-                    icon: Icons.person,
-                    label: 'Nome',
-                    secret: false,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.email,
-                    label: 'Email',
-                    secret: false,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.phone,
-                    label: 'Telefone',
-                    secret: false,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.person_4,
-                    label: 'CPF',
-                    secret: false,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.map,
-                    label: 'Endereço',
-                    secret: false,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.lock,
-                    label: 'Senha',
-                    secret: true,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomTextFields(
-                    icon: Icons.lock,
-                    label: 'Confirme sua Senha',
-                    secret: true,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomButton(
-                    text: 'Confirmar',
-                    route: '/finalizeRegistrationPage',
-                    color: ConstantsColors.blueShade900,
-                    textColor: ConstantsColors.whiteShade900,
-                  ),
-                  const SizedBox(height: 20),
-                  const CustomButton(
-                    text: 'Voltar',
-                    route: '/userTypePage',
-                    color: ConstantsColors.whiteShade900,
-                    textColor: ConstantsColors.blueShade900,
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Informe alguns dados importantes para nós',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color.fromARGB(190, 0, 0, 0),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 80),
+                    CustomTextFields(
+                      icon: Icons.person,
+                      label: 'Nome',
+                      secret: false,
+                      controller: nameController,
+                      keyboardType: TextInputType.name,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.email,
+                      label: 'Email',
+                      secret: false,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.phone,
+                      label: 'Telefone',
+                      secret: false,
+                      controller: phoneController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.person_4,
+                      label: 'CPF',
+                      secret: false,
+                      controller: cpfCnpjController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.map,
+                      label: 'Endereço',
+                      secret: false,
+                      controller: addressController,
+                      keyboardType: TextInputType.text,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.lock,
+                      label: 'Senha',
+                      secret: true,
+                      controller: passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextFields(
+                      icon: Icons.lock,
+                      label: 'Confirme sua Senha',
+                      secret: true,
+                      controller: confirmPasswordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    if (errorMessage.isNotEmpty)
+                      Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    CustomButton(
+                      text: 'Confirmar',
+                      color: ConstantsColors.blueShade900,
+                      textColor: ConstantsColors.whiteShade900,
+                      onPressed: () {
+                        if (formKey.currentState?.validate() ?? false) {
+                          registerUser();
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const CustomButton(
+                      text: 'Voltar',
+                      route: '/userTypePage',
+                      color: ConstantsColors.whiteShade900,
+                      textColor: ConstantsColors.blueShade900,
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
           ),

@@ -12,17 +12,21 @@ class CustomButton extends StatefulWidget {
   final double? fontSize;
   final bool? hasMensage;
   final String? mensage;
-  const CustomButton(
-      {super.key,
-      required this.text,
-      required this.route,
-      this.color,
-      this.textColor,
-      this.width,
-      this.height,
-      this.fontSize,
-      this.hasMensage = false,
-      this.mensage});
+  final VoidCallback? onPressed;
+
+  const CustomButton({
+    super.key,
+    required this.text,
+    this.route = '',
+    this.color,
+    this.textColor,
+    this.width,
+    this.height,
+    this.fontSize,
+    this.hasMensage = false,
+    this.mensage,
+    this.onPressed,
+  });
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
@@ -36,15 +40,18 @@ class _CustomButtonState extends State<CustomButton> {
       width: widget.width,
       child: ElevatedButton(
         onPressed: () {
-          if (widget.route.isNotEmpty && widget.hasMensage == true) {
+          if (widget.onPressed != null) {
+            widget.onPressed!();
+          } else if (widget.route.isNotEmpty && widget.hasMensage == true) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  backgroundColor: ConstantsColors.blueShade900,
-                  behavior: SnackBarBehavior.floating,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  content: Text(widget.mensage ?? '')),
+                backgroundColor: ConstantsColors.blueShade900,
+                behavior: SnackBarBehavior.floating,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                content: Text(widget.mensage ?? ''),
+              ),
             );
             GoRouter.of(context).go(widget.route);
           } else if (widget.route.isNotEmpty && widget.hasMensage == false) {
