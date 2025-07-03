@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
             if (index == 0) {
               return Padding(
                 padding:
-                    const EdgeInsets.only(top: 30.0, bottom: 30.0, left: 10.0),
+                    const EdgeInsets.only(top: 30.0, bottom: 20.0, left: 10.0),
                 child: Text(
                   'Olá, Name 👋',
                   style: const TextStyle(
