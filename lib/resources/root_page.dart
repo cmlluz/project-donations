@@ -117,6 +117,7 @@ class _RootPageState extends State<RootPage> {
                       label: 'Criar Necessidade/Doação',
                       onTap: () {
                         GoRouter.of(context).go("/itemPostPage");
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -128,6 +129,7 @@ class _RootPageState extends State<RootPage> {
                       label: 'Criar publicação',
                       onTap: () {
                         GoRouter.of(context).go("/postPage");
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
