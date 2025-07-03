@@ -9,7 +9,6 @@ class CustomTextFields extends StatefulWidget {
   final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator; // NOVO
   final int? maxLines;
   final int? maxLength; // NOVO
   final double? height; // NOVO
@@ -24,7 +23,6 @@ class CustomTextFields extends StatefulWidget {
     this.labelColor,
     this.controller,
     this.keyboardType,
-    this.validator,
     this.maxLines,
     this.maxLength,
     this.height,
@@ -55,7 +53,6 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           controller: widget.controller,
           keyboardType: widget.keyboardType,
           obscureText: hide,
-          validator: widget.validator,
           maxLines: widget.maxLines ?? 1,
           maxLength: widget.maxLength,
           style: TextStylesConstants.kcustomTextField,
@@ -76,12 +73,10 @@ class _CustomTextFieldState extends State<CustomTextFields> {
             labelText: widget.label,
             isDense: true,
             hintText: widget.hintText,
-            border: widget.border ??
-                OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide:
-                      const BorderSide(width: 0, style: BorderStyle.none),
-                ),
+            border: widget.border ?? OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+            ),
             hintStyle: const TextStyle(
               fontSize: 16,
               color: Color.fromARGB(255, 150, 150, 150),
