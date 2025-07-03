@@ -29,7 +29,7 @@ class _SearchPageState extends State<SearchPage> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: 30.0, bottom: 20.0, left: 10.0),
+                      top: 20.0, bottom: 20.0, left: 10.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -61,7 +61,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 const SizedBox(height: 10.0),
                 SizedBox(
-                  height: constraints.maxHeight - 225,
+                  height: constraints.maxHeight - 210,
                   child: getSelectedPage(),
                 ),
               ],
