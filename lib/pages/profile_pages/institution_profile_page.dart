@@ -126,6 +126,21 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
                           ],
                         ),
                       ),
+                      Transform.translate(
+                        offset: const Offset(5, -20),
+                        child: IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: ConstantsColors.blueShade900,
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isFavorite = !isFavorite;
+                            });
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -326,24 +341,6 @@ class InstitutionProfilePageState extends State<InstitutionProfilePage> {
                   },
                 ),
               ],
-            ),
-          ),
-          Positioned(
-            top: 0,
-            right: 5,
-            child: IconButton(
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite
-                    ? ConstantsColors.blueShade900
-                    : ConstantsColors.blueShade900,
-                size: 30,
-              ),
-              onPressed: () {
-                setState(() {
-                  isFavorite = !isFavorite;
-                });
-              },
             ),
           ),
         ],
