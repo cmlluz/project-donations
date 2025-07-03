@@ -79,7 +79,6 @@ class FavoriteCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
                     Expanded(
                       child: Text(
                         description,
@@ -97,7 +96,8 @@ class FavoriteCard extends StatelessWidget {
                         width: 120,
                         child: ElevatedButton(
                           onPressed: () {
-                            GoRouter.of(context).go('/managerProfilePage');
+                            GoRouter.of(context)
+                                .push('/institutionProfilePage');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ConstantsColors.greyShade200,
