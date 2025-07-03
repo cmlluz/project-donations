@@ -76,25 +76,34 @@ class _RootPageState extends State<RootPage> {
             color: Color.fromARGB(255, 205, 239, 251),
             borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    color: ConstantsColors.blueShade900,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Comece a postar',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: ConstantsColors.blueShade900,
+                      ).merge(TextStylesConstants.kinterSemiBold),
+                    ),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              Text(
-                'Comece a postar',
-                style: const TextStyle(
-                        fontSize: 20, color: ConstantsColors.blueShade900)
-                    .merge(TextStylesConstants.kinterSemiBold),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: ConstantsColors.blueShade900,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
               Row(
