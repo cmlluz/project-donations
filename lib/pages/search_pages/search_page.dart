@@ -61,9 +61,8 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 const SizedBox(height: 10.0),
                 SizedBox(
-                  height: constraints.maxHeight - 260,
-                  child:
-                      getSelectedPage(),
+                  height: constraints.maxHeight - 225,
+                  child: getSelectedPage(),
                 ),
               ],
             ),
