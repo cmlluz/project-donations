@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
@@ -80,5 +81,13 @@ class AuthService {
       print(e.toString());
     }
     return null;
+  }
+
+  Future<UserCredential?> loginWithFacebook() async {
+    final LoginResult loginResult = await FacebookAuth.instance
+        .login(permissions: ['public_profile', 'email']);
+    final OAuthCredential facebookAuthCredential =
+        FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
+    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
   }
 }

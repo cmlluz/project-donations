@@ -224,15 +224,27 @@ class _LoginPage extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      /*  Padding(
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: FacebookAuthButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            try {
+                              await firebaseAuth.loginWithFacebook();
+                              if (mounted) {
+                                GoRouter.of(context).go('/root');
+                              }
+                            } catch (e) {
+                              setState(() {
+                                errorMessage =
+                                    'Erro ao entrar com Facebook: ${e.toString()}';
+                              });
+                            }
+                          },
                           style: const AuthButtonStyle(
                             buttonType: AuthButtonType.icon,
                           ),
-                        ), --> ainda n fiz
-                      ), */
+                        ),
+                      ),
                     ],
                   ),
                 ],
