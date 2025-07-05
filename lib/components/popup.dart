@@ -4,21 +4,20 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 
 class Popup extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String confirmText;
+  final String? title;
+  final String? subtitle;
+  final String? confirmText;
   final String? cancelText;
-  final String confirmRoute;
+  final String? confirmRoute;
   final bool reminderButton;
 
   const Popup({
     super.key,
-    this.title = "Seus dados estão desatualizados",
-    this.subtitle =
-        "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
-    this.confirmText = "Atualizar agora",
-    this.cancelText = "Me lembre mais tarde",
-    this.confirmRoute = "/editProfilePage",
+    this.title,
+    this.subtitle,
+    this.confirmText,
+    this.cancelText,
+    this.confirmRoute,
     this.reminderButton = true,
   });
 
@@ -30,51 +29,56 @@ class Popup extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 12.0),
-          Text(
-            title,
-            style: TextStylesConstants.kpoppinsSemiBold.merge(
-              const TextStyle(
-                  fontSize: 18.0, color: ConstantsColors.greyShade900),
+          if (title != null) ...[
+            const SizedBox(height: 12.0),
+            Text(
+              title!,
+              style: TextStylesConstants.kpoppinsSemiBold.merge(
+                const TextStyle(
+                    fontSize: 18.0, color: ConstantsColors.greyShade900),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12.0),
-          Text(
-            subtitle,
-            style: TextStylesConstants.kpoppinsRegular.merge(
-              const TextStyle(
-                  fontSize: 15.0, color: ConstantsColors.blackShade900),
+          ],
+          if (subtitle != null) ...[
+            const SizedBox(height: 12.0),
+            Text(
+              subtitle!,
+              style: TextStylesConstants.kpoppinsRegular.merge(
+                const TextStyle(
+                    fontSize: 15.0, color: ConstantsColors.blackShade900),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
+          ],
           const SizedBox(height: 18.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: ConstantsColors.blueShade900,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0, vertical: 8.0),
-                  minimumSize: const Size(130, 35),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
+              if (confirmText != null && confirmRoute != null)
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: ConstantsColors.blueShade900,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 8.0),
+                    minimumSize: const Size(130, 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    GoRouter.of(context).go(confirmRoute!);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    confirmText!,
+                    style: TextStylesConstants.kpoppinsBold.merge(
+                      const TextStyle(
+                          fontSize: 12.0, color: ConstantsColors.whiteShade900),
+                    ),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  GoRouter.of(context).go(confirmRoute);
-                },
-                child: Text(
-                  confirmText,
-                  style: TextStylesConstants.kpoppinsBold.merge(
-                    const TextStyle(
-                        fontSize: 12.0, color: ConstantsColors.whiteShade900),
-                  ),
-                ),
-              ),
-              if (reminderButton)
+              if (reminderButton && cancelText != null)
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     backgroundColor: ConstantsColors.greyShade300,
@@ -87,7 +91,7 @@ class Popup extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
-                    cancelText ?? "Me lembre mais tarde",
+                    cancelText!,
                     style: TextStylesConstants.kpoppinsRegular.merge(
                       const TextStyle(
                           fontSize: 12.0, color: ConstantsColors.blackShade900),

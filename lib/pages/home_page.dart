@@ -32,7 +32,14 @@ class _HomePageState extends State<HomePage> {
   //           ),
   //           content: SizedBox(
   //             width: dialogWidth,
-  //             child: const Popup(),
+  //             child: const Popup(
+  //               title: "Seus dados estão desatualizados",
+  //               subtitle:
+  //                   "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
+  //               confirmText: "Atualizar agora",
+  //               cancelText: "Me lembre mais tarde",
+  //               confirmRoute: "/editProfilePage",
+  //             ),
   //           ),
   //         );
   //       },
