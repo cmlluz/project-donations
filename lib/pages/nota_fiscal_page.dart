@@ -61,8 +61,8 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                 color: ConstantsColors.whiteShade900,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(35.0)),
               ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -160,29 +160,33 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                       );
                     }),
                     const SizedBox(height: 30),
-                    const CustomButton(
-                      height: 50,
-                      width: double.infinity,
-                      text: 'Emitir Nota Fiscal',
-                      color: ConstantsColors.blueShade900,
-                      textColor: ConstantsColors.whiteShade900,
-                      route: '/root',
-                      hasMensage: true,
-                      mensage: 'Nota Fiscal emitida com sucesso!',
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          'Cancelar',
-                          style: const TextStyle(
-                            color: ConstantsColors.blueShade900,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ).merge(TextStylesConstants.kpoppinsSemiBold),
+                    Column(
+                      children: [
+                        const CustomButton(
+                          height: 50,
+                          width: double.infinity,
+                          text: 'Emitir Nota Fiscal',
+                          color: ConstantsColors.blueShade900,
+                          textColor: ConstantsColors.whiteShade900,
+                          route: '/root',
+                          hasMensage: true,
+                          mensage: 'Nota Fiscal emitida com sucesso!',
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Cancelar',
+                              style: const TextStyle(
+                                color: ConstantsColors.blueShade900,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ).merge(TextStylesConstants.kpoppinsSemiBold),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
