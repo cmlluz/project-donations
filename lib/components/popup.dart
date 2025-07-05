@@ -3,19 +3,25 @@ import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 
-class UpdatePopup extends StatefulWidget {
-  final bool? reminderButton;
+class Popup extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String confirmText;
+  final String? cancelText;
+  final String confirmRoute;
+  final bool reminderButton;
 
-  const UpdatePopup({
+  const Popup({
     super.key,
-    this.reminderButton,
+    this.title = "Seus dados estão desatualizados",
+    this.subtitle =
+        "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
+    this.confirmText = "Atualizar agora",
+    this.cancelText = "Me lembre mais tarde",
+    this.confirmRoute = "/editProfilePage",
+    this.reminderButton = true,
   });
 
-  @override
-  State<UpdatePopup> createState() => _UpdatePopupState();
-}
-
-class _UpdatePopupState extends State<UpdatePopup> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -24,27 +30,25 @@ class _UpdatePopupState extends State<UpdatePopup> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            height: 12.0,
-          ),
+          const SizedBox(height: 12.0),
           Text(
-            "Seus dados estão desatualizados",
-            style: TextStylesConstants.kpoppinsSemiBold.merge(const TextStyle(
-                fontSize: 18.0, color: ConstantsColors.greyShade900)),
+            title,
+            style: TextStylesConstants.kpoppinsSemiBold.merge(
+              const TextStyle(
+                  fontSize: 18.0, color: ConstantsColors.greyShade900),
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(
-            height: 12.0,
-          ),
+          const SizedBox(height: 12.0),
           Text(
-            "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
-            style: TextStylesConstants.kpoppinsRegular.merge(const TextStyle(
-                fontSize: 15.0, color: ConstantsColors.blackShade900)),
+            subtitle,
+            style: TextStylesConstants.kpoppinsRegular.merge(
+              const TextStyle(
+                  fontSize: 15.0, color: ConstantsColors.blackShade900),
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(
-            height: 18.0,
-          ),
+          const SizedBox(height: 18.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -60,17 +64,17 @@ class _UpdatePopupState extends State<UpdatePopup> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  GoRouter.of(context).go('/editProfilePage');
+                  GoRouter.of(context).go(confirmRoute);
                 },
                 child: Text(
-                  "Atualizar agora",
+                  confirmText,
                   style: TextStylesConstants.kpoppinsBold.merge(
                     const TextStyle(
                         fontSize: 12.0, color: ConstantsColors.whiteShade900),
                   ),
                 ),
               ),
-              if (widget.reminderButton ?? true)
+              if (reminderButton)
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     backgroundColor: ConstantsColors.greyShade300,
@@ -81,11 +85,9 @@ class _UpdatePopupState extends State<UpdatePopup> {
                       borderRadius: BorderRadius.circular(6.0),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                   child: Text(
-                    "Me lembre mais tarde",
+                    cancelText ?? "Me lembre mais tarde",
                     style: TextStylesConstants.kpoppinsRegular.merge(
                       const TextStyle(
                           fontSize: 12.0, color: ConstantsColors.blackShade900),
