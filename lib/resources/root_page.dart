@@ -7,6 +7,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -16,7 +17,21 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  int _bottomNavIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    NavigationController.currentIndex.addListener(_updateIndex);
+  }
+
+  @override
+  void dispose() {
+    NavigationController.currentIndex.removeListener(_updateIndex);
+    super.dispose();
+  }
+
+  void _updateIndex() {
+    setState(() {});
+  }
 
   //lista das paginas
   List<Widget> pages = const [
@@ -40,7 +55,7 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
-        index: _bottomNavIndex,
+        index: NavigationController.currentIndex.value,
         children: pages,
       ),
       bottomNavigationBar: AnimatedBottomNavigationBar(
@@ -49,7 +64,7 @@ class _RootPageState extends State<RootPage> {
         inactiveColor: ConstantsColors.blueShade900.withOpacity(.6),
         icons: iconList,
         iconSize: 28.0,
-        activeIndex: _bottomNavIndex,
+        activeIndex: NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
@@ -57,7 +72,7 @@ class _RootPageState extends State<RootPage> {
             _showBottomMenu(context);
           } else {
             setState(() {
-              _bottomNavIndex = index;
+              NavigationController.currentIndex.value = index;
             });
           }
         },

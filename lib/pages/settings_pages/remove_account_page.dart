@@ -2,8 +2,8 @@ import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:appdonationsgestor/core/routes.dart';
+import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class RemoveAccountPage extends StatefulWidget {
   const RemoveAccountPage({super.key});
@@ -96,7 +96,10 @@ class _RemoveAccountPage extends State<RemoveAccountPage> {
                                 ),
                               ),
                               onPressed: () {
-                                // GoRouter.of(context).pushNamed('loginPage');
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                NavigationController.resetIndex();
+                                GoRouter.of(context).pushNamed('loginPage');
                               },
                               child: Text(
                                 'Deletar permanentemente',

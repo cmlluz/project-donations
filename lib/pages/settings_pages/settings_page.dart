@@ -4,6 +4,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -66,6 +67,8 @@ class _SettingsPage extends State<SettingsPage> {
             _buildSettingOption(
               title: 'Sair da conta',
               onTap: () {
+                Navigator.pop(context);
+                NavigationController.resetIndex();
                 GoRouter.of(context).pushNamed('loginPage');
               },
             ),
