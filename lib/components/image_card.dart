@@ -18,7 +18,7 @@ class ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // context.push('/institutionProfilePage');
+        context.push('/postDetailPage');
       },
       child: Material(
         elevation: 15,
@@ -36,7 +36,6 @@ class ImageCard extends StatelessWidget {
                   return const Icon(Icons.broken_image);
                 },
               ),
-
               Positioned(
                 bottom: 10,
                 left: 5,
