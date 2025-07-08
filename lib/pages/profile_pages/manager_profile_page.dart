@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/components/post_card.dart';
+import 'package:go_router/go_router.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({Key? key}) : super(key: key);
@@ -98,6 +99,20 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                             ],
                           ),
                         ),
+                        Transform.translate(
+                          offset: const Offset(5, -20),
+                          child: IconButton(
+                            icon: const Icon(Icons.settings_outlined,
+                                color: ConstantsColors.blueShade900, size: 30),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const SettingsPage()),
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -151,7 +166,9 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                                       color: ConstantsColors.greyShade900),
                                 ),
                               ),
-                              onPressed: () => {},
+                              onPressed: () {
+                                GoRouter.of(context).push('/hystoryPage');
+                              },
                             ),
                           ],
                         ),
@@ -290,21 +307,6 @@ class _ManagerProfilePage extends State<ManagerProfilePage> {
                     },
                   ),
                 ],
-              ),
-            ),
-            Positioned(
-              top: 5,
-              right: 10,
-              child: IconButton(
-                icon: const Icon(Icons.settings_outlined,
-                    color: ConstantsColors.blueShade900, size: 30),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsPage()),
-                  );
-                },
               ),
             ),
           ],

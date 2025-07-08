@@ -33,32 +33,58 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Favoritos',
-          style: const TextStyle(
-                  fontSize: 30, color: ConstantsColors.blackShade900)
-              .merge(TextStylesConstants.kpoppinsBold),
+      backgroundColor: ConstantsColors.whiteShade900,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 3.0, left: 15.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Favoritos',
+                style: const TextStyle(
+                  fontSize: 30,
+                  color: ConstantsColors.blackShade900,
+                ).merge(TextStylesConstants.kpoppinsBold),
+              ),
+            ),
+          ),
         ),
       ),
       body: favoriteItems.isEmpty
           ? const Center(child: Text('Nenhum usuário favoritado.'))
-          : ListView.builder(
-              itemCount: favoriteItems.length,
-              itemBuilder: (context, index) {
-                final item = favoriteItems[index];
-                return FavoriteCard(
-                  name: item.name,
-                  description: item.description,
-                  imageUrl: item.imageUrl,
-                  onDelete: () {
-                    setState(() {
-                      favoriteItems.removeAt(index);
-                    });
-                  },
-                );
-              },
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: ListView.builder(
+                itemCount: favoriteItems.length,
+                itemBuilder: (context, index) {
+                  final item = favoriteItems[index];
+                  return FavoriteCard(
+                    name: item.name,
+                    description: item.description,
+                    imageUrl: item.imageUrl,
+                    onDelete: () {
+                      setState(() {
+                        favoriteItems.removeAt(index);
+                      });
+                    },
+                  );
+                },
+              ),
             ),
     );
   }
+}
+
+class ItemModel {
+  final String name;
+  final String description;
+  final String imageUrl;
+
+  ItemModel({
+    required this.name,
+    required this.description,
+    required this.imageUrl,
+  });
 }

@@ -173,34 +173,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 120,
-                  child: TextFormField(
-                    controller: bioController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: InputDecoration(
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.only(bottom: 55),
-                        child: Icon(
-                          Icons.info_outline,
-                          color: Colors.grey,
-                        ),
+                TextFormField(
+                  controller: bioController,
+                  keyboardType: TextInputType.multiline,
+                  minLines: 4,
+                  maxLines: 6,
+                  textAlignVertical: TextAlignVertical.top,
+                  decoration: InputDecoration(
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(bottom: 70),
+                      child: Icon(
+                        Icons.info_outline,
+                        color: Colors.grey,
                       ),
-                      labelText: 'Biografia',
-                      alignLabelWithHint: true,
-                      filled: true,
-                      fillColor: ConstantsColors.whiteShade900,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      hintText: 'Digite sua biografia...',
-                      hintStyle: const TextStyle(
-                        fontSize: 16,
-                        color: Color.fromARGB(255, 150, 150, 150),
-                      ),
+                    ),
+                    labelText: 'Biografia',
+                    alignLabelWithHint: true,
+                    filled: true,
+                    fillColor: ConstantsColors.whiteShade900,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    hintText: 'Digite sua biografia...',
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 150, 150, 150),
                     ),
                   ),
                 ),

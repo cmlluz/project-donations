@@ -17,6 +17,9 @@ import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/pages/necessity_page.dart';
+import 'package:appdonationsgestor/pages/hystory_page.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -40,6 +43,9 @@ class RouteNames {
   static const String managerProfilePage = "managerProfilePage";
   static const String removeAccountPage = "removeAccountPage";
   static const String editProfilePage = "editProfilePage";
+  static const String necessityPage = "necessityPage";
+  static const String hystoryPage = "hystoryPage";
+  static const String postDetailPage = "postDetailPage";
 }
 
 class AppRountersConfiguration {
@@ -195,6 +201,27 @@ class AppRountersConfiguration {
           name: RouteNames.editProfilePage,
           pageBuilder: (context, state) => const MaterialPage(
             child: EditProfilePage(),
+          ),
+        ),
+        GoRoute(
+          path: '/necessityPage',
+          name: RouteNames.necessityPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: NecessityPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/hystoryPage',
+          name: RouteNames.hystoryPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: HystoryPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/postDetailPage',
+          name: RouteNames.postDetailPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: PostDetailPage(),
           ),
         ),
       ],

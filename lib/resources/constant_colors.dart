@@ -6,6 +6,8 @@ class ConstantsColors {
       Color.fromRGBO(1, 91, 124, 1); // buttonColor, labelColor
   static const Color blueShade500 =
       Color.fromRGBO(92, 147, 166, 1); // mainColor
+  static const Color blueShade400 =
+      Color.fromRGBO(205, 239, 251, 1); // mainColor
   static const Color blueShade800 = Color.fromRGBO(24, 32, 101, 1); // darkBlue
   static const Color blueShade950 = Color.fromRGBO(3, 32, 106, 1); // darkerBlue
   static const Color indigoShade900 = Color.fromRGBO(26, 35, 126, 1);

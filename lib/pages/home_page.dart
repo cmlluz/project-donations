@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/components/card_item.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/components/popup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,6 +12,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+
+  // Display do popup de atualização cadastral
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) {
+  //         final screenWidth = MediaQuery.of(context).size.width;
+  //         final dialogWidth = screenWidth * 0.9;
+
+  //         return AlertDialog(
+  //           backgroundColor: ConstantsColors.blueShade400,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20),
+  //           ),
+  //           content: SizedBox(
+  //             width: dialogWidth,
+  //             child: const Popup(
+  //               title: "Seus dados estão desatualizados",
+  //               subtitle:
+  //                   "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
+  //               confirmText: "Atualizar agora",
+  //               cancelText: "Me lembre mais tarde",
+  //               confirmRoute: "/editProfilePage",
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +58,7 @@ class _HomePageState extends State<HomePage> {
             if (index == 0) {
               return Padding(
                 padding:
-                    const EdgeInsets.only(top: 30.0, bottom: 30.0, left: 10.0),
+                    const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 10.0),
                 child: Text(
                   'Olá, Name 👋',
                   style: const TextStyle(
