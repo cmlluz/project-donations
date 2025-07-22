@@ -224,7 +224,7 @@ class _LoginPage extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      Padding(
+                      /*Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: FacebookAuthButton(
                           onPressed: () async {
@@ -244,7 +244,7 @@ class _LoginPage extends State<LoginPage> {
                             buttonType: AuthButtonType.icon,
                           ),
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ],

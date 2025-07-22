@@ -2,11 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:appdonationsgestor/services/api_services.dart';
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final ApiService _apiService = ApiService();
 
   User? get currentUser => firebaseAuth.currentUser;
 
@@ -16,21 +18,36 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+    final UserCredential userCredential = await firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password);
+
+    if (userCredential.user != null) {
+      await _apiService.syncUser();
+    }
+
+    return userCredential;
   }
 
   Future<UserCredential> createAccount({
     required String email,
     required String password,
   }) async {
-    return await firebaseAuth.createUserWithEmailAndPassword(
+    final UserCredential userCredential =
+        await firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    if (userCredential.user != null) {
+      await _apiService.syncUser();
+    }
+
+    return userCredential;
   }
 
   Future<void> signOut() async {
+    await GoogleSignIn().signOut();
+    await FacebookAuth.instance.logOut();
     await firebaseAuth.signOut();
   }
 
@@ -44,6 +61,7 @@ class AuthService {
     required String username,
   }) async {
     await currentUser!.updateDisplayName(username);
+    await _apiService.updateUser({"name": username});
   }
 
   Future<void> deleteAccount({
@@ -53,6 +71,7 @@ class AuthService {
     AuthCredential credential =
         EmailAuthProvider.credential(email: email, password: password);
     await currentUser!.reauthenticateWithCredential(credential);
+    await _apiService.deleteUser(); //rever codigo, teste mal sucedido
     await currentUser!.delete();
     await firebaseAuth.signOut();
   }
@@ -71,23 +90,42 @@ class AuthService {
   Future<UserCredential?> loginWithGoogle() async {
     try {
       final googleUser = await GoogleSignIn().signIn();
-
       final googleAuth = await googleUser?.authentication;
-
       final cred = GoogleAuthProvider.credential(
           idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
-      return await firebaseAuth.signInWithCredential(cred);
+
+      final userCredential = await firebaseAuth.signInWithCredential(cred);
+
+      if (userCredential.user != null) {
+        await _apiService.syncUser();
+      }
+
+      return userCredential;
     } catch (e) {
       print(e.toString());
+      return null;
     }
-    return null;
   }
 
   Future<UserCredential?> loginWithFacebook() async {
-    final LoginResult loginResult = await FacebookAuth.instance
-        .login(permissions: ['public_profile', 'email']);
-    final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
-    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+    try {
+      final LoginResult loginResult = await FacebookAuth.instance
+          .login(permissions: ['public_profile', 'email']);
+
+      final OAuthCredential facebookAuthCredential =
+          FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
+
+      final userCredential = await FirebaseAuth.instance
+          .signInWithCredential(facebookAuthCredential);
+
+      if (userCredential.user != null) {
+        await _apiService.syncUser();
+      }
+
+      return userCredential;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 }

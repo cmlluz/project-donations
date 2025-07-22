@@ -47,27 +47,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: CircleAvatar(
-                      backgroundColor:
-                          ConstantsColors.blueShade900.withOpacity(0.5),
-                      child: IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite
-                              ? Colors.red
-                              : ConstantsColors.whiteShade900,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isFavorite = !isFavorite;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 16,
+                  //   right: 16,
+                  //   child: CircleAvatar(
+                  //     backgroundColor:
+                  //         ConstantsColors.blueShade900.withOpacity(0.5),
+                  //     child: IconButton(
+                  //       icon: Icon(
+                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
+                  //         color: isFavorite
+                  //             ? Colors.red
+                  //             : ConstantsColors.whiteShade900,
+                  //       ),
+                  //       onPressed: () {
+                  //         setState(() {
+                  //           isFavorite = !isFavorite;
+                  //         });
+                  //       },
+                  //     ),
+                  //   ),
+                  // ),
                   Positioned(
                     bottom: 16,
                     left: 16,

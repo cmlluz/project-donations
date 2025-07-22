@@ -17,7 +17,7 @@ class ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // context.push('/institutionProfilePage');
+        Navigator.pushNamed(context, '/postDetailPage');
       },
       child: Material(
         elevation: 15,

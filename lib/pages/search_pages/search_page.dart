@@ -24,12 +24,12 @@ class _SearchPageState extends State<SearchPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 5.0, right: 5.0),
+            padding: const EdgeInsets.only(top: 24.0, left: 5.0, right: 5.0),
             child: Column(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: 30.0, bottom: 30.0, left: 10.0),
+                      top: 20.0, bottom: 20.0, left: 10.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -61,9 +61,8 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 const SizedBox(height: 10.0),
                 SizedBox(
-                  height: constraints.maxHeight - 260,
-                  child:
-                      getSelectedPage(),
+                  height: constraints.maxHeight - 215,
+                  child: getSelectedPage(),
                 ),
               ],
             ),

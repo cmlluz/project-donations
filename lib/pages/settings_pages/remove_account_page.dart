@@ -5,8 +5,6 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:appdonationsgestor/core/routes.dart';
 
 class RemoveAccountPage extends StatefulWidget {
   const RemoveAccountPage({super.key});

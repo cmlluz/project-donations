@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);

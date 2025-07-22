@@ -7,6 +7,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -16,7 +17,21 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  int _bottomNavIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    NavigationController.currentIndex.addListener(_updateIndex);
+  }
+
+  @override
+  void dispose() {
+    NavigationController.currentIndex.removeListener(_updateIndex);
+    super.dispose();
+  }
+
+  void _updateIndex() {
+    setState(() {});
+  }
 
   //lista das paginas
   List<Widget> pages = const [
@@ -40,7 +55,7 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
-        index: _bottomNavIndex,
+        index: NavigationController.currentIndex.value,
         children: pages,
       ),
       bottomNavigationBar: AnimatedBottomNavigationBar(
@@ -49,7 +64,7 @@ class _RootPageState extends State<RootPage> {
         inactiveColor: ConstantsColors.blueShade900.withOpacity(.6),
         icons: iconList,
         iconSize: 28.0,
-        activeIndex: _bottomNavIndex,
+        activeIndex: NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         onTap: (index) {
@@ -57,7 +72,7 @@ class _RootPageState extends State<RootPage> {
             _showBottomMenu(context);
           } else {
             setState(() {
-              _bottomNavIndex = index;
+              NavigationController.currentIndex.value = index;
             });
           }
         },
@@ -76,25 +91,34 @@ class _RootPageState extends State<RootPage> {
             color: Color.fromARGB(255, 205, 239, 251),
             borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    color: ConstantsColors.blueShade900,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Comece a postar',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: ConstantsColors.blueShade900,
+                      ).merge(TextStylesConstants.kinterSemiBold),
+                    ),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              Text(
-                'Comece a postar',
-                style: const TextStyle(
-                        fontSize: 20, color: ConstantsColors.blueShade900)
-                    .merge(TextStylesConstants.kinterSemiBold),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: ConstantsColors.blueShade900,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
               Row(
@@ -108,6 +132,7 @@ class _RootPageState extends State<RootPage> {
                       label: 'Criar Necessidade/Doação',
                       onTap: () {
                         GoRouter.of(context).go("/itemPostPage");
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -119,6 +144,7 @@ class _RootPageState extends State<RootPage> {
                       label: 'Criar publicação',
                       onTap: () {
                         GoRouter.of(context).go("/postPage");
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),

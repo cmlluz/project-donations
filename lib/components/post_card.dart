@@ -15,7 +15,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push('/institutionProfilePage');
+        context.push('/postDetailPage');
       },
       child: Material(
         elevation: 0,
