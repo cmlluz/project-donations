@@ -4,6 +4,7 @@ import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,8 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   File? _selectedImg;
+  final PostController _controller = PostController();
+  String mensagem = '';
 
   Future pickImageFromGallery() async {
     final selectedImage =
@@ -29,7 +32,24 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  final PostController _controller = PostController();
+  Future<void> publicar() async {
+    String authorUid = authService.value.currentUser?.uid ?? '';
+    String token = await authService.value.currentUser?.getIdToken() ?? '';
+    String imageUrl = _controller.crtlPic.text;
+    String caption = _controller.crtlDesc.text;
+    bool favorited = false;
+
+    String resultado = await _controller.publicarPost(
+      authorUid: authorUid,
+      imageUrl: imageUrl,
+      caption: caption,
+      favorited: favorited,
+      token: token,
+    );
+    setState(() {
+      mensagem = resultado;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +130,7 @@ class _PostPageState extends State<PostPage> {
                 labelColor: ConstantsColors.greyShade200,
               ),
               const SizedBox(height: 20),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomButton(
@@ -121,10 +141,12 @@ class _PostPageState extends State<PostPage> {
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade900,
                     hasMensage: true,
-                    mensage: 'Publicado com sucesso!',
+                    mensage:
+                        mensagem.isEmpty ? 'Publicado com sucesso!' : mensagem,
+                    onPressed: publicar,
                   ),
-                  SizedBox(width: 20),
-                  CustomButton(
+                  const SizedBox(width: 20),
+                  const CustomButton(
                     height: 50,
                     width: 150,
                     text: 'Voltar',
