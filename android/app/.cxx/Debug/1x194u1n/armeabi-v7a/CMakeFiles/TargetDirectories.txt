@@ -1,0 +1,2 @@
+C:/Users/kkjun/DonationApp/android/app/.cxx/Debug/1x194u1n/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/kkjun/DonationApp/android/app/.cxx/Debug/1x194u1n/armeabi-v7a/CMakeFiles/rebuild_cache.dir
