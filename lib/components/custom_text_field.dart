@@ -89,7 +89,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
               ),
             ),
             filled: true,
-            fillColor: widget.labelColor ?? ConstantsColors.whiteShade900,
+            fillColor: widget.labelColor ?? ConstantsColors.whiteShade700,
             prefixIcon: Icon(widget.icon),
             suffixIcon: widget.secret
                 ? IconButton(
@@ -106,7 +106,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
             hintText: widget.hintText,
             hintStyle: const TextStyle(
               fontSize: 16,
-              color: Color.fromARGB(255, 150, 150, 150),
+              color: ConstantsColors.blackShade700,
             ),
           ),
         ),

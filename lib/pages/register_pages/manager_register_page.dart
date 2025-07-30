@@ -35,7 +35,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
     emailController.dispose();
     addressController.dispose();
     passwordController.dispose();
-    super.dispose();
     confirmPasswordController.dispose();
     super.dispose();
   }
@@ -73,18 +72,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
     return Scaffold(
       body: SizedBox.expand(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ConstantsColors.blueShade500,
-                ConstantsColors.tealShade200
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
+          decoration: const BoxDecoration(color: ConstantsColors.whiteShade700),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -92,25 +80,63 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    const SizedBox(height: 50),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: ConstantsColors.blueShade900),
+                          onPressed: () {
+                            GoRouter.of(context).go('/userTypePage');
+                          },
+                        ),
+                        const SizedBox(width: 75),
+                        Container(
+                          width: 70,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: ConstantsColors.blueShade900,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        Container(
+                          width: 70,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: ConstantsColors.greyShade300,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Text(
+                      'Passo 1 de 2',
+                      style: TextStyle(
+                        color: ConstantsColors.blackShade700,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 30),
                     Text(
-                      'Queremos saber mais sobre você!',
+                      'Criar conta',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: ConstantsColors.blackShade700,
-                        fontSize: 28,
+                        color: ConstantsColors.blueShade900,
+                        fontSize: 30,
                       ).merge(TextStylesConstants.kpoppinsBlack),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Informe alguns dados importantes para nós',
+                    const Text(
+                      'Informe alguns dados importantes',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: ConstantsColors.blackShade700,
-                        fontSize: 18,
-                      ).merge(TextStylesConstants.kpoppinsLight),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
                     CustomTextFields(
                       icon: Icons.person,
                       label: 'Nome',
@@ -121,7 +147,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.email,
                       label: 'Email',
@@ -132,15 +158,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    CustomTextFields(
-                      icon: Icons.person_2_outlined,
-                      label: 'CPF / CNPJ',
-                      secret: false,
-                      controller: cpfCnpjController,
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.phone,
                       label: 'Telefone',
@@ -151,7 +169,15 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
+                    CustomTextFields(
+                      icon: Icons.person_4,
+                      label: 'CPF',
+                      secret: false,
+                      controller: cpfCnpjController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.map,
                       label: 'Endereço',
@@ -159,7 +185,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                       controller: addressController,
                       keyboardType: TextInputType.text,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.lock,
                       label: 'Senha',
@@ -170,18 +196,18 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.lock,
-                      label: 'Confirme a senha',
+                      label: 'Confirme sua Senha',
                       secret: true,
-                      controller: passwordController,
+                      controller: confirmPasswordController,
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) => value == null || value.isEmpty
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     if (errorMessage.isNotEmpty)
                       Text(
                         errorMessage,
@@ -189,7 +215,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                       ),
                     CustomButton(
                       text: 'Confirmar',
-                      route: '/finalizeRegistrationPage',
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
                       onPressed: () {
@@ -197,13 +222,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           registerUser();
                         }
                       },
-                    ),
-                    const SizedBox(height: 20),
-                    const CustomButton(
-                      text: 'Voltar',
-                      route: '/userTypePage',
-                      color: ConstantsColors.whiteShade900,
-                      textColor: ConstantsColors.blueShade900,
                     ),
                     const SizedBox(height: 30),
                   ],
