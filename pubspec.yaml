@@ -32,6 +32,7 @@ dependencies:
   intl_utils: ^2.1.0
   flutter:
     sdk: flutter
+  flutter_custom_clippers: ^2.1.0 
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -92,13 +93,8 @@ flutter:
         - asset: assets/fontes/JacquesFrancois-Regular.ttf
     - family: Poppins
       fonts:
-        - asset: assets/fontes/Poppins-Regular.ttf
-        - asset: assets/fontes/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fontes/Poppins-SemiBold.ttf
-          weight: 600
+        - asset: assets/fontes/Poppins-BoldItalic.ttf
         - asset: assets/fontes/Poppins-Bold.ttf
-          weight: 700
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
