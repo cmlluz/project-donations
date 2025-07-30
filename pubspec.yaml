@@ -86,6 +86,20 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
+  fonts:
+    - family: Jacques Francois
+      fonts:
+        - asset: assets/fontes/JacquesFrancois-Regular.ttf
+    - family: Poppins
+      fonts:
+        - asset: assets/fontes/Poppins-Regular.ttf
+        - asset: assets/fontes/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fontes/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fontes/Poppins-Bold.ttf
+          weight: 700
+
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
@@ -102,6 +116,11 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  #    - family: Jacques Francois
+  #      fonts:
+  #        - asset: fonts/JacquesFrancois-Regular.ttf
+  #        - asset: fonts/JacquesFrancois-Italic.ttf
+  #          style: italic
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

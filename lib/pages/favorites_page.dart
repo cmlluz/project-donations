@@ -37,16 +37,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 3.0, left: 15.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Favoritos',
-                style: const TextStyle(
-                  fontSize: 30,
-                  color: ConstantsColors.blackShade900,
-                ).merge(TextStylesConstants.kpoppinsBold),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 3.0, left: 15.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Favoritos',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    color: ConstantsColors.blackShade900,
+                  ).merge(TextStylesConstants.kpoppinsBold),
+                ),
               ),
             ),
           ),

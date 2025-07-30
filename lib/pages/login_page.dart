@@ -61,193 +61,210 @@ class _LoginPage extends State<LoginPage> {
       body: SizedBox.expand(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ConstantsColors.blueShade500,
-                ConstantsColors.tealShade200,
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
+            color: ConstantsColors.whiteShade700,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 80),
-                  CustomTextFields(
-                    icon: Icons.email,
-                    label: 'Email',
-                    secret: false,
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 20),
-                  Stack(
-                    children: [
-                      CustomTextFields(
-                        icon: Icons.lock,
-                        label: 'Senha',
-                        secret: true,
-                        controller: passwordController,
-                        keyboardType: TextInputType.visiblePassword,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    Image.asset(
+                      'assets/ChatGPT Image 12 de jul. de 2025, 22_58_22 1.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    const Text(
+                      'Colab',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontFamily: 'Jacques Francois',
+                        color: ConstantsColors.blueShade900,
                       ),
-                      const SizedBox(height: 20),
-                      if (errorMessage.isNotEmpty)
-                        Text(
-                          errorMessage,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
+                    ),
+                    const Text("Salvador",
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontFamily: 'Jacques Francois',
+                          color: ConstantsColors.blueShade900,
+                        )),
+                    const SizedBox(height: 40),
+                    CustomTextFields(
+                      icon: Icons.email,
+                      label: 'Email',
+                      labelColor: ConstantsColors.whiteShade700,
+                      secret: false,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextFields(
+                      icon: Icons.lock,
+                      label: 'Senha',
+                      labelColor: ConstantsColors.whiteShade700,
+                      secret: true,
+                      controller: passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                    ),
+                    if (errorMessage.isNotEmpty)
+                      Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
                         onPressed: () {
                           GoRouter.of(context).go('/forgotPasswordPage');
                         },
                         child: Text(
                           'Esqueci minha senha',
                           style: TextStylesConstants.kformularyText.copyWith(
-                            color: ConstantsColors.blueShade900,
+                            color: ConstantsColors.greyShade600,
                             fontSize: 14,
                           ),
                           textAlign: TextAlign.end,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              GoRouter.of(context).go('/userTypePage');
-                            },
-                            child: const Text(
-                              'Não tem uma conta? Crie uma!',
-                              style: TextStyle(
-                                color: ConstantsColors.blueShade900,
-                                fontSize: 14,
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: 250,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        onPressed: isLoading ? null : signIn,
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Entrar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 2.5,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  ConstantsColors.blueShade900.withOpacity(0.0),
+                                  ConstantsColors.blueShade900,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ConstantsColors.blueShade900,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('ou entrar com',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 16,
+                                color: ConstantsColors.blackShade700,
+                              )),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 2.5,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  ConstantsColors.blueShade900,
+                                  ConstantsColors.blueShade900.withOpacity(0.0),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                             ),
                           ),
-                          onPressed: isLoading ? null : signIn,
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  'Continuar',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                  ),
-                                ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(
-                          color: ConstantsColors.greyShade600,
-                          thickness: 1,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          'ou',
-                          style: TextStylesConstants.kformularyText.copyWith(
-                            color: ConstantsColors.greyShade600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        child: Divider(
-                          color: ConstantsColors.greyShade600,
-                          thickness: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: GoogleAuthButton(
-                          onPressed: () async {
-                            try {
-                              await firebaseAuth.loginWithGoogle();
-                              if (mounted) {
-                                GoRouter.of(context).go('/root');
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: GoogleAuthButton(
+                            onPressed: () async {
+                              try {
+                                await firebaseAuth.loginWithGoogle();
+                                if (mounted) {
+                                  GoRouter.of(context).go('/root');
+                                }
+                              } catch (e) {
+                                setState(() {
+                                  errorMessage =
+                                      'Erro ao entrar com Google: ${e.toString()}';
+                                });
                               }
-                            } catch (e) {
-                              setState(() {
-                                errorMessage =
-                                    'Erro ao entrar com Google: ${e.toString()}';
-                              });
-                            }
-                          },
-                          style: const AuthButtonStyle(
-                            buttonType: AuthButtonType.icon,
+                            },
+                            style: const AuthButtonStyle(
+                              buttonType: AuthButtonType.icon,
+                            ),
                           ),
+                        ),
+                        /*Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: FacebookAuthButton(
+                            onPressed: () async {
+                              try {
+                                await firebaseAuth.loginWithFacebook();
+                                if (mounted) {
+                                  GoRouter.of(context).go('/root');
+                                }
+                              } catch (e) {
+                                setState(() {
+                                  errorMessage =
+                                      'Erro ao entrar com Facebook: ${e.toString()}';
+                                });
+                              }
+                            },
+                            style: const AuthButtonStyle(
+                              buttonType: AuthButtonType.icon,
+                            ),
+                          ),
+                        ),*/
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        GoRouter.of(context).go('/userTypePage');
+                      },
+                      child: const Text(
+                        'Não tem conta? Crie uma!',
+                        style: TextStyle(
+                          color: ConstantsColors.blueShade900,
+                          fontSize: 14,
                         ),
                       ),
-                      /*Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: FacebookAuthButton(
-                          onPressed: () async {
-                            try {
-                              await firebaseAuth.loginWithFacebook();
-                              if (mounted) {
-                                GoRouter.of(context).go('/root');
-                              }
-                            } catch (e) {
-                              setState(() {
-                                errorMessage =
-                                    'Erro ao entrar com Facebook: ${e.toString()}';
-                              });
-                            }
-                          },
-                          style: const AuthButtonStyle(
-                            buttonType: AuthButtonType.icon,
-                          ),
-                        ),
-                      ),*/
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

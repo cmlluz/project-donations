@@ -60,6 +60,34 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           maxLength: widget.maxLength,
           style: TextStylesConstants.kcustomTextField,
           decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(
+                width: 1.5,
+                color: ConstantsColors.blueShade900,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(
+                width: 2,
+                color: ConstantsColors.blueShade900,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(
+                width: 2,
+                color: ConstantsColors.redShade900,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(
+                width: 2.5,
+                color: ConstantsColors.redShade900,
+              ),
+            ),
             filled: true,
             fillColor: widget.labelColor ?? ConstantsColors.whiteShade900,
             prefixIcon: Icon(widget.icon),
@@ -76,12 +104,6 @@ class _CustomTextFieldState extends State<CustomTextFields> {
             labelText: widget.label,
             isDense: true,
             hintText: widget.hintText,
-            border: widget.border ??
-                OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide:
-                      const BorderSide(width: 0, style: BorderStyle.none),
-                ),
             hintStyle: const TextStyle(
               fontSize: 16,
               color: Color.fromARGB(255, 150, 150, 150),
