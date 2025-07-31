@@ -119,11 +119,9 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/userRegisterPage',
           name: RouteNames.userRegisterPage,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: UserRegisterPage(),
-            );
-          },
+          pageBuilder: (context, state) => const MaterialPage(
+            child: UserRegisterPage(),
+          ),
         ),
         GoRoute(
           path: '/institutionRegisterPage',
@@ -166,11 +164,9 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/finalizeRegistrationPage',
           name: RouteNames.finalizeRegistrationPage,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: FinalizeRegistrationPage(),
-            );
-          },
+          pageBuilder: (context, state) => const MaterialPage(
+            child: FinalizeRegistrationPage(),
+          ),
         ),
         GoRoute(
           path: '/favoritesPage',

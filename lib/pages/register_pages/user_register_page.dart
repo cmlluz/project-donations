@@ -54,7 +54,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
       );
 
       if (mounted) {
-        GoRouter.of(context).go('/finalizeRegistrationPage');
+        GoRouter.of(context).push('/finalizeRegistrationPage');
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -93,7 +93,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                           icon: const Icon(Icons.arrow_back,
                               color: ConstantsColors.blueShade900),
                           onPressed: () {
-                            GoRouter.of(context).go('/userTypePage');
+                            Navigator.of(context).pop();
                           },
                         ),
                         const SizedBox(width: 75),

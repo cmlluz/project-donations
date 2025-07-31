@@ -42,7 +42,7 @@ class _LoginPage extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
       if (mounted) {
-        GoRouter.of(context).go('/root');
+        GoRouter.of(context).push('/root');
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -118,7 +118,7 @@ class _LoginPage extends State<LoginPage> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          GoRouter.of(context).go('/forgotPasswordPage');
+                          GoRouter.of(context).push('/forgotPasswordPage');
                         },
                         child: Text(
                           'Esqueci minha senha',
@@ -214,7 +214,7 @@ class _LoginPage extends State<LoginPage> {
                               try {
                                 await firebaseAuth.loginWithGoogle();
                                 if (mounted) {
-                                  GoRouter.of(context).go('/root');
+                                  GoRouter.of(context).push('/root');
                                 }
                               } catch (e) {
                                 setState(() {
@@ -235,7 +235,7 @@ class _LoginPage extends State<LoginPage> {
                               try {
                                 await firebaseAuth.loginWithFacebook();
                                 if (mounted) {
-                                  GoRouter.of(context).go('/root');
+                                  GoRouter.of(context).push('/root');
                                 }
                               } catch (e) {
                                 setState(() {
@@ -253,7 +253,7 @@ class _LoginPage extends State<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        GoRouter.of(context).go('/userTypePage');
+                        GoRouter.of(context).push('/userTypePage');
                       },
                       child: const Text(
                         'Não tem conta? Crie uma!',

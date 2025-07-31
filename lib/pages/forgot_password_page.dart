@@ -60,14 +60,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
       body: SizedBox.expand(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ConstantsColors.blueShade500,
-                ConstantsColors.tealShade200
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
+            color: ConstantsColors.whiteShade700,
           ),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -78,9 +71,10 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                   'Recuperar Senha',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: ConstantsColors.blackShade700,
+                    color: ConstantsColors.blueShade900,
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
+                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -125,7 +119,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                 const CustomButton(
                   text: "Voltar",
                   route: '/',
-                  color: ConstantsColors.whiteShade900,
+                  color: ConstantsColors.whiteShade700,
                   textColor: ConstantsColors.blueShade900,
                 )
               ],

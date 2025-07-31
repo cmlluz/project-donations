@@ -29,7 +29,7 @@ class UserType extends StatelessWidget {
               ),
               child: IconButton(
                 onPressed: () {
-                  GoRouter.of(context).go('/');
+                  Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.arrow_back,
                     color: ConstantsColors.whiteShade600),
@@ -39,10 +39,10 @@ class UserType extends StatelessWidget {
           Expanded(
               child: Container(
             color: ConstantsColors.whiteShade700,
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
+                const Padding(
                   padding: EdgeInsets.only(bottom: 35),
                   child: SizedBox(
                     width: 280,
@@ -58,23 +58,28 @@ class UserType extends StatelessWidget {
                   ),
                 ),
                 CustomButton(
-                    height: 50,
-                    width: 300,
-                    text: 'Pessoa Física',
-                    route: '/userRegisterPage'),
-                SizedBox(height: 15),
+                  height: 50,
+                  width: 300,
+                  text: 'Pessoa Física',
+                  onPressed: () =>
+                      GoRouter.of(context).push('/userRegisterPage'),
+                ),
+                const SizedBox(height: 15),
                 CustomButton(
-                    height: 50,
-                    width: 300,
-                    text: 'Instituição',
-                    route: '/institutionRegisterPage'),
-                SizedBox(height: 15),
+                  height: 50,
+                  width: 300,
+                  text: 'Instituição',
+                  onPressed: () =>
+                      GoRouter.of(context).push('/institutionRegisterPage'),
+                ),
+                const SizedBox(height: 15),
                 CustomButton(
                     height: 50,
                     width: 300,
                     text: 'Gestor',
-                    route: '/gestorRegisterPage'),
-                SizedBox(height: 40),
+                    onPressed: () =>
+                        GoRouter.of(context).push('/gestorRegisterPage')),
+                const SizedBox(height: 40),
               ],
             ),
           )),

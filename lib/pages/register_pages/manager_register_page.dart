@@ -46,7 +46,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
         password: passwordController.text.trim(),
       );
       if (mounted) {
-        GoRouter.of(context).go('/finalizeRegistrationPage');
+        GoRouter.of(context).push('/finalizeRegistrationPage');
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -86,7 +86,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                           icon: const Icon(Icons.arrow_back,
                               color: ConstantsColors.blueShade900),
                           onPressed: () {
-                            GoRouter.of(context).go('/userTypePage');
+                            Navigator.of(context).pop();
                           },
                         ),
                         const SizedBox(width: 75),
