@@ -62,7 +62,7 @@ class _PostPageState extends State<PostPage> {
             GoRouter.of(context).go('/root');
           },
         ),
-        title: const Text(
+        title: Text(
           'Criar Publicação',
           style: TextStylesConstants.kformularyTitle,
         ),

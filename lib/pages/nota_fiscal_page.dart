@@ -42,7 +42,7 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Criar Nota Fiscal',
           style: TextStylesConstants.kformularyTitle,
         ),
