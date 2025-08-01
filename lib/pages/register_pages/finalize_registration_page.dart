@@ -34,50 +34,64 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
       body: SizedBox.expand(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ConstantsColors.blueShade500,
-                ConstantsColors.tealShade200
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
+            color: ConstantsColors.whiteShade700,
           ),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back,
+                            color: ConstantsColors.blueShade900),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      const SizedBox(width: 73),
+                      Container(
+                        width: 140,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: ConstantsColors.blueShade900,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Passo 2 de 2',
+                    style: TextStyle(
+                      color: ConstantsColors.blackShade700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
                   const SizedBox(height: 40),
                   const Text(
                     'Quase lá!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color.fromARGB(186, 0, 0, 0),
+                      color: ConstantsColors.blueShade900,
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Faltam só mais alguns detalhes',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(186, 0, 0, 0),
-                      fontSize: 16,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: _pickImage,
                     child: CircleAvatar(
-                      backgroundColor: ConstantsColors.blueShade500,
+                      backgroundColor: ConstantsColors.blueShade900,
                       radius: 60,
                       backgroundImage:
                           _image != null ? FileImage(_image!) : null,
                       child: _image == null
-                          ? const Icon(Icons.add_photo_alternate_sharp,
-                              size: 50)
+                          ? const Icon(Icons.add_a_photo,
+                              size: 50, color: ConstantsColors.whiteShade700)
                           : null,
                     ),
                   ),
@@ -85,8 +99,9 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                   const Text(
                     'Adicione uma foto de perfil',
                     style: TextStyle(
-                      color: Color.fromARGB(186, 0, 0, 0),
+                      color: ConstantsColors.greyShade600,
                       fontSize: 16,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -113,20 +128,22 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                     route: '/root',
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade900,
-                    width: 130,
+                    width: 190,
                     height: 35,
                     hasMensage: true,
                     mensage: 'Cadastro realizado com sucesso!',
                   ),
                   const SizedBox(height: 10),
-                  const CustomButton(
+                  CustomButton(
                     text: 'Voltar',
-                    route: '/institutionRegisterPage',
-                    color: ConstantsColors.whiteShade900,
+                    color: ConstantsColors.whiteShade700,
                     textColor: ConstantsColors.blueShade900,
-                    width: 130,
+                    width: 190,
                     height: 35,
                     fontSize: 18,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
               ),

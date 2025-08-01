@@ -46,7 +46,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
         password: passwordController.text.trim(),
       );
       if (mounted) {
-        GoRouter.of(context).go('/finalizeRegistrationPage');
+        GoRouter.of(context).push('/finalizeRegistrationPage');
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -72,16 +72,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
     return Scaffold(
       body: SizedBox.expand(
         child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                ConstantsColors.blueShade500,
-                ConstantsColors.tealShade200
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
+          decoration: const BoxDecoration(color: ConstantsColors.whiteShade700),
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -89,28 +80,66 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    const SizedBox(height: 50),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: ConstantsColors.blueShade900),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        const SizedBox(width: 75),
+                        Container(
+                          width: 70,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: ConstantsColors.blueShade900,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        Container(
+                          width: 70,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: ConstantsColors.greyShade300,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Text(
+                      'Passo 1 de 2',
+                      style: TextStyle(
+                        color: ConstantsColors.blackShade700,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 30),
                     Text(
-                      'Queremos saber mais sobre você!',
+                      'Criar conta',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: ConstantsColors.blackShade700,
-                        fontSize: 28,
+                        color: ConstantsColors.blueShade900,
+                        fontSize: 30,
                       ).merge(TextStylesConstants.kpoppinsBlack),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Informe alguns dados importantes para nós',
+                    const Text(
+                      'Informe alguns dados importantes',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: ConstantsColors.blackShade700,
-                        fontSize: 18,
-                      ).merge(TextStylesConstants.kpoppinsLight),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
                     CustomTextFields(
                       icon: Icons.person,
-                      label: 'Nome da instituição',
+                      label: 'Nome da Instituição',
                       secret: false,
                       controller: nameController,
                       keyboardType: TextInputType.name,
@@ -118,10 +147,10 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.email,
-                      label: 'Email',
+                      label: 'Email do responsável',
                       secret: false,
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -129,15 +158,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    CustomTextFields(
-                      icon: Icons.apartment,
-                      label: 'CNPJ',
-                      secret: false,
-                      controller: cpfCnpjController,
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.phone,
                       label: 'Telefone',
@@ -148,15 +169,26 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
+                    CustomTextFields(
+                      icon: Icons.person_4,
+                      label: 'CNPJ',
+                      secret: false,
+                      controller: cpfCnpjController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.map,
                       label: 'Endereço',
                       secret: false,
                       controller: addressController,
                       keyboardType: TextInputType.text,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Campo obrigatório'
+                          : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.lock,
                       label: 'Senha',
@@ -167,10 +199,10 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     CustomTextFields(
                       icon: Icons.lock,
-                      label: 'Confirme a senha',
+                      label: 'Confirme sua Senha',
                       secret: true,
                       controller: confirmPasswordController,
                       keyboardType: TextInputType.visiblePassword,
@@ -178,7 +210,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           ? 'Campo obrigatório'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     if (errorMessage.isNotEmpty)
                       Text(
                         errorMessage,
@@ -186,7 +218,6 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                       ),
                     CustomButton(
                       text: 'Confirmar',
-                      route: '/finalizeRegistrationPage',
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
                       onPressed: () {
@@ -194,13 +225,6 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                           registerUser();
                         }
                       },
-                    ),
-                    const SizedBox(height: 10),
-                    const CustomButton(
-                      text: 'Voltar',
-                      route: '/userTypePage',
-                      color: ConstantsColors.whiteShade900,
-                      textColor: ConstantsColors.blueShade900,
                     ),
                     const SizedBox(height: 30),
                   ],
