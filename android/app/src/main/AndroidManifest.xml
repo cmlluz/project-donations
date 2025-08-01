@@ -2,7 +2,7 @@
     package="com.example.appdonationsgestor"
     xmlns:tools="http://schemas.android.com/tools">
     <application
-        android:label="appdonationsgestor"
+        android:label="Colab Salvador"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
