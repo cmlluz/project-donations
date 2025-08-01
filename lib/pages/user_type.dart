@@ -21,8 +21,7 @@ class UserType extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image:
-                      AssetImage('assets/Man donating coin in charity box.png'),
+                  image: AssetImage('assets/accountTypeImage.png'),
                   fit: BoxFit.cover,
                 ),
                 color: ConstantsColors.blueShade900,
