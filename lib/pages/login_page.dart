@@ -30,7 +30,7 @@ class _LoginPage extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> signIn() async {
+  /*Future<void> signIn() async {
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -53,7 +53,7 @@ class _LoginPage extends State<LoginPage> {
         isLoading = false;
       });
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +140,10 @@ class _LoginPage extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
+                        onPressed: () {
+                          GoRouter.of(context).push('/root');
+                        },
+                        /* 
                         onPressed: isLoading ? null : signIn,
                         child: isLoading
                             ? const SizedBox(
@@ -157,6 +161,14 @@ class _LoginPage extends State<LoginPage> {
                                   fontSize: 18,
                                 ),
                               ),
+                        */
+                        child: const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

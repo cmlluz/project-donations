@@ -88,7 +88,7 @@ class _RootPageState extends State<RootPage> {
       builder: (_) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 205, 239, 251),
+            color: ConstantsColors.whiteShade700,
             borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
           ),
           padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
@@ -109,7 +109,7 @@ class _RootPageState extends State<RootPage> {
                     ),
                   ),
                   Align(
-                    alignment: Alignment.topLeft,
+                    alignment: Alignment.topRight,
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
@@ -124,29 +124,29 @@ class _RootPageState extends State<RootPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.only(bottom: 30, left: 15, right: 15),
-                    child: _BottomMenuOption(
-                      icon: Icons.volunteer_activism_outlined,
-                      label: 'Criar Necessidade/Doação',
-                      onTap: () {
-                        GoRouter.of(context).go("/itemPostPage");
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                  _BottomMenuOption(
+                    icon: Icons.volunteer_activism_outlined,
+                    label: 'Anunciar \n Necessidade',
+                    onTap: () {
+                      GoRouter.of(context).push("/itemPostPage");
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  Container(
-                    padding:
-                        const EdgeInsets.only(bottom: 30, left: 15, right: 15),
-                    child: _BottomMenuOption(
-                      icon: Icons.post_add,
-                      label: 'Criar publicação',
-                      onTap: () {
-                        GoRouter.of(context).go("/postPage");
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                  _BottomMenuOption(
+                    icon: Icons.text_snippet_rounded,
+                    label: 'Criar \n publicação',
+                    onTap: () {
+                      GoRouter.of(context).push("/postPage");
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  _BottomMenuOption(
+                    icon: Icons.receipt_long_sharp,
+                    label: 'Criar \n nota fiscal',
+                    onTap: () {
+                      GoRouter.of(context).push("/notaFiscalPage");
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
               ),
@@ -176,21 +176,24 @@ class _BottomMenuOption extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          Material(
-            elevation: 8,
-            shape: const CircleBorder(),
-            shadowColor: ConstantsColors.blackShade900,
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: const Color.fromARGB(255, 205, 239, 251),
-              child: Icon(icon, size: 28, color: ConstantsColors.greyShade900),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: ConstantsColors.whiteShade700,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: ConstantsColors.blueShade900,
+                width: 1,
+              ),
             ),
+            child: Icon(icon, size: 40, color: ConstantsColors.blueShade900),
           ),
           const SizedBox(height: 8),
           Text(
             label,
+            textAlign: TextAlign.center,
             style: const TextStyle(
-                    fontSize: 14, color: ConstantsColors.blueShade900)
+                    fontSize: 12, color: ConstantsColors.blueShade900)
                 .merge(TextStylesConstants.kinterRegular),
           ),
         ],
