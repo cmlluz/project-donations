@@ -20,6 +20,7 @@ import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/necessity_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -46,6 +47,7 @@ class RouteNames {
   static const String necessityPage = "necessityPage";
   static const String hystoryPage = "hystoryPage";
   static const String postDetailPage = "postDetailPage";
+  static const String confirmedRegistration = "confirmedRegistration";
 }
 
 class AppRountersConfiguration {
@@ -219,6 +221,15 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) => const MaterialPage(
             child: PostDetailPage(),
           ),
+        ),
+        GoRoute(
+          path: '/confirmedRegistration',
+          name: RouteNames.confirmedRegistration,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: RegistrationConfirmedPage(),
+            );
+          },
         ),
       ],
     );

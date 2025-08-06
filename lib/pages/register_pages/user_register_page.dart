@@ -39,7 +39,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
     super.dispose();
   }
 
-  void registerUser() async {
+  /*void registerUser() async {
     if (passwordController.text != confirmPasswordController.text) {
       setState(() {
         errorMessage = 'As senhas não coincidem';
@@ -72,7 +72,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
         }
       });
     }
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -225,9 +225,10 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
                       onPressed: () {
-                        if (formKey.currentState?.validate() ?? false) {
+                        /*if (formKey.currentState?.validate() ?? false) {
                           registerUser();
-                        }
+                        }*/
+                        GoRouter.of(context).push('/finalizeRegistrationPage');
                       },
                     ),
                     const SizedBox(height: 30),
