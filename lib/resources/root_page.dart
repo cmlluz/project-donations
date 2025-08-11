@@ -48,7 +48,7 @@ class _RootPageState extends State<RootPage> {
     Icons.list,
     Icons.add,
     Icons.favorite_outline,
-    Icons.person_outline,
+    Icons.logout_outlined,
   ];
 
   @override
@@ -70,6 +70,8 @@ class _RootPageState extends State<RootPage> {
         onTap: (index) {
           if (index == 2) {
             _showBottomMenu(context);
+          } else if (index == 4) {
+            _showLogoutMenu(context);
           } else {
             setState(() {
               NavigationController.currentIndex.value = index;
@@ -148,6 +150,113 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLogoutMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: ConstantsColors.whiteShade700,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+          ),
+          padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: ConstantsColors.greyShade600,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Sair',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: ConstantsColors.blueShade900,
+                        ).merge(TextStylesConstants.kinterSemiBold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 19),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Tem certeza que deseja sair?',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ConstantsColors.blueShade900.withOpacity(0.7),
+                    ).merge(TextStylesConstants.kinterRegular),
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.whiteShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: const BorderSide(
+                                color: ConstantsColors.blueShade900),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancelar',
+                          style: const TextStyle(
+                            color: ConstantsColors.blueShade900,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          //
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          'Sim, sair',
+                          style: const TextStyle(
+                            color: ConstantsColors.whiteShade900,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
               const SizedBox(height: 24),
