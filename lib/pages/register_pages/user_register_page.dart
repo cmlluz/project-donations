@@ -228,6 +228,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                         if (formKey.currentState?.validate() ?? false) {
                           registerUser();
                         }
+                        GoRouter.of(context).push('/finalizeRegistrationPage');
                       },
                     ),
                     const SizedBox(height: 30),

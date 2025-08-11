@@ -125,13 +125,11 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                   const SizedBox(height: 20),
                   const CustomButton(
                     text: 'Cadastrar',
-                    route: '/root',
+                    route: '/confirmedRegistration',
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade900,
                     width: 190,
                     height: 35,
-                    hasMensage: true,
-                    mensage: 'Cadastro realizado com sucesso!',
                   ),
                   const SizedBox(height: 10),
                   CustomButton(
