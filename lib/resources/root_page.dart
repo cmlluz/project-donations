@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/controllers/navigation_controller.dart';
+import 'package:appdonationsgestor/auth/app_data.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -50,6 +53,19 @@ class _RootPageState extends State<RootPage> {
     Icons.favorite_outline,
     Icons.logout_outlined,
   ];
+
+  void logout() async {
+    try {
+      await authService.value.signOut();
+      AppData.navBarCurrentIndexNotifier.value = 0;
+      AppData.onboardingCurrentIndexNotifier.value = 0;
+      if (context.mounted) {
+        context.go('/');
+      }
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +255,8 @@ class _RootPageState extends State<RootPage> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          //
+                          Navigator.of(context).pop();
+                          logout(); // Chama a função logout
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ConstantsColors.blueShade900,
