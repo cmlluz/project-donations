@@ -73,7 +73,7 @@ class _LoginPage extends State<LoginPage> {
                   children: [
                     const SizedBox(height: 40),
                     Image.asset(
-                      'assets/ChatGPT Image 12 de jul. de 2025, 22_58_22 1.png',
+                      'assets/appLogo.png',
                       width: 100,
                       height: 100,
                     ),

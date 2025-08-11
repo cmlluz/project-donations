@@ -1,23 +1,27 @@
+// import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
+// import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/auth/app_data.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+class NotificationsPage extends StatefulWidget {
+  const NotificationsPage({Key? key}) : super(key: key);
 
   @override
-  State<SettingsPage> createState() => _SettingsPage();
+  State<NotificationsPage> createState() => _NotificationsPage();
 }
 
-class _SettingsPage extends State<SettingsPage> {
-  bool isNotificationOn = false;
-
+class _NotificationsPage extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configurações'),
+        title: const Text('Notificações'),
         centerTitle: true,
         backgroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
@@ -35,42 +39,42 @@ class _SettingsPage extends State<SettingsPage> {
         ),
       ),
       backgroundColor: ConstantsColors.whiteShade900,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildSettingOption(
-              title: 'Editar Perfil',
-              onTap: () {
-                GoRouter.of(context).pushNamed('editProfilePage');
-              },
-            ),
-            _buildSettingOption(
-              title: 'Notificações',
-              icon: isNotificationOn
-                  ? Icons.toggle_on
-                  : Icons.toggle_off_outlined,
-              iconColor: isNotificationOn
-                  ? ConstantsColors.blueShade900
-                  : ConstantsColors.blueShade900,
-              iconSize: 36,
-              alignment: MainAxisAlignment.spaceBetween,
-              onTap: () {
-                setState(() {
-                  isNotificationOn = !isNotificationOn;
-                });
-              },
-            ),
-            _buildSettingOption(
-              title: 'Deletar conta',
-              // titleSize: 18,
-              textColor: ConstantsColors.redShade800,
-              onTap: () {
-                GoRouter.of(context).pushNamed('removeAccountPage');
-              },
-            ),
-          ],
-        ),
-      ),
+      // body: SingleChildScrollView(
+      //   child: Column(
+      //     children: [
+      //       _buildSettingOption(
+      //         title: 'Editar Perfil',
+      //         onTap: () {
+      //           GoRouter.of(context).pushNamed('editProfilePage');
+      //         },
+      //       ),
+      //       _buildSettingOption(
+      //         title: 'Notificações',
+      //         icon: isNotificationOn
+      //             ? Icons.toggle_on
+      //             : Icons.toggle_off_outlined,
+      //         iconColor: isNotificationOn
+      //             ? ConstantsColors.blueShade900
+      //             : ConstantsColors.blueShade900,
+      //         iconSize: 36,
+      //         alignment: MainAxisAlignment.spaceBetween,
+      //         onTap: () {
+      //           setState(() {
+      //             isNotificationOn = !isNotificationOn;
+      //           });
+      //         },
+      //       ),
+      //       _buildSettingOption(
+      //         title: 'Deletar conta',
+      //         // titleSize: 18,
+      //         textColor: ConstantsColors.redShade800,
+      //         onTap: () {
+      //           GoRouter.of(context).pushNamed('removeAccountPage');
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 

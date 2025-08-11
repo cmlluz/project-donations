@@ -24,7 +24,7 @@ class ItemPostPage extends StatelessWidget {
             GoRouter.of(context).go('/root');
           },
         ),
-        title: const Text(
+        title: Text(
           'Criar novo anúncio',
           style: TextStylesConstants.kformularyTitle,
         ),
