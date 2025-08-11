@@ -32,15 +32,24 @@ class FavoriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Material(
-        elevation: 5.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+      child: InkWell(
+        onTap: () {
+          GoRouter.of(context).push('/institutionProfilePage');
+        },
+        customBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: ConstantsColors.blueShade900,
+              width: 1,
+            ),
+          ),
           width: 330,
-          height: 140,
-          padding: const EdgeInsets.all(12),
+          height: 100,
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           child: Row(
             children: [
               ClipRRect(
@@ -63,7 +72,8 @@ class FavoriteCard extends StatelessWidget {
                             name,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: ConstantsColors.blackShade900,
+                              color: ConstantsColors.blueShade900,
+                              fontWeight: FontWeight.bold,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -71,7 +81,7 @@ class FavoriteCard extends StatelessWidget {
                         IconButton(
                           onPressed: onDelete,
                           icon: const Icon(
-                            Icons.delete_outline,
+                            Icons.delete,
                             color: ConstantsColors.redShade800,
                           ),
                           padding: EdgeInsets.zero,
@@ -79,41 +89,13 @@ class FavoriteCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Expanded(
-                      child: Text(
-                        description,
-                        style: const TextStyle(fontSize: 12),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: SizedBox(
-                        height: 20,
-                        width: 120,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            GoRouter.of(context)
-                                .push('/institutionProfilePage');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ConstantsColors.greyShade200,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            'Visitar perfil',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: ConstantsColors.blackShade800,
-                            ),
-                          ),
-                        ),
-                      ),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                          fontSize: 12, color: ConstantsColors.blueShade900),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
                     ),
                   ],
                 ),
