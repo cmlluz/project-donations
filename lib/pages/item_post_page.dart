@@ -159,15 +159,22 @@ class DonationItemComponent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-            const CustomButton(
+            CustomButton(
               height: 40,
               width: 150,
               text: 'Publicar',
-              route: '/root',
               color: ConstantsColors.blueShade900,
               textColor: ConstantsColors.whiteShade700,
-              hasMensage: true,
-              mensage: 'Publicado com sucesso!',
+              onPressed: () {
+                if (postTypeController.selectedValueCategory.value ==
+                    'Doação') {
+                  GoRouter.of(context).push('/feedback?text1=Doação');
+                }
+                if (postTypeController.selectedValueCategory.value ==
+                    'Necessidade') {
+                  GoRouter.of(context).push('/feedback?text1=Necessidade');
+                }
+              },
             ),
             const SizedBox(height: 10),
             const CustomButton(

@@ -32,7 +32,7 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  Future<void> publicar() async {
+  /*Future<void> publicar() async {
     String authorUid = authService.value.currentUser?.uid ?? '';
     String token = await authService.value.currentUser?.getIdToken() ?? '';
     String imageUrl = _controller.crtlPic.text;
@@ -49,7 +49,7 @@ class _PostPageState extends State<PostPage> {
     setState(() {
       mensagem = resultado;
     });
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -137,13 +137,14 @@ class _PostPageState extends State<PostPage> {
                     height: 50,
                     width: 150,
                     text: 'Publicar',
-                    route: '/root',
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade900,
-                    hasMensage: true,
-                    mensage:
-                        mensagem.isEmpty ? 'Publicado com sucesso!' : mensagem,
-                    onPressed: publicar,
+                    onPressed: () {
+                      // publicar();
+                      // if (mensagem.isNotEmpty) {
+                      GoRouter.of(context).push('/feedback?text1=Publicação');
+                      // }
+                    },
                   ),
                   const SizedBox(width: 20),
                   const CustomButton(
