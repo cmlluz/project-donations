@@ -5,6 +5,7 @@ import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -67,97 +68,153 @@ class _PostPageState extends State<PostPage> {
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade900,
+        foregroundColor: ConstantsColors.whiteShade700,
         elevation: 0,
         centerTitle: true,
       ),
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          color: ConstantsColors.whiteShade900,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(35.0),
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: ConstantsColors.whiteShade700,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(35.0),
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  pickImageFromGallery();
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20),
-                  alignment: Alignment.center,
-                  width: 400,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    border: Border.all(
-                      color: ConstantsColors.greyShade300,
-                      width: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              children: [
+                const SizedBox(height: 30),
+                GestureDetector(
+                  onTap: () {
+                    pickImageFromGallery();
+                  },
+                  child: DottedBorder(
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(25.0),
+                    color: ConstantsColors.blueShade900,
+                    dashPattern: const [5, 5],
+                    strokeWidth: 2,
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 350,
+                      height: 250,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(1, 91, 124, 0.05),
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _selectedImg != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                  child: Image.file(
+                                    _selectedImg!,
+                                    width: 350,
+                                    height: 250,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Column(
+                                  children: [
+                                    Icon(
+                                      Icons.image_search_outlined,
+                                      size: 80,
+                                      color: ConstantsColors.blueShade900,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Clique para selecionar uma imagem',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: ConstantsColors.blueShade900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ],
+                      ),
                     ),
-                    image: _selectedImg == null
-                        ? const DecorationImage(
-                            image: AssetImage('assets/tigre.webp'),
-                            fit: BoxFit.cover,
-                          )
-                        : DecorationImage(
-                            image: FileImage(_selectedImg!) as ImageProvider,
-                            fit: BoxFit.cover,
-                          ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                "Descreva a postagem:",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: ConstantsColors.blueShade900,
-                ).merge(TextStylesConstants.kpoppinsBold),
-              ),
-              const SizedBox(height: 20),
-              CustomTextFields(
-                icon: Icons.description,
-                label: 'Legenda',
-                hintText: 'Escreva uma descrição para o post',
-                secret: false,
-                controller: _controller.crtlDesc,
-                keyboardType: TextInputType.text,
-                labelColor: ConstantsColors.greyShade200,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomButton(
-                    height: 50,
-                    width: 150,
-                    text: 'Publicar',
-                    color: ConstantsColors.blueShade900,
-                    textColor: ConstantsColors.whiteShade900,
-                    onPressed: () {
-                      // publicar();
-                      // if (mensagem.isNotEmpty) {
-                      GoRouter.of(context).push('/feedback?text1=Publicação');
-                      // }
-                    },
+                const SizedBox(height: 40),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Descrição",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: ConstantsColors.greyShade600,
+                    ),
                   ),
-                  const SizedBox(width: 20),
-                  const CustomButton(
-                    height: 50,
-                    width: 150,
-                    text: 'Voltar',
-                    route: '/root',
-                    color: ConstantsColors.whiteShade900,
-                    textColor: ConstantsColors.blueShade900,
+                ),
+                const SizedBox(height: 10),
+                const Material(
+                  elevation: 2,
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  color: ConstantsColors.whiteShade700,
+                  child: TextField(
+                    maxLines: 3,
+                    maxLength: 150,
+                    decoration: InputDecoration(
+                      counterText: '',
+                      labelStyle:
+                          TextStyle(color: ConstantsColors.whiteShade700),
+                      hintText: 'Escreva uma descrição para o post',
+                      hintStyle: TextStyle(
+                        color: ConstantsColors.greyShade600,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: ConstantsColors
+                              .blueShade900, // Cor da borda padrão
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(
+                          width: 1.5,
+                          // Cor da borda quando o usuário clica no campo
+                          color: ConstantsColors.blueShade900,
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 40),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomButton(
+                      height: 40,
+                      width: 220,
+                      text: 'Publicar',
+                      color: ConstantsColors.blueShade900,
+                      textColor: ConstantsColors.whiteShade700,
+                      onPressed: () {
+                        // publicar();
+                        // if (mensagem.isNotEmpty) {
+                        GoRouter.of(context).push('/feedback?text1=Publicação');
+                        // }
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    const CustomButton(
+                      height: 40,
+                      width: 220,
+                      text: 'Cancelar',
+                      route: '/root',
+                      color: ConstantsColors.whiteShade700,
+                      textColor: ConstantsColors.greyShade600,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
