@@ -36,8 +36,8 @@ class _RootPageState extends State<RootPage> {
     setState(() {});
   }
 
-  //lista das paginas
-  List<Widget> pages = const [
+  // Lista de páginas
+  final List<Widget> pages = const [
     HomePage(),
     SearchPage(),
     SizedBox.shrink(),
@@ -45,13 +45,13 @@ class _RootPageState extends State<RootPage> {
     ManagerProfilePage(),
   ];
 
-  //lista de icones das paginas
-  List<IconData> iconList = [
-    Icons.home,
-    Icons.list,
-    Icons.add,
-    Icons.favorite_outline,
-    Icons.logout_outlined,
+  // Lista de imagens dos ícones
+  final List<String> iconList = [
+    'assets/icons/home_icon.png',
+    'assets/icons/welcome_icon.png',
+    'assets/icons/create_icon.png',
+    'assets/icons/favorites_icon.png',
+    'assets/icons/logout_icon.png',
   ];
 
   void logout() async {
@@ -74,15 +74,23 @@ class _RootPageState extends State<RootPage> {
         index: NavigationController.currentIndex.value,
         children: pages,
       ),
-      bottomNavigationBar: AnimatedBottomNavigationBar(
-        splashColor: ConstantsColors.blueShade500,
-        activeColor: ConstantsColors.blueShade900,
-        inactiveColor: ConstantsColors.blueShade900.withOpacity(.6),
-        icons: iconList,
-        iconSize: 28.0,
+      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+        itemCount: iconList.length,
+        tabBuilder: (index, isActive) {
+          final iconColor = isActive
+              ? ConstantsColors.blueShade900
+              : ConstantsColors.blueShade500;
+
+          return Image.asset(iconList[index], color: iconColor);
+        },
         activeIndex: NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
+        scaleFactor: 1.0, 
+        splashColor: Colors.transparent,
+        splashSpeedInMilliseconds: 1,
+        shadow: const Shadow(color: Colors.transparent),
+        elevation: 0,
         onTap: (index) {
           if (index == 2) {
             _showBottomMenu(context);
@@ -256,7 +264,7 @@ class _RootPageState extends State<RootPage> {
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          logout(); // Chama a função logout
+                          logout();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ConstantsColors.blueShade900,
