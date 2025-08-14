@@ -22,6 +22,7 @@ import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
+import 'package:appdonationsgestor/pages/feedback_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -50,6 +51,7 @@ class RouteNames {
   static const String postDetailPage = "postDetailPage";
   static const String confirmedRegistration = "confirmedRegistration";
   static const String notaFiscalPage = "notaFiscalPage";
+  static const String feedbackPage = "feedback";
 }
 
 class AppRountersConfiguration {
@@ -239,6 +241,16 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: NotaFiscalPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/feedback',
+          name: RouteNames.feedbackPage,
+          pageBuilder: (context, state) {
+            final String? text1 = state.uri.queryParameters['text1'];
+            return MaterialPage(
+              child: FeedbackPage(text1: text1 ?? 'Publicação'),
             );
           },
         ),
