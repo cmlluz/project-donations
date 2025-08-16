@@ -13,7 +13,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
+  final List<Map<String, String>> cardsData = [
+    {
+      "title": "Lar dos Idosos",
+      "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing...",
+      "avatarUrl":
+          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
+      "location": "Salvador, Bahia",
+      "date": "15 Jun, 2025",
+      "imageAsset": "assets/donations.jpg",
+    },
+    {
+      "title": "Centro Comunitário",
+      "subtitle": "Ajudando crianças carentes com educação e saúde",
+      "avatarUrl":
+          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
+      "location": "Recife, PE",
+      "date": "10 Jun, 2025",
+      "imageAsset": "assets/donations2.jpg",
+    },
+    {
+      "title": "ONG Teste",
+      "subtitle":
+          "Este é um subtítulo muito longo para testar a limitação de duas linhas no CardItem. Ele deve mostrar reticências quando ultrapassar o limite.",
+      "avatarUrl":
+          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
+      "location": "São Paulo, SP",
+      "date": "20 Jun, 2025",
+      "imageAsset": "assets/donations.jpg",
+    },
+  ];
 
   // Display do popup de atualização cadastral
   // void initState() {
@@ -111,46 +140,27 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SafeArea(
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          itemCount: 13,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(left: 10.0),
-                    horizontalTitleGap: 12.0,
-                    leading: const CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
-                      ),
-                    ),
-                    title: Text(
-                      "Lar dos idosos",
-                      style: const TextStyle(
-                        color: ConstantsColors.blackShade900,
-                        fontSize: 16,
-                      ).merge(TextStylesConstants.kinterSemiBold),
-                    ),
-                  ),
-                  const CardItem(),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15.0, top: 10.0),
-                    child: Text(
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing",
-                      style: const TextStyle(
-                        color: ConstantsColors.greyShade900,
-                        fontSize: 14,
-                      ).merge(TextStylesConstants.kpoppinsMedium),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+        child: Container(
+          color: ConstantsColors.whiteShade900,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(left: 5.0, right: 5.0, top: 29.0),
+            itemCount: cardsData.length,
+            itemBuilder: (context, index) {
+              final card = cardsData[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 29.0),
+                child: CardItem(
+                  onTap: () => print("Clicou no card ${card['title']}"),
+                  title: card['title']!,
+                  subtitle: card['subtitle'],
+                  avatarUrl: card['avatarUrl']!,
+                  location: card['location']!,
+                  date: card['date']!,
+                  imageAsset: card['imageAsset']!,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
