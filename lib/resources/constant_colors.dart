@@ -26,6 +26,8 @@ class ConstantsColors {
   static const Color greyShade50 =
       Color.fromRGBO(245, 245, 245, 1); // veryLightgrey
   static const Color greyShade600 = Color.fromARGB(255, 117, 117, 117);
+  static const Color greyShade500 =
+      Color.fromARGB(255, 126, 126, 126); // midGrey (#7E7E7E)
   static const Color greyShade300 = Color(0xFFE0E0E0);
 
   // ⚪ White Shades
