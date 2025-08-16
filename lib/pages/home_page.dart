@@ -3,6 +3,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/popup.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -50,25 +51,70 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(252, 251, 248, 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                offset: const Offset(0, 1),
+                blurRadius: 2,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 21.0, vertical: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () =>
+                        GoRouter.of(context).pushNamed("managerProfilePage"),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      minimumSize: Size.zero,
+                    ),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 24,
+                          backgroundImage: AssetImage("assets/profile.jpg"),
+                        ),
+                        const SizedBox(width: 11.0),
+                        Text(
+                          'Olá, Name 👋',
+                          style: const TextStyle(
+                            color: ConstantsColors.blueShade900,
+                            fontSize: 20,
+                          ).merge(TextStylesConstants.kpoppinsRegular),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      GoRouter.of(context).push('/notificationsPage');
+                    },
+                    icon: Image.asset("assets/icons/notification_icon.png"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           itemCount: 13,
           itemBuilder: (context, index) {
-            if (index == 0) {
-              return Padding(
-                padding:
-                    const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 10.0),
-                child: Text(
-                  'Olá, Name 👋',
-                  style: const TextStyle(
-                    color: ConstantsColors.greyShade900,
-                    fontSize: 30,
-                  ).merge(TextStylesConstants.kpoppinsBold),
-                ),
-              );
-            }
-
             return Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: Column(
