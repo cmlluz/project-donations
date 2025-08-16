@@ -209,7 +209,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       itemBuilder: (context, index) {
                         final item = _itensFiltrados[index];
                         return FavoriteCard(
-                          // Seu card customizado
                           name: item.name,
                           description: item.description,
                           imageUrl: item.imageUrl,
