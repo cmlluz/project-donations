@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   IconButton(
                     onPressed: () {
-                      GoRouter.of(context).push('/notificationsPage');
+                      GoRouter.of(context).pushNamed("notificationsPage");
                     },
                     icon: Image.asset("assets/icons/notification_icon.png"),
                   ),

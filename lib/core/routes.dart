@@ -17,6 +17,7 @@ import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
 import 'package:appdonationsgestor/pages/necessity_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
@@ -52,6 +53,7 @@ class RouteNames {
   static const String confirmedRegistration = "confirmedRegistration";
   static const String notaFiscalPage = "notaFiscalPage";
   static const String feedbackPage = "feedback";
+  static const String notificationsPage = "notificationsPage";
 }
 
 class AppRountersConfiguration {
@@ -241,6 +243,15 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: NotaFiscalPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/notificationsPage',
+          name: RouteNames.notificationsPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: NotificationsPage(),
             );
           },
         ),
