@@ -177,13 +177,18 @@ class DonationItemComponent extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10),
-            const CustomButton(
-              height: 40,
-              width: 150,
-              text: 'Voltar',
-              route: '/root',
-              color: ConstantsColors.whiteShade700,
-              textColor: ConstantsColors.blueShade900,
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancelar',
+                  style: const TextStyle(
+                    color: ConstantsColors.greyShade600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ).merge(TextStylesConstants.kpoppinsSemiBold),
+                ),
+              ),
             ),
           ],
         );

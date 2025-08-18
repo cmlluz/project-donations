@@ -11,6 +11,7 @@ import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/auth/app_data.dart';
 import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:appdonationsgestor/components/menu_button.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -86,7 +87,7 @@ class _RootPageState extends State<RootPage> {
         activeIndex: NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
-        scaleFactor: 1.0, 
+        scaleFactor: 1.0,
         splashColor: Colors.transparent,
         splashSpeedInMilliseconds: 1,
         shadow: const Shadow(color: Colors.transparent),
@@ -150,7 +151,7 @@ class _RootPageState extends State<RootPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _BottomMenuOption(
+                  MenuButton(
                     icon: Icons.volunteer_activism_outlined,
                     label: 'Anunciar \n Necessidade',
                     onTap: () {
@@ -158,7 +159,7 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  _BottomMenuOption(
+                  MenuButton(
                     icon: Icons.text_snippet_rounded,
                     label: 'Criar \n publicação',
                     onTap: () {
@@ -166,7 +167,7 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  _BottomMenuOption(
+                  MenuButton(
                     icon: Icons.receipt_long_sharp,
                     label: 'Criar \n nota fiscal',
                     onTap: () {
@@ -289,49 +290,6 @@ class _RootPageState extends State<RootPage> {
           ),
         );
       },
-    );
-  }
-}
-
-class _BottomMenuOption extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _BottomMenuOption({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: ConstantsColors.whiteShade700,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: ConstantsColors.blueShade900,
-                width: 1,
-              ),
-            ),
-            child: Icon(icon, size: 40, color: ConstantsColors.blueShade900),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                    fontSize: 12, color: ConstantsColors.blueShade900)
-                .merge(TextStylesConstants.kinterRegular),
-          ),
-        ],
-      ),
     );
   }
 }

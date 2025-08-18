@@ -1,18 +1,19 @@
+import 'dart:io';
+
+import 'package:appdonationsgestor/components/image_picker_sheet.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
+// Importe seus componentes e constantes aqui
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class NotaFiscalPage extends StatefulWidget {
-  final List<Item> items;
-
-  const NotaFiscalPage({
-    Key? key,
-    this.items = const [Item(description: 'Sem descrição', quantity: 1)],
-  }) : super(key: key);
+  const NotaFiscalPage({super.key});
 
   @override
   State<NotaFiscalPage> createState() => _NotaFiscalPageState();
@@ -20,17 +21,42 @@ class NotaFiscalPage extends StatefulWidget {
 
 class _NotaFiscalPageState extends State<NotaFiscalPage> {
   final TextEditingController customerNameController = TextEditingController();
-  final TextEditingController customerCpfCnpjController =
-      TextEditingController();
-  final TextEditingController invoiceNumberController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
+  final List<File> _selectedImages = [];
 
-  late List<Item> items;
+  // Função para mostrar o pop-up na parte inferior da tela
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ImagePickerOptionsSheet(
+          onCameraTap: () {
+            _pickImage(ImageSource.camera);
+            Navigator.of(context).pop();
+          },
+          onGalleryTap: () {
+            _pickImage(ImageSource.gallery);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage =
+        await ImagePicker().pickImage(source: source, imageQuality: 80);
+
+    if (pickedImage != null) {
+      setState(() {
+        _selectedImages.add(File(pickedImage.path));
+      });
+    }
+  }
 
   @override
-  void initState() {
-    super.initState();
-    items = widget.items;
+  void dispose() {
+    customerNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,146 +73,171 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade900,
+        foregroundColor: ConstantsColors.whiteShade700,
         elevation: 0,
         centerTitle: true,
       ),
       body: Column(
         children: [
-          const SizedBox(height: 50),
+          const SizedBox(height: 20),
           Expanded(
             child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                color: ConstantsColors.whiteShade900,
+                color: ConstantsColors.whiteShade700,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(35.0)),
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // CAMPO DE TÍTULO/DESCRIÇÃO
                     CustomTextFields(
-                      icon: Icons.person,
-                      label: 'Nome / Razão Social',
+                      icon: Icons.description_outlined,
+                      label: 'Título/Descrição',
                       controller: customerNameController,
-                      keyboardType: TextInputType.name,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextFields(
-                      icon: Icons.badge,
-                      label: 'CPF / CNPJ',
-                      controller: customerCpfCnpjController,
                       keyboardType: TextInputType.text,
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10)),
                     ),
-                    const SizedBox(height: 15),
-                    CustomTextFields(
-                      icon: Icons.confirmation_number,
-                      label: 'Número da Nota',
-                      controller: invoiceNumberController,
-                      keyboardType: TextInputType.number,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextFields(
-                      icon: Icons.date_range,
-                      label: 'Data da Emissão',
-                      controller: dateController,
-                      keyboardType: TextInputType.datetime,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
                     const SizedBox(height: 25),
-                    Text(
-                      'Itens',
-                      style: TextStylesConstants.kformularyTitle
-                          .copyWith(fontSize: 20),
+
+                    // ÁREA DE UPLOAD DE IMAGEM
+                    GestureDetector(
+                      onTap: _showImagePickerOptions,
+                      child: DottedBorder(
+                        borderType: BorderType.RRect,
+                        radius: const Radius.circular(20.0),
+                        color: ConstantsColors.blueShade900.withOpacity(0.5),
+                        dashPattern: const [6, 6],
+                        strokeWidth: 2,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(1, 91, 124, 0.05),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.image_search_outlined,
+                                size: 50,
+                                color: ConstantsColors.blueShade900,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Envie a imagem da nota aqui',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: ConstantsColors.blueShade900
+                                      .withOpacity(0.8),
+                                ),
+                              ),
+                              const Text(
+                                'Procurar',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: ConstantsColors.blueShade900,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // LISTA VERTICAL DE IMAGENS ENVIADAS
+                    const Text(
+                      'Imagens enviadas:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: ConstantsColors.greyShade600,
+                      ),
                     ),
                     const SizedBox(height: 10),
-                    ...items.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      Item item = entry.value;
 
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          GoRouter.of(context)
-                              .go('/nota-fiscal/detalhes?itemIndex=$index');
-                        },
-                        child: Card(
+                    if (_selectedImages.isNotEmpty)
+                      ..._selectedImages.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        File imageFile = entry.value;
+
+                        return Container(
                           margin: const EdgeInsets.only(bottom: 12),
-                          shape: RoundedRectangleBorder(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[300]!),
                           ),
-                          elevation: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 6,
-                                  child: Text(
-                                    item.description.isNotEmpty
-                                        ? item.description
-                                        : 'Sem descrição',
-                                    style: TextStylesConstants.kpoppinsMedium,
-                                  ),
+                          child: Row(
+                            children: [
+                              // Preview da Imagem
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.file(
+                                  imageFile,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
                                 ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Qtd: ${item.quantity}',
-                                    style: TextStylesConstants.kinterRegular,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    setState(() {
-                                      items.removeAt(index);
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 15),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.redAccent),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedImages.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ],
                           ),
+                        );
+                      })
+                    else
+                      Text(
+                        'Nenhuma imagem enviada ainda.',
+                        style: TextStylesConstants.kpoppinsRegular
+                            .copyWith(color: Colors.grey),
+                      ),
+
+                    const SizedBox(height: 50),
+
+                    CustomButton(
+                      height: 50,
+                      width: double.infinity,
+                      text: 'Emitir Nota Fiscal',
+                      color: ConstantsColors.blueShade900,
+                      textColor: ConstantsColors.whiteShade900,
+                      onPressed: () {
+                        if (mounted) {
+                          GoRouter.of(context)
+                              .push('/feedback?text1=Nota Fiscal');
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancelar',
+                          style: const TextStyle(
+                            color: ConstantsColors.greyShade600,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ).merge(TextStylesConstants.kpoppinsSemiBold),
                         ),
-                      );
-                    }),
-                    const SizedBox(height: 30),
-                    Column(
-                      children: [
-                        const CustomButton(
-                          height: 50,
-                          width: double.infinity,
-                          text: 'Emitir Nota Fiscal',
-                          color: ConstantsColors.blueShade900,
-                          textColor: ConstantsColors.whiteShade900,
-                          route: '/root',
-                          hasMensage: true,
-                          mensage: 'Nota Fiscal emitida com sucesso!',
-                        ),
-                        const SizedBox(height: 12),
-                        Center(
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'Cancelar',
-                              style: const TextStyle(
-                                color: ConstantsColors.blueShade900,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ).merge(TextStylesConstants.kpoppinsSemiBold),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -197,14 +248,4 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
       ),
     );
   }
-}
-
-class Item {
-  final String description;
-  final int quantity;
-
-  const Item({
-    this.description = '',
-    this.quantity = 1,
-  });
 }

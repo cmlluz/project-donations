@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:go_router/go_router.dart';
@@ -48,14 +49,18 @@ class RegistrationConfirmedPage extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10),
-            CustomButton(
-              text: 'Voltar',
-              width: 190,
-              color: ConstantsColors.whiteShade700,
-              textColor: ConstantsColors.blueShade900,
-              onPressed: () {
-                GoRouter.of(context).go('/');
-              },
+            Center(
+              child: TextButton(
+                onPressed: () => GoRouter.of(context).go('/'),
+                child: Text(
+                  'Voltar',
+                  style: const TextStyle(
+                    color: ConstantsColors.greyShade900,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ).merge(TextStylesConstants.kpoppinsSemiBold),
+                ),
+              ),
             ),
           ],
         ),

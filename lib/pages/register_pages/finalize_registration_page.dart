@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -132,16 +133,18 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                     height: 35,
                   ),
                   const SizedBox(height: 10),
-                  CustomButton(
-                    text: 'Voltar',
-                    color: ConstantsColors.whiteShade700,
-                    textColor: ConstantsColors.blueShade900,
-                    width: 190,
-                    height: 35,
-                    fontSize: 18,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                  Center(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancelar',
+                        style: const TextStyle(
+                          color: ConstantsColors.greyShade600,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ).merge(TextStylesConstants.kpoppinsSemiBold),
+                      ),
+                    ),
                   ),
                 ],
               ),
