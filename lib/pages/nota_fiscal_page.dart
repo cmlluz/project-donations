@@ -5,8 +5,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-
-// Importe seus componentes e constantes aqui
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -23,7 +21,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
   final TextEditingController customerNameController = TextEditingController();
   final List<File> _selectedImages = [];
 
-  // Função para mostrar o pop-up na parte inferior da tela
   void _showImagePickerOptions() {
     showModalBottomSheet(
       context: context,
@@ -93,7 +90,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // CAMPO DE TÍTULO/DESCRIÇÃO
                     CustomTextFields(
                       icon: Icons.description_outlined,
                       label: 'Título/Descrição',
@@ -103,8 +99,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                           borderRadius: BorderRadius.circular(10)),
                     ),
                     const SizedBox(height: 25),
-
-                    // ÁREA DE UPLOAD DE IMAGEM
                     GestureDetector(
                       onTap: _showImagePickerOptions,
                       child: DottedBorder(
@@ -153,8 +147,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-
-                    // LISTA VERTICAL DE IMAGENS ENVIADAS
                     const Text(
                       'Imagens enviadas:',
                       style: TextStyle(
@@ -163,7 +155,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-
                     if (_selectedImages.isNotEmpty)
                       ..._selectedImages.asMap().entries.map((entry) {
                         int index = entry.key;
@@ -179,7 +170,6 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                           ),
                           child: Row(
                             children: [
-                              // Preview da Imagem
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: Image.file(
@@ -209,9 +199,7 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                         style: TextStylesConstants.kpoppinsRegular
                             .copyWith(color: Colors.grey),
                       ),
-
                     const SizedBox(height: 50),
-
                     CustomButton(
                       height: 50,
                       width: double.infinity,
