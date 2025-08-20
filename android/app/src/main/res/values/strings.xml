@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Donation App</string>
+    <string name="facebook_app_id">1252671446411055</string>
+    <string name="fb_login_protocol_scheme">fb1252671446411055</string>
+    <string name="facebook_client_token">c9d2833967355ff03afcab8193091dd7</string>
+</resources>

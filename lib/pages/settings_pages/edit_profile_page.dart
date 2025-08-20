@@ -91,7 +91,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             GoRouter.of(context).go('/root');
           },
         ),
-        title: const Text(
+        title: Text(
           'Editar Perfil',
           style: TextStylesConstants.kformularyTitle,
         ),

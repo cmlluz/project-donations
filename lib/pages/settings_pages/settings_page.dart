@@ -1,13 +1,7 @@
-// import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
-// import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
-import 'package:appdonationsgestor/auth/app_data.dart';
-import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
-import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -18,29 +12,13 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPage extends State<SettingsPage> {
   bool isNotificationOn = false;
-  final formKey = GlobalKey<FormState>();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  String errorMessage = '';
-
-  void logout() async {
-    try {
-      await authService.value.signOut();
-      AppData.navBarCurrentIndexNotifier.value = 0;
-      AppData.onboardingCurrentIndexNotifier.value = 0;
-      if (context.mounted) {
-        context.go('/');
-      }
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configurações'),
+        centerTitle: true,
         backgroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         iconTheme: const IconThemeData(color: ConstantsColors.blueShade900),
@@ -52,6 +30,7 @@ class _SettingsPage extends State<SettingsPage> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
+          iconSize: 30,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -59,14 +38,12 @@ class _SettingsPage extends State<SettingsPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 27),
             _buildSettingOption(
               title: 'Editar Perfil',
               onTap: () {
                 GoRouter.of(context).pushNamed('editProfilePage');
               },
             ),
-            const SizedBox(height: 27),
             _buildSettingOption(
               title: 'Notificações',
               icon: isNotificationOn
@@ -75,7 +52,7 @@ class _SettingsPage extends State<SettingsPage> {
               iconColor: isNotificationOn
                   ? ConstantsColors.blueShade900
                   : ConstantsColors.blueShade900,
-              iconSize: 32,
+              iconSize: 36,
               alignment: MainAxisAlignment.spaceBetween,
               onTap: () {
                 setState(() {
@@ -83,16 +60,9 @@ class _SettingsPage extends State<SettingsPage> {
                 });
               },
             ),
-            const SizedBox(height: 27),
-            _buildSettingOption(
-              title: 'Sair da conta',
-              onTap: () {
-                logout();
-              },
-            ),
-            const SizedBox(height: 27),
             _buildSettingOption(
               title: 'Deletar conta',
+              // titleSize: 18,
               textColor: ConstantsColors.redShade800,
               onTap: () {
                 GoRouter.of(context).pushNamed('removeAccountPage');
@@ -106,6 +76,7 @@ class _SettingsPage extends State<SettingsPage> {
 
   Widget _buildSettingOption({
     required String title,
+    double titleSize = 16,
     IconData? icon,
     Color textColor = ConstantsColors.blackShade900,
     Color iconColor = ConstantsColors.blackShade900,
@@ -122,7 +93,7 @@ class _SettingsPage extends State<SettingsPage> {
           ),
         ),
       ),
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: alignment,
         children: [
@@ -130,6 +101,7 @@ class _SettingsPage extends State<SettingsPage> {
             child: TextButton(
               onPressed: onTap,
               style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
                 alignment: Alignment.centerLeft,
               ),
               child: Row(
@@ -139,13 +111,13 @@ class _SettingsPage extends State<SettingsPage> {
                     title,
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 16,
+                      fontSize: titleSize,
                     ).merge(TextStylesConstants.kpoppinsLight),
                   ),
                   Icon(
                     icon,
                     color: iconColor,
-                    size: iconSize, // ← controla o tamanho do ícone
+                    size: iconSize,
                   ),
                 ],
               ),

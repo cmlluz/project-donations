@@ -2,7 +2,6 @@ import 'dart:ui'; // necessário para BackdropFilter
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ImageCard extends StatelessWidget {
   final String imageUrl;
@@ -18,7 +17,7 @@ class ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push('/postDetailPage');
+        Navigator.pushNamed(context, '/postDetailPage');
       },
       child: Material(
         elevation: 15,

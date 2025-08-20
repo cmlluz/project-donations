@@ -46,9 +46,9 @@ class ProfileInfoComponent extends StatelessWidget {
                 ).merge(TextStylesConstants.kpoppinsBlack),
               ),
             ),
-            const Row(
+             Row(
               children: [
-                Icon(Icons.phone_in_talk_outlined),
+                const Icon(Icons.phone_in_talk_outlined),
                 Opacity(
                     opacity: 0.7,
                     child: Text(
@@ -58,9 +58,9 @@ class ProfileInfoComponent extends StatelessWidget {
                     ))
               ],
             ),
-            const Row(
+             Row(
               children: [
-                Icon(Icons.email_outlined),
+                const Icon(Icons.email_outlined),
                 Opacity(
                     opacity: 0.7,
                     child: Text(

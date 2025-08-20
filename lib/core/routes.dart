@@ -17,9 +17,13 @@ import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
 import 'package:appdonationsgestor/pages/necessity_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
+import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
+import 'package:appdonationsgestor/pages/feedback_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -46,6 +50,10 @@ class RouteNames {
   static const String necessityPage = "necessityPage";
   static const String hystoryPage = "hystoryPage";
   static const String postDetailPage = "postDetailPage";
+  static const String confirmedRegistration = "confirmedRegistration";
+  static const String notaFiscalPage = "notaFiscalPage";
+  static const String feedbackPage = "feedback";
+  static const String notificationsPage = "notificationsPage";
 }
 
 class AppRountersConfiguration {
@@ -119,11 +127,9 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/userRegisterPage',
           name: RouteNames.userRegisterPage,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: UserRegisterPage(),
-            );
-          },
+          pageBuilder: (context, state) => const MaterialPage(
+            child: UserRegisterPage(),
+          ),
         ),
         GoRoute(
           path: '/institutionRegisterPage',
@@ -166,11 +172,9 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/finalizeRegistrationPage',
           name: RouteNames.finalizeRegistrationPage,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: FinalizeRegistrationPage(),
-            );
-          },
+          pageBuilder: (context, state) => const MaterialPage(
+            child: FinalizeRegistrationPage(),
+          ),
         ),
         GoRoute(
           path: '/favoritesPage',
@@ -223,6 +227,43 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) => const MaterialPage(
             child: PostDetailPage(),
           ),
+        ),
+        GoRoute(
+          path: '/confirmedRegistration',
+          name: RouteNames.confirmedRegistration,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: RegistrationConfirmedPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/notaFiscalPage',
+          name: RouteNames.notaFiscalPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: NotaFiscalPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/notificationsPage',
+          name: RouteNames.notificationsPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: NotificationsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/feedback',
+          name: RouteNames.feedbackPage,
+          pageBuilder: (context, state) {
+            final String? text1 = state.uri.queryParameters['text1'];
+            return MaterialPage(
+              child: FeedbackPage(text1: text1 ?? 'Publicação'),
+            );
+          },
         ),
       ],
     );

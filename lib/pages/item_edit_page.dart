@@ -22,7 +22,7 @@ class ItemEditPage extends StatelessWidget {
             GoRouter.of(context).go('/institutionProfilePage');
           },
         ),
-        title: const Text(
+        title: Text(
           'Editar necessidade',
           style: TextStylesConstants.kformularyTitle,
         ),

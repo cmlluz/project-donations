@@ -139,15 +139,7 @@ class _HystoryPage extends State<HystoryPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => NotaFiscalPage(
-                                          items: [
-                                            Item(
-                                              description: necessidade['item'],
-                                              quantity:
-                                                  necessidade['quantidade'],
-                                            ),
-                                          ],
-                                        ),
+                                        builder: (_) => NotaFiscalPage(),
                                       ),
                                     );
                                   } else {

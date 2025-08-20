@@ -65,15 +65,15 @@ class _CustomButtonState extends State<CustomButton> {
         style: ElevatedButton.styleFrom(
           backgroundColor: widget.color ?? ConstantsColors.blueShade900,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(10.0),
           ),
         ),
         child: Text(
           widget.text,
           style: TextStyle(
+            fontFamily: 'Poppins-Bold',
             color: widget.textColor ?? Colors.white,
             fontSize: widget.fontSize ?? 18,
-            fontWeight: FontWeight.w600,
           ),
         ),
       ),

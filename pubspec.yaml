@@ -2,7 +2,7 @@ name: appdonationsgestor
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: ">=3.4.4 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -28,11 +28,13 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  http: ^1.1.0
+  http: ^1.2.1
   intl_utils: ^2.1.0
   flutter:
     sdk: flutter
-
+  flutter_custom_clippers: ^2.1.0
+  flutter_launcher_icons: ^0.13.1
+  dotted_border: ^2.1.0 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -47,8 +49,7 @@ dependencies:
   firebase_auth: ^5.6.0
   google_sign_in: ^6.3.0
   cloud_firestore: ^5.6.9
-
-   
+  flutter_facebook_auth: ^7.1.2
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +67,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -76,6 +76,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/icons/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
@@ -84,6 +85,15 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
+
+  fonts:
+    - family: Jacques Francois
+      fonts:
+        - asset: assets/fontes/JacquesFrancois-Regular.ttf
+    - family: Poppins
+      fonts:
+        - asset: assets/fontes/Poppins-BoldItalic.ttf
+        - asset: assets/fontes/Poppins-Bold.ttf
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
@@ -101,6 +111,16 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+  #    - family: Jacques Francois
+  #      fonts:
+  #        - asset: fonts/JacquesFrancois-Regular.ttf
+  #        - asset: fonts/JacquesFrancois-Italic.ttf
+  #          style: italic
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/appIcon.png"
