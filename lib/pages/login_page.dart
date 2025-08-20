@@ -73,24 +73,10 @@ class _LoginPage extends State<LoginPage> {
                   children: [
                     const SizedBox(height: 40),
                     Image.asset(
-                      'assets/appLogo.png',
-                      width: 100,
-                      height: 100,
+                      'assets/LogoName.png',
+                      width: 180,
+                      height: 180,
                     ),
-                    const Text(
-                      'Colab',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontFamily: 'Jacques Francois',
-                        color: ConstantsColors.blueShade900,
-                      ),
-                    ),
-                    const Text("Salvador",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontFamily: 'Jacques Francois',
-                          color: ConstantsColors.blueShade900,
-                        )),
                     const SizedBox(height: 40),
                     CustomTextFields(
                       icon: Icons.email,

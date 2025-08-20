@@ -216,7 +216,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             setState(() {
                               _todosOsFavoritos.removeWhere((originalItem) =>
                                   originalItem.name == item.name);
-                              _itensFiltrados.removeAt(index);
+                              _itensFiltrados.remove(item);
                             });
                           },
                         );
