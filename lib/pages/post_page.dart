@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
+import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -22,15 +23,32 @@ class _PostPageState extends State<PostPage> {
   final PostController _controller = PostController();
   String mensagem = '';
 
-  Future pickImageFromGallery() async {
-    final selectedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future pickImageFromGallery(ImageSource source) async {
+    final selectedImage = await ImagePicker().pickImage(source: source);
 
     setState(() {
       if (selectedImage != null) {
         _selectedImg = File(selectedImage.path);
       }
     });
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ImagePickerOptionsSheet(
+          onCameraTap: () {
+            pickImageFromGallery(ImageSource.camera);
+            Navigator.of(context).pop();
+          },
+          onGalleryTap: () {
+            pickImageFromGallery(ImageSource.gallery);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
   }
 
   /*Future<void> publicar() async {
@@ -88,7 +106,7 @@ class _PostPageState extends State<PostPage> {
                 const SizedBox(height: 30),
                 GestureDetector(
                   onTap: () {
-                    pickImageFromGallery();
+                    _showImagePickerOptions();
                   },
                   child: DottedBorder(
                     borderType: BorderType.RRect,
@@ -98,7 +116,7 @@ class _PostPageState extends State<PostPage> {
                     strokeWidth: 2,
                     child: Container(
                       alignment: Alignment.center,
-                      width: 350,
+                      width: double.infinity,
                       height: 250,
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(1, 91, 124, 0.05),
@@ -117,19 +135,29 @@ class _PostPageState extends State<PostPage> {
                                     fit: BoxFit.cover,
                                   ),
                                 )
-                              : const Column(
+                              : Column(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.image_search_outlined,
                                       size: 80,
                                       color: ConstantsColors.blueShade900,
                                     ),
-                                    SizedBox(height: 10),
+                                    const SizedBox(height: 10),
                                     Text(
-                                      'Clique para selecionar uma imagem',
+                                      'Envie a foto aqui',
                                       style: TextStyle(
                                         fontSize: 16,
+                                        color: ConstantsColors.greyShade600
+                                            .withOpacity(0.8),
+                                      ),
+                                    ),
+                                    const Text(
+                                      'Procurar',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                         color: ConstantsColors.blueShade900,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ],
@@ -203,13 +231,18 @@ class _PostPageState extends State<PostPage> {
                       },
                     ),
                     const SizedBox(height: 10),
-                    const CustomButton(
-                      height: 40,
-                      width: 220,
-                      text: 'Cancelar',
-                      route: '/root',
-                      color: ConstantsColors.whiteShade700,
-                      textColor: ConstantsColors.greyShade600,
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancelar',
+                          style: const TextStyle(
+                            color: ConstantsColors.greyShade600,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ).merge(TextStylesConstants.kpoppinsSemiBold),
+                        ),
+                      ),
                     ),
                   ],
                 ),

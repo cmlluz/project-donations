@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:go_router/go_router.dart';
@@ -64,14 +65,18 @@ class _FeedbackPageState extends State<FeedbackPage> {
               },
             ),
             const SizedBox(height: 10),
-            CustomButton(
-              text: 'Criar nova ${widget.text1}',
-              width: 250,
-              color: ConstantsColors.whiteShade700,
-              textColor: ConstantsColors.blueShade900,
-              onPressed: () {
-                GoRouter.of(context).pop();
-              },
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Criar nova ${widget.text1}',
+                  style: const TextStyle(
+                    color: ConstantsColors.greyShade600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ).merge(TextStylesConstants.kpoppinsSemiBold),
+                ),
+              ),
             ),
           ],
         ),
