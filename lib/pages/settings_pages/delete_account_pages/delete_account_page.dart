@@ -24,20 +24,6 @@ class _DeleteAccountPage extends State<DeleteAccountPage> {
     super.dispose();
   }
 
-  void deleteAccount() async {
-    try {
-      await authService.value.deleteAccount(
-          email: emailController.text, password: passwordController.text);
-      AppData.navBarCurrentIndexNotifier.value = 0;
-      AppData.onboardingCurrentIndexNotifier.value = 0;
-      if (context.mounted) {
-        context.go('/');
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

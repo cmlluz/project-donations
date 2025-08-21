@@ -16,6 +16,7 @@ import 'package:appdonationsgestor/pages/register_pages/finalize_registration_pa
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/delete_account_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/confirm_deletion_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
 import 'package:appdonationsgestor/pages/necessity_page.dart';
@@ -46,6 +47,7 @@ class RouteNames {
   static const String favoritesPage = "favoritesPage";
   static const String managerProfilePage = "managerProfilePage";
   static const String deleteAccountPage = "deleteAccountPage";
+  static const String confirmDeletionPage = "confirmDeletionPage";
   static const String editProfilePage = "editProfilePage";
   static const String necessityPage = "necessityPage";
   static const String hystoryPage = "hystoryPage";
@@ -186,18 +188,26 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-            path: '/managerProfilePage',
-            name: RouteNames.managerProfilePage,
-            pageBuilder: (context, state) {
-              return const MaterialPage(
-                child: ManagerProfilePage(),
-              );
-            }),
+          path: '/managerProfilePage',
+          name: RouteNames.managerProfilePage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: ManagerProfilePage(),
+            );
+          },
+        ),
         GoRoute(
           path: '/deleteAccountPage',
           name: RouteNames.deleteAccountPage,
           pageBuilder: (context, state) => const MaterialPage(
             child: DeleteAccountPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/confirmDeletionPage',
+          name: RouteNames.confirmDeletionPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: ConfirmDeletionPage(),
           ),
         ),
         GoRoute(
