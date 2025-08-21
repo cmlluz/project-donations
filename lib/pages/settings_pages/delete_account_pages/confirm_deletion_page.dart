@@ -83,6 +83,7 @@ class _ConfirmDeletionPageState extends State<ConfirmDeletionPage> {
               ),
               onPressed: () {
                 // deleteAccount();
+                GoRouter.of(context).pushNamed('deleteFeedbackPage');
               },
               child: Text(
                 "Deletar conta",
