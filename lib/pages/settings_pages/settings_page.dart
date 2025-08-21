@@ -65,7 +65,7 @@ class _SettingsPage extends State<SettingsPage> {
               // titleSize: 18,
               textColor: ConstantsColors.redShade800,
               onTap: () {
-                GoRouter.of(context).pushNamed('removeAccountPage');
+                GoRouter.of(context).pushNamed('deleteAccountPage');
               },
             ),
           ],
