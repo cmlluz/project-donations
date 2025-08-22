@@ -19,6 +19,7 @@ class ConstantsColors {
       Color.fromARGB(190, 0, 0, 0); // lighterBlack
 
   static const Color greyShade900 = Color(0xFF2F2F2F); // lightgrey
+  static const Color greyShade800 = Color(0xFF3C3C3C); // rgba(60, 60, 60, 1)
   static const Color greyShade100 =
       Color.fromARGB(17, 238, 238, 238); // darkergrey
   static const Color greyShade200 =
