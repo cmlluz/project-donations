@@ -12,23 +12,44 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   bool isFavorite = false;
 
+  // Lista de itens de teste
+  final List<Map<String, dynamic>> itensNecessarios = [
+    {
+      "titulo": "Agasalhos - Necessidade",
+      "local": "Barbalho, Salvador",
+      "instituicao": "Lar dos idosos",
+      "detalhes":
+          "Precisamos de agasalhos para os idosos devido às baixas temperaturas.",
+      "button": true,
+    },
+    // {
+    //   "titulo": "Alimentos não perecíveis",
+    //   "local": "Centro, Salvador",
+    //   "instituicao": "Casa Esperança",
+    //   "detalhes": "A instituição está arrecadando alimentos para 50 famílias.",
+    //   "button": false,
+    // },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
-          child: Column(
+      body: ListView.builder(
+        padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
+        itemCount: itensNecessarios.length,
+        itemBuilder: (context, index) {
+          final item = itensNecessarios[index];
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(25), // Arredonda tudo
+                    borderRadius: BorderRadius.circular(25),
                     child: Image.asset(
                       'assets/instituicao.png',
                       width: double.infinity,
-                      height: 300,
+                      height: 400,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -47,27 +68,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                     ),
                   ),
-                  // Positioned(
-                  //   top: 16,
-                  //   right: 16,
-                  //   child: CircleAvatar(
-                  //     backgroundColor:
-                  //         ConstantsColors.blueShade900.withOpacity(0.5),
-                  //     child: IconButton(
-                  //       icon: Icon(
-                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
-                  //         color: isFavorite
-                  //             ? Colors.red
-                  //             : ConstantsColors.whiteShade900,
-                  //       ),
-                  //       onPressed: () {
-                  //         setState(() {
-                  //           isFavorite = !isFavorite;
-                  //         });
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: CircleAvatar(
+                      backgroundColor: isFavorite
+                          ? ConstantsColors.blueShade900
+                          : Colors.grey.withOpacity(0.5),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                   Positioned(
                     bottom: 16,
                     left: 16,
@@ -75,33 +95,33 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: ConstantsColors.blueShade900.withOpacity(0.5),
+                        color: ConstantsColors.blueShade900,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Agasalhos - Necessidade",
-                            style: TextStyle(
+                          Text(
+                            item["titulo"],
+                            style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
-                            ),
+                            ).merge(TextStylesConstants.kinterSemiBold),
                           ),
                           const SizedBox(height: 4),
                           Row(
                             children: [
                               const Icon(Icons.location_pin,
-                                  color: Colors.white, size: 16),
+                                  color: ConstantsColors.greyShade600,
+                                  size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                "Barbalho, Salvador",
-                                style:
-                                    TextStylesConstants.kpoppinsRegular.merge(
+                                item["local"],
+                                style: TextStylesConstants.krobotoRegular.merge(
                                   const TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                    color: ConstantsColors.greyShade600,
                                   ),
                                 ),
                               ),
@@ -119,54 +139,65 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   backgroundImage: AssetImage('assets/instituicao.png'),
                 ),
                 title: Text(
-                  "Lar dos idosos",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
-                  ),
+                  item["instituicao"],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: ConstantsColors.blueShade900,
+                  ).merge(TextStylesConstants.kinterSemiBold),
                 ),
               ),
               const SizedBox(height: 16),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 8.0),
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
                     "Detalhes",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.",
-                  style: TextStyle(color: Colors.black54),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.blueShade900,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      color: ConstantsColors.blueShade900,
+                    ).merge(
+                      TextStylesConstants.kpoppinsMedium,
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    // definir rota
-                  },
-                  child: const Text(
-                    "Quero doar",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Text(
+                  item["detalhes"],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: ConstantsColors.greyShade600,
+                  ).merge(
+                    TextStylesConstants.kpoppinsMedium,
+                  ),
+                ),
+              ),
+              if (item["button"])
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ConstantsColors.blueShade900,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onPressed: () {
+                      // ação do botão
+                    },
+                    child: const Text(
+                      "Quero doar",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 24),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
