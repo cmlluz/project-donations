@@ -57,8 +57,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     top: 16,
                     left: 16,
                     child: CircleAvatar(
-                      backgroundColor:
-                          ConstantsColors.blueShade900.withOpacity(0.5),
+                      backgroundColor: ConstantsColors.blueShade900,
                       child: IconButton(
                         icon: const Icon(
                           Icons.arrow_back,
