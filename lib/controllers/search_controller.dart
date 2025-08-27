@@ -71,6 +71,9 @@ class AppSearchController extends ChangeNotifier {
         imageUrl: 'assets/donations.jpg',
         category: SearchCategory.doacao,
         createdAt: DateTime.now(),
+        location: 'Centro, Salvador',
+        institution: 'Doador Anônimo',
+        institutionImageUrl: 'assets/profile.jpg',
       ),
       SearchItem(
         id: '2',
@@ -79,6 +82,9 @@ class AppSearchController extends ChangeNotifier {
         imageUrl: 'assets/instituicao.png',
         category: SearchCategory.instituicao,
         createdAt: DateTime.now(),
+        location: 'Barbalho, Salvador',
+        institution: 'Instituto dos Idosos São Francisco',
+        institutionImageUrl: 'assets/instituicao.png',
       ),
       SearchItem(
         id: '3',
@@ -87,6 +93,9 @@ class AppSearchController extends ChangeNotifier {
         imageUrl: 'assets/donations2.jpg',
         category: SearchCategory.necessidade,
         createdAt: DateTime.now(),
+        location: 'Liberdade, Salvador',
+        institution: 'Casa da Esperança',
+        institutionImageUrl: 'assets/instituicao.png',
       ),
       SearchItem(
         id: '4',
@@ -95,8 +104,57 @@ class AppSearchController extends ChangeNotifier {
         imageUrl: 'assets/donations.jpg',
         category: SearchCategory.doacao,
         createdAt: DateTime.now(),
+        location: 'Pelourinho, Salvador',
+        institution: 'Família Solidária',
+        institutionImageUrl: 'assets/profile.jpg',
       ),
-      // Add more mock data...
+      SearchItem(
+        id: '5',
+        title: 'Necessidade de Agasalhos para Idosos',
+        description:
+            'Precisamos de agasalhos para os idosos devido às baixas temperaturas',
+        imageUrl: 'assets/donations2.jpg',
+        category: SearchCategory.necessidade,
+        createdAt: DateTime.now(),
+        location: 'Barbalho, Salvador',
+        institution: 'Lar dos Idosos São Francisco',
+        institutionImageUrl: 'assets/instituicao.png',
+      ),
+      SearchItem(
+        id: '6',
+        title: 'Instituto Casa de Apoio à Criança',
+        description:
+            'Instituição que atende crianças em situação de risco social',
+        imageUrl: 'assets/instituicao.png',
+        category: SearchCategory.instituicao,
+        createdAt: DateTime.now(),
+        location: 'Federação, Salvador',
+        institution: 'Casa de Apoio à Criança',
+        institutionImageUrl: 'assets/instituicao.png',
+      ),
+      SearchItem(
+        id: '7',
+        title: 'Necessidade de Material Escolar',
+        description:
+            'Cadernos, lápis e materiais escolares para crianças carentes',
+        imageUrl: 'assets/donations.jpg',
+        category: SearchCategory.necessidade,
+        createdAt: DateTime.now(),
+        location: 'Subúrbio, Salvador',
+        institution: 'Escola Comunitária',
+        institutionImageUrl: 'assets/instituicao.png',
+      ),
+      SearchItem(
+        id: '8',
+        title: 'Doação de Livros Infantis',
+        description: 'Doação de livros infantis em bom estado',
+        imageUrl: 'assets/donations2.jpg',
+        category: SearchCategory.doacao,
+        createdAt: DateTime.now(),
+        location: 'Barra, Salvador',
+        institution: 'Biblioteca Comunitária',
+        institutionImageUrl: 'assets/profile.jpg',
+      ),
     ];
   }
 }

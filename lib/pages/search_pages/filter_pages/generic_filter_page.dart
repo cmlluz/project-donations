@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:go_router/go_router.dart';
 
 class GenericFilterPage extends StatelessWidget {
@@ -90,10 +91,13 @@ class GenericFilterPage extends StatelessWidget {
               child: ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12)),
-                child: ImageCard(
-                  imageUrl: item.imageUrl,
-                  title: 'Doação',
-                  location: 'Salvador, Bahia',
+                child: AbsorbPointer(
+                  child: ImageCard(
+                    imageUrl: item.imageUrl,
+                    title: 'Doação',
+                    location: 'Salvador, Bahia',
+                    onTap: null,
+                  ),
                 ),
               ),
             ),
@@ -134,20 +138,18 @@ class GenericFilterPage extends StatelessWidget {
   }
 
   void _navigateToDetail(BuildContext context, SearchItem item) {
-    final route = _getDetailRoute(item.category);
-    GoRouter.of(context).push('$route/${item.id}');
-  }
+    final post = PostModel(
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      imageUrl: item.imageUrl,
+      location: item.location,
+      institution: item.institution,
+      institutionImageUrl: item.institutionImageUrl,
+      createdAt: item.createdAt,
+      category: item.category.name,
+    );
 
-  String _getDetailRoute(SearchCategory category) {
-    switch (category) {
-      case SearchCategory.doacao:
-        return '/doacao-detail';
-      case SearchCategory.necessidade:
-        return '/necessidade-detail';
-      case SearchCategory.instituicao:
-        return '/instituicao-detail';
-      default:
-        return '/item-detail';
-    }
+    GoRouter.of(context).push('/postDetailPage', extra: post);
   }
 }

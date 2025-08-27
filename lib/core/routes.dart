@@ -26,6 +26,7 @@ import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -243,9 +244,28 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/postDetailPage',
           name: RouteNames.postDetailPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: PostDetailPage(),
-          ),
+          pageBuilder: (context, state) {
+            // Obter dados do extra
+            final postData = state.extra as PostModel?;
+
+            // Se não houver dados, criar um post padrão
+            final post = postData ??
+                PostModel(
+                  id: '0',
+                  title: 'Post não encontrado',
+                  description: 'Não foi possível carregar os dados do post.',
+                  imageUrl: 'assets/instituicao.png',
+                  location: 'Salvador, Bahia',
+                  institution: 'Sistema',
+                  institutionImageUrl: 'assets/instituicao.png',
+                  createdAt: DateTime.now(),
+                  category: 'outros',
+                );
+
+            return MaterialPage(
+              child: PostDetailPage(post: post),
+            );
+          },
         ),
         GoRoute(
           path: '/confirmedRegistration',

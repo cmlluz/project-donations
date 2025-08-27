@@ -5,6 +5,9 @@ class SearchItem {
   final String imageUrl;
   final SearchCategory category;
   final DateTime createdAt;
+  final String location;
+  final String institution;
+  final String institutionImageUrl;
 
   const SearchItem({
     required this.id,
@@ -13,6 +16,9 @@ class SearchItem {
     required this.imageUrl,
     required this.category,
     required this.createdAt,
+    required this.location,
+    required this.institution,
+    required this.institutionImageUrl,
   });
 }
 
