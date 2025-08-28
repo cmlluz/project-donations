@@ -1,312 +1,312 @@
-// import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
-import 'package:appdonationsgestor/components/post_card.dart';
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
+import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 
 class ManagerProfilePage extends StatefulWidget {
-  const ManagerProfilePage({Key? key}) : super(key: key);
+  const ManagerProfilePage({super.key});
 
   @override
-  State<ManagerProfilePage> createState() => _ManagerProfilePage();
+  State<ManagerProfilePage> createState() => _ManagerProfilePageState();
 }
 
-class _ManagerProfilePage extends State<ManagerProfilePage> {
+class _ManagerProfilePageState extends State<ManagerProfilePage> {
+  bool showDonations = false;
+
+  final List<String> posts = [
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+  ];
+
+  final List<Map<String, dynamic>> donations = [
+    {
+      "titulo": "Agasalhos - Doação",
+      "local": "Barbalho, Salvador",
+      "quantidade": "5",
+      "imagem": "assets/instituicao.png"
+    },
+    {
+      "titulo": "Vestuário - Doação",
+      "local": "Rio Vermelho, Salvador",
+      "quantidade": "12",
+      "imagem": "assets/donations.jpg"
+    },
+    {
+      "titulo": "Sapatos - Doação",
+      "local": "Pituba, Salvador",
+      "quantidade": "7",
+      "imagem": "assets/donations2.jpg"
+    },
+    {
+      "titulo": "Livros - Doação",
+      "local": "Barra, Salvador",
+      "quantidade": "15",
+      "imagem": "assets/donations.jpg"
+    },
+    {
+      "titulo": "Cobertores - Doação",
+      "local": "Liberdade, Salvador",
+      "quantidade": "8",
+      "imagem": "assets/instituicao.png"
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(vertical: 30.0, horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: ConstantsColors.blueShade900,
-                            width: 4.0,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back,
+                        color: ConstantsColors.blueShade900),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 35,
+                    backgroundImage: NetworkImage(
+                      "https://www.w3schools.com/howto/img_avatar.png",
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Lucia Fontes",
+                          style: TextStylesConstants.kpoppinsMedium.merge(
+                            const TextStyle(
+                              fontSize: 16,
+                              color: ConstantsColors.blueShade900,
+                            ),
                           ),
                         ),
-                        child: const CircleAvatar(
-                          radius: 70,
-                          backgroundImage: NetworkImage(
-                            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
+                        const SizedBox(height: 2),
+                        Text(
+                          "Contato",
+                          style: TextStylesConstants.kinterBold.merge(
+                            const TextStyle(
+                              fontSize: 13,
+                              color: ConstantsColors.blueShade900,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: 4),
+                        Row(
                           children: [
-                            const SizedBox(height: 5),
+                            const Icon(Icons.phone,
+                                size: 16, color: ConstantsColors.blueShade900),
+                            const SizedBox(width: 4),
                             Text(
-                              'Lucia Fontes ',
-                              style: TextStylesConstants.kinterSemiBold
-                                  .merge(const TextStyle(fontSize: 20.0)),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              'Contato: ',
-                              style: TextStylesConstants.kinterBold
-                                  .merge(const TextStyle(fontSize: 15.0)),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.phone_in_talk_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '(71)12345-6789',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 15.0)),
+                              "(71)1234-5678",
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                  fontSize: 13,
+                                  color: ConstantsColors.greyShade800,
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.email_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Luciafontes@gmail.com',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 15.0)),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(5, -20),
-                        child: IconButton(
-                          icon: const Icon(Icons.settings_outlined,
-                              color: ConstantsColors.blueShade900, size: 30),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SettingsPage()),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Detalhes:',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(fontSize: 20.0),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ali',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                              fontSize: 14.0,
-                              color: ConstantsColors.greyShade600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Doações',
-                            style: TextStylesConstants.kpoppinsMedium.merge(
-                              const TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                          TextButton(
-                            child: Text(
-                              'ver todas',
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.email,
+                                size: 16, color: ConstantsColors.blueShade900),
+                            const SizedBox(width: 4),
+                            Text(
+                              "luciafontes@gmail.com",
                               style: TextStylesConstants.kinterRegular.merge(
                                 const TextStyle(
-                                    fontSize: 13.0,
-                                    color: ConstantsColors.greyShade900),
+                                  fontSize: 13,
+                                  color: ConstantsColors.greyShade800,
+                                ),
                               ),
                             ),
-                            onPressed: () {
-                              GoRouter.of(context).push('/hystoryPage');
-                            },
-                          ),
-                        ],
-                      ),
-                      Card(
-                        elevation: 3,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          ],
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: const Border(
-                              right: BorderSide(
-                                color: ConstantsColors.blueShade900,
-                                width: 5,
-                              ),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Agasalho',
-                                  style: TextStylesConstants.kpoppinsMedium
-                                      .merge(const TextStyle(fontSize: 15))),
-                              const SizedBox(height: 6),
-                              Text('Quantidade: 3',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(
-                                          fontSize: 12,
-                                          color:
-                                              ConstantsColors.greyShade600))),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_pin,
-                                    color: ConstantsColors.greyShade600,
-                                    size: 15,
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('Barbalho, Salvador',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('10 de Abril de 2024',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0, vertical: 2.0),
-                                      minimumSize: const Size(0, 0),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      backgroundColor:
-                                          ConstantsColors.greyShade300,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Vestimentas',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(
-                                        const TextStyle(
-                                          fontSize: 12,
-                                          color: ConstantsColors.greyShade900,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Text(
-                    'Publicações',
-                    textAlign: TextAlign.start,
-                    style: TextStylesConstants.kpoppinsMedium.merge(
-                      const TextStyle(
-                        fontSize: 20.0,
-                        color: ConstantsColors.blackShade900,
-                      ),
+                  Transform.translate(
+                    offset: const Offset(5, -25),
+                    child: IconButton(
+                      icon: const Icon(Icons.settings_outlined,
+                          color: ConstantsColors.blueShade900, size: 30),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/settings');
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Detalhes",
+                  style: TextStylesConstants.kpoppinsRegular.merge(
+                    const TextStyle(
+                      fontSize: 20,
+                      color: ConstantsColors.blueShade900,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut oil",
+                  style: TextStylesConstants.kpoppinsMedium.merge(
+                    const TextStyle(
+                      fontSize: 14,
+                      color: ConstantsColors.greyShade600,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showDonations = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !showDonations
+                                ? ConstantsColors.blueShade900
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Publicações",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                TextStyle(
+                                  color: !showDonations
+                                      ? Colors.white
+                                      : ConstantsColors.blueShade900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showDonations = true;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: showDonations
+                                ? ConstantsColors.blueShade900
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Doações",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                TextStyle(
+                                  color: showDonations
+                                      ? Colors.white
+                                      : ConstantsColors.blueShade900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (!showDonations)
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    mainAxisSpacing: 1.0,
-                    crossAxisSpacing: 1.0,
-                    childAspectRatio: 1,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 1.0,
                   ),
-                  itemCount: 24,
+                  itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                      color: Colors.white,
-                      child: const PostCard(
-                        imageUrl: 'assets/donations.jpg',
-                      ),
+                    return GestureDetector(
+                      onTap: () {
+                        print('Publicação clicada: ${posts[index]}');
+                      },
+                      child: ExpandableCard(imageUrl: posts[index]),
+                    );
+                  },
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: donations.length,
+                  itemBuilder: (context, index) {
+                    return DonationCard(
+                      titulo: donations[index]["titulo"],
+                      local: donations[index]["local"],
+                      quantidade: donations[index]["quantidade"],
+                      imagem: donations[index]["imagem"],
+                      onTap: () {
+                        print('Doação clicada: ${donations[index]["titulo"]}');
+                      },
                     );
                   },
                 ),
-              ],
-            ),
+              const SizedBox(height: 24),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
