@@ -62,28 +62,29 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+          backgroundColor: ConstantsColors.whiteShade900,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back,
+                color: ConstantsColors.blueShade900),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back,
-                        color: ConstantsColors.blueShade900),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
                 children: [
                   const CircleAvatar(
-                    radius: 35,
-                    backgroundImage: NetworkImage(
-                      "https://www.w3schools.com/howto/img_avatar.png",
+                    radius: 40,
+                    backgroundImage: AssetImage(
+                      "assets/profile.jpg",
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -190,7 +191,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: ConstantsColors.blueShade900),
+                  color: ConstantsColors.blueShade900.withOpacity(0.1),
                 ),
                 child: Row(
                   children: [
@@ -285,10 +287,10 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
+                    crossAxisCount: 2,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 1,
                   ),
                   itemCount: donations.length,
                   itemBuilder: (context, index) {

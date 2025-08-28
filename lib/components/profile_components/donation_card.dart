@@ -84,7 +84,7 @@ class DonationCard extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: ConstantsColors.blueShade900.withOpacity(0.38),
+              color: ConstantsColors.blueShade900,
               boxShadow: [
                 BoxShadow(
                   color: ConstantsColors.blueShade900.withOpacity(0.6),
