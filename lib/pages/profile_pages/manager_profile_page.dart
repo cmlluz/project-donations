@@ -3,6 +3,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
+import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({super.key});
@@ -154,7 +155,11 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                       icon: const Icon(Icons.settings_outlined,
                           color: ConstantsColors.blueShade900, size: 30),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/settings');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPage()),
+                        );
                       },
                     ),
                   ),
