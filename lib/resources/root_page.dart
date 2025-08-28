@@ -2,7 +2,6 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
-import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +42,7 @@ class _RootPageState extends State<RootPage> {
     SearchPage(),
     SizedBox.shrink(),
     FavoritesPage(),
-    ManagerProfilePage(),
+    SizedBox.shrink(),
   ];
 
   // Lista de imagens dos ícones
