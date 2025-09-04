@@ -4,6 +4,8 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({super.key});
@@ -26,37 +28,53 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     "assets/instituicao.png",
   ];
 
-  final List<Map<String, dynamic>> donations = [
-    {
-      "titulo": "Agasalhos - Doação",
-      "local": "Barbalho, Salvador",
-      "quantidade": "5",
-      "imagem": "assets/instituicao.png"
-    },
-    {
-      "titulo": "Vestuário - Doação",
-      "local": "Rio Vermelho, Salvador",
-      "quantidade": "12",
-      "imagem": "assets/donations.jpg"
-    },
-    {
-      "titulo": "Sapatos - Doação",
-      "local": "Pituba, Salvador",
-      "quantidade": "7",
-      "imagem": "assets/donations2.jpg"
-    },
-    {
-      "titulo": "Livros - Doação",
-      "local": "Barra, Salvador",
-      "quantidade": "15",
-      "imagem": "assets/donations.jpg"
-    },
-    {
-      "titulo": "Cobertores - Doação",
-      "local": "Liberdade, Salvador",
-      "quantidade": "8",
-      "imagem": "assets/instituicao.png"
-    },
+  final List<PostModel> donations = [
+    PostModel(
+      id: "1",
+      title: "Agasalhos - Doação",
+      description:
+          "Doação de agasalhos para famílias em situação de vulnerabilidade.",
+      imageUrl: "assets/instituicao.png",
+      location: "Barbalho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 12),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "2",
+      title: "Vestuário - Doação",
+      description: "Doação de roupas variadas para pessoas em situação de rua.",
+      imageUrl: "assets/donations.jpg",
+      location: "Rio Vermelho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 20),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "3",
+      title: "Sapatos - Doação",
+      description: "Distribuição de sapatos para comunidades carentes.",
+      imageUrl: "assets/donations2.jpg",
+      location: "Pituba, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 25),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "4",
+      title: "Cobertores - Doação",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "doacao",
+    ),
   ];
 
   @override
@@ -299,13 +317,20 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   ),
                   itemCount: donations.length,
                   itemBuilder: (context, index) {
+                    final post = donations[index]; // ou posts[index]
+
                     return DonationCard(
-                      titulo: donations[index]["titulo"],
-                      local: donations[index]["local"],
-                      quantidade: donations[index]["quantidade"],
-                      imagem: donations[index]["imagem"],
+                      titulo: post.title,
+                      local: post.location,
+                      quantidade: "5", // se quiser manter badge
+                      imagem: post.imageUrl,
                       onTap: () {
-                        print('Doação clicada: ${donations[index]["titulo"]}');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostDetailPage(post: post),
+                          ),
+                        );
                       },
                     );
                   },
