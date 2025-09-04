@@ -6,7 +6,7 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 class DonationCard extends StatelessWidget {
   final String titulo;
   final String local;
-  final String quantidade;
+  final int? quantidade;
   final String imagem;
   final VoidCallback? onTap;
 

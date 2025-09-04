@@ -2,6 +2,7 @@ class PostModel {
   final String id;
   final String title;
   final String description;
+  final int? quantity;
   final String imageUrl;
   final String location;
   final String institution;
@@ -13,6 +14,7 @@ class PostModel {
     required this.id,
     required this.title,
     required this.description,
+    this.quantity,
     required this.imageUrl,
     required this.location,
     required this.institution,
@@ -32,6 +34,7 @@ class PostModel {
       id: id,
       title: title,
       description: description,
+      quantity: null, 
       imageUrl: imageUrl,
       location: 'Salvador, Bahia',
       institution: 'Instituição Exemplo',

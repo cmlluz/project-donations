@@ -34,6 +34,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       title: "Agasalhos - Doação",
       description:
           "Doação de agasalhos para famílias em situação de vulnerabilidade.",
+      quantity: 35,
       imageUrl: "assets/instituicao.png",
       location: "Barbalho, Salvador",
       institution: "Lar dos Idosos",
@@ -45,6 +46,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       id: "2",
       title: "Vestuário - Doação",
       description: "Doação de roupas variadas para pessoas em situação de rua.",
+      quantity: 50,
       imageUrl: "assets/donations.jpg",
       location: "Rio Vermelho, Salvador",
       institution: "Lar dos Idosos",
@@ -56,6 +58,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       id: "3",
       title: "Sapatos - Doação",
       description: "Distribuição de sapatos para comunidades carentes.",
+      quantity: 20,
       imageUrl: "assets/donations2.jpg",
       location: "Pituba, Salvador",
       institution: "Lar dos Idosos",
@@ -68,6 +71,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       title: "Cobertores - Doação",
       description:
           "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
       imageUrl: "assets/instituicao.png",
       location: "Liberdade, Salvador",
       institution: "Lar dos Idosos",
@@ -317,12 +321,12 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   ),
                   itemCount: donations.length,
                   itemBuilder: (context, index) {
-                    final post = donations[index]; // ou posts[index]
+                    final post = donations[index];
 
                     return DonationCard(
                       titulo: post.title,
                       local: post.location,
-                      quantidade: "5", // se quiser manter badge
+                      quantidade: post.quantity,
                       imagem: post.imageUrl,
                       onTap: () {
                         Navigator.push(

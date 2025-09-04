@@ -6,6 +6,8 @@ import 'package:appdonationsgestor/components/profile_components/expandable_card
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
 import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
   const InstitutionProfilePage({super.key});
@@ -26,31 +28,57 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
     "assets/donations2.jpg",
   ];
 
-  final List<Map<String, dynamic>> donations = [
-    {
-      "titulo": "Agasalhos - Doação",
-      "local": "Barbalho, Salvador",
-      "quantidade": "5",
-      "imagem": "assets/instituicao.png"
-    },
-    {
-      "titulo": "Vestuário - Doação",
-      "local": "Rio Vermelho, Salvador",
-      "quantidade": "12",
-      "imagem": "assets/donations.jpg"
-    },
-    {
-      "titulo": "Sapatos - Doação",
-      "local": "Pituba, Salvador",
-      "quantidade": "7",
-      "imagem": "assets/donations2.jpg"
-    },
-    {
-      "titulo": "Cobertores - Doação",
-      "local": "Liberdade, Salvador",
-      "quantidade": "8",
-      "imagem": "assets/instituicao.png"
-    },
+  final List<PostModel> donations = [
+    PostModel(
+      id: "1",
+      title: "Agasalhos - Doação",
+      description:
+          "Doação de agasalhos para famílias em situação de vulnerabilidade.",
+      quantity: 35, 
+      imageUrl: "assets/instituicao.png",
+      location: "Barbalho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 12),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "2",
+      title: "Vestuário - Doação",
+      description: "Doação de roupas variadas para pessoas em situação de rua.",
+      quantity: 50, 
+      imageUrl: "assets/donations.jpg",
+      location: "Rio Vermelho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 20),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "3",
+      title: "Sapatos - Doação",
+      description: "Distribuição de sapatos para comunidades carentes.",
+      quantity: 20,
+      imageUrl: "assets/donations2.jpg",
+      location: "Pituba, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 25),
+      category: "doacao",
+    ),
+    PostModel(
+      id: "4",
+      title: "Cobertores - Doação",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "doacao",
+    ),
   ];
 
   final List<Map<String, String>> notasFiscais = [
@@ -247,11 +275,21 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       ),
       itemCount: donations.length,
       itemBuilder: (context, index) {
+        final post = donations[index];
+
         return DonationCard(
-          titulo: donations[index]["titulo"],
-          local: donations[index]["local"],
-          quantidade: donations[index]["quantidade"],
-          imagem: donations[index]["imagem"],
+          titulo: post.title,
+          local: post.location,
+          quantidade: post.quantity,
+          imagem: post.imageUrl,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PostDetailPage(post: post),
+              ),
+            );
+          },
         );
       },
     );
