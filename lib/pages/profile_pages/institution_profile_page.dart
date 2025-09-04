@@ -1,350 +1,284 @@
+import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:flutter/material.dart';
-// import 'package:appdonationsgestor/components/gallery_state.dart';
-// import 'package:appdonationsgestor/components/profile_info_component.dart';
-// import 'package:page_transition/page_transition.dart';
-import 'package:appdonationsgestor/components/post_card.dart';
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
+import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
+import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
+import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
   const InstitutionProfilePage({super.key});
 
   @override
-  State<InstitutionProfilePage> createState() => InstitutionProfilePageState();
+  State<InstitutionProfilePage> createState() => _InstitutionProfilePageState();
 }
 
-class InstitutionProfilePageState extends State<InstitutionProfilePage> {
-  bool isFavorite = false;
+class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
+  int selectedTab = 0;
+
+  final List<String> posts = [
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+  ];
+
+  final List<Map<String, dynamic>> donations = [
+    {
+      "titulo": "Agasalhos - Doação",
+      "local": "Barbalho, Salvador",
+      "quantidade": "5",
+      "imagem": "assets/instituicao.png"
+    },
+    {
+      "titulo": "Vestuário - Doação",
+      "local": "Rio Vermelho, Salvador",
+      "quantidade": "12",
+      "imagem": "assets/donations.jpg"
+    },
+    {
+      "titulo": "Sapatos - Doação",
+      "local": "Pituba, Salvador",
+      "quantidade": "7",
+      "imagem": "assets/donations2.jpg"
+    },
+    {
+      "titulo": "Cobertores - Doação",
+      "local": "Liberdade, Salvador",
+      "quantidade": "8",
+      "imagem": "assets/instituicao.png"
+    },
+  ];
+
+  final List<Map<String, String>> notasFiscais = [
+    {"titulo": "Exemplo de Nota Fiscal", "dataEmissao": "12/08/2025"},
+    {
+      "titulo": "Nota Fiscal para o Instituto Doação",
+      "dataEmissao": "20/08/2025"
+    },
+    {
+      "titulo": "Nota Fiscal para o Instituto Necessidade",
+      "dataEmissao": "25/08/2025"
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ConstantsColors.whiteShade900,
       appBar: AppBar(
-        title: const Text('Voltar'),
+        backgroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
-        iconTheme: const IconThemeData(color: ConstantsColors.blackShade900),
-        titleTextStyle: TextStylesConstants.kinterSemiBold.merge(
-          const TextStyle(
-            color: ConstantsColors.blackShade900,
-            fontSize: 22,
-          ),
-        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon:
+              const Icon(Icons.arrow_back, color: ConstantsColors.blueShade900),
           onPressed: () => Navigator.pop(context),
         ),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 2.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: ConstantsColors.blueShade900,
-                            width: 4.0,
-                          ),
-                        ),
-                        child: const CircleAvatar(
-                          radius: 70,
-                          backgroundImage: NetworkImage(
-                            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Lar dos idosos',
-                              style: TextStylesConstants.kinterSemiBold
-                                  .merge(const TextStyle(fontSize: 19.0)),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              'Contato: ',
-                              style: TextStylesConstants.kinterBold
-                                  .merge(const TextStyle(fontSize: 14.0)),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.phone_in_talk_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '(71)12345-6789',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 14.0)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.email_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'intituicaotal@gmail.com',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 14.0)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Text(
-                              'Chave Pix: ',
-                              style: TextStylesConstants.kinterBold
-                                  .merge(const TextStyle(fontSize: 14.0)),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'intituicaotal@gmail.com',
-                              style: TextStylesConstants.kinterRegular
-                                  .merge(const TextStyle(fontSize: 14.0)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(5, -20),
-                        child: IconButton(
-                          icon: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: ConstantsColors.blueShade900,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFavorite = !isFavorite;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Detalhes
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Detalhes:',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(fontSize: 20.0),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                              fontSize: 14.0,
-                              color: ConstantsColors.greyShade600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Doações
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Suas necessidades',
-                            style: TextStylesConstants.kpoppinsMedium.merge(
-                              const TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                          TextButton(
-                            child: Text(
-                              'ver todas',
-                              style: TextStylesConstants.kinterRegular.merge(
-                                const TextStyle(
-                                    fontSize: 13.0,
-                                    color: ConstantsColors.greyShade900),
-                              ),
-                            ),
-                            onPressed: () {
-                              GoRouter.of(context).push('/necessityPage');
-                            },
-                          ),
-                        ],
-                      ),
-                      Card(
-                        elevation: 3,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: const Border(
-                              right: BorderSide(
-                                color: ConstantsColors.blueShade900,
-                                width: 5,
-                              ),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Agasalho',
-                                  style: TextStylesConstants.kpoppinsMedium
-                                      .merge(const TextStyle(fontSize: 15))),
-                              const SizedBox(height: 6),
-                              Text('Quantidade: 3',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(
-                                          fontSize: 12,
-                                          color:
-                                              ConstantsColors.greyShade600))),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_pin,
-                                    color: ConstantsColors.greyShade600,
-                                    size: 15,
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('Barbalho, Salvador',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('10 de Abril de 2024',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0, vertical: 2.0),
-                                      minimumSize: const Size(0, 0),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      backgroundColor:
-                                          ConstantsColors.greyShade300,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Vestimentas',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(
-                                        const TextStyle(
-                                          fontSize: 12,
-                                          color: ConstantsColors.greyShade900,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Publicações
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Text(
-                    'Publicações',
-                    textAlign: TextAlign.start,
-                    style: TextStylesConstants.kpoppinsMedium.merge(
-                      const TextStyle(
-                        fontSize: 20.0,
-                        color: ConstantsColors.blackShade900,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 1.0,
-                    crossAxisSpacing: 1.0,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: 24,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                      color: Colors.white,
-                      child: const PostCard(
-                        imageUrl: 'assets/donations.jpg',
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined,
+                color: ConstantsColors.blueShade900),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          )
         ],
       ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- Header perfil ---
+              Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage("assets/profile.jpg"),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Lar dos Idosos",
+                          style: TextStylesConstants.kpoppinsMedium.merge(
+                            const TextStyle(
+                              fontSize: 18,
+                              color: ConstantsColors.blueShade900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.phone,
+                                size: 16, color: ConstantsColors.blueShade900),
+                            const SizedBox(width: 4),
+                            Text("(71)1234-5678",
+                                style: TextStylesConstants.kinterRegular),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.email,
+                                size: 16, color: ConstantsColors.blueShade900),
+                            const SizedBox(width: 4),
+                            Text("lardosidosos@email.com",
+                                style: TextStylesConstants.kinterRegular),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                "Detalhes",
+                style: TextStylesConstants.kpoppinsRegular.merge(
+                  const TextStyle(
+                    fontSize: 20,
+                    color: ConstantsColors.blueShade900,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...",
+                style: TextStylesConstants.kpoppinsMedium.merge(
+                  const TextStyle(
+                    fontSize: 14,
+                    color: ConstantsColors.greyShade600,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: ConstantsColors.blueShade900),
+                ),
+                child: Row(
+                  children: [
+                    _buildTabButton("Publicações", 0),
+                    _buildTabButton("Doações", 1),
+                    _buildTabButton("Notas Fiscais", 2),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              if (selectedTab == 0) _buildPosts(),
+              if (selectedTab == 1) _buildDonations(),
+              if (selectedTab == 2) _buildNotes(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String title, int index) {
+    final isSelected = selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() => selectedTab = index);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? ConstantsColors.blueShade900 : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : ConstantsColors.blueShade900,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPosts() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1.0,
+      ),
+      itemCount: posts.length,
+      itemBuilder: (context, index) {
+        return ExpandableCard(imageUrl: posts[index]);
+      },
+    );
+  }
+
+  Widget _buildDonations() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1,
+      ),
+      itemCount: donations.length,
+      itemBuilder: (context, index) {
+        return DonationCard(
+          titulo: donations[index]["titulo"],
+          local: donations[index]["local"],
+          quantidade: donations[index]["quantidade"],
+          imagem: donations[index]["imagem"],
+        );
+      },
+    );
+  }
+
+  Widget _buildNotes() {
+    return Column(
+      children: notasFiscais.map((nota) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: NotaFiscalCard(
+            titulo: nota["titulo"]!,
+            dataEmissao: nota["dataEmissao"]!,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotaFiscalDetailPage(
+                    titulo: nota["titulo"]!,
+                    imagePath: "assets/nota_fiscal.png",
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }).toList(),
     );
   }
 }
