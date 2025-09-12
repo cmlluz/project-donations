@@ -98,38 +98,30 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
-      appBar: AppBar(
-        backgroundColor: ConstantsColors.whiteShade900,
-        elevation: 0,
-        leading: IconButton(
-          icon:
-              const Icon(Icons.arrow_back, color: ConstantsColors.blueShade900),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+          backgroundColor: ConstantsColors.whiteShade900,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back,
                 color: ConstantsColors.blueShade900),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          )
-        ],
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   const CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage("assets/profile.jpg"),
+                    backgroundImage: AssetImage(
+                      "assets/profile.jpg",
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -137,56 +129,100 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Lar dos Idosos",
+                          "Lucia Fontes",
                           style: TextStylesConstants.kpoppinsMedium.merge(
                             const TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               color: ConstantsColors.blueShade900,
                             ),
                           ),
                         ),
                         const SizedBox(height: 2),
+                        Text(
+                          "Contato",
+                          style: TextStylesConstants.kinterBold.merge(
+                            const TextStyle(
+                              fontSize: 13,
+                              color: ConstantsColors.blueShade900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
                             const Icon(Icons.phone,
                                 size: 16, color: ConstantsColors.blueShade900),
                             const SizedBox(width: 4),
-                            Text("(71)1234-5678",
-                                style: TextStylesConstants.kinterRegular),
+                            Text(
+                              "(71)1234-5678",
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                  fontSize: 13,
+                                  color: ConstantsColors.greyShade800,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
                             const Icon(Icons.email,
                                 size: 16, color: ConstantsColors.blueShade900),
                             const SizedBox(width: 4),
-                            Text("lardosidosos@email.com",
-                                style: TextStylesConstants.kinterRegular),
+                            Text(
+                              "luciafontes@gmail.com",
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                  fontSize: 13,
+                                  color: ConstantsColors.greyShade800,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  Transform.translate(
+                    offset: const Offset(5, -25),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.favorite,
+                        color: ConstantsColors.blueShade900,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        //ação para tirar dos favoritos
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
-              Text(
-                "Detalhes",
-                style: TextStylesConstants.kpoppinsRegular.merge(
-                  const TextStyle(
-                    fontSize: 20,
-                    color: ConstantsColors.blueShade900,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Detalhes",
+                  style: TextStylesConstants.kpoppinsRegular.merge(
+                    const TextStyle(
+                      fontSize: 20,
+                      color: ConstantsColors.blueShade900,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...",
-                style: TextStylesConstants.kpoppinsMedium.merge(
-                  const TextStyle(
-                    fontSize: 14,
-                    color: ConstantsColors.greyShade600,
-                    height: 1.5,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut oil",
+                  style: TextStylesConstants.kpoppinsMedium.merge(
+                    const TextStyle(
+                      fontSize: 14,
+                      color: ConstantsColors.greyShade600,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               ),
