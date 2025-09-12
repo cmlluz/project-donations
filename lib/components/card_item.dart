@@ -54,7 +54,6 @@ class _CardItemState extends State<CardItem> {
     );
 
     tp.layout(maxWidth: MediaQuery.of(context).size.width - 60);
-    // 60 ≈ padding lateral (27 + 13 + margem extra)
 
     if (mounted) {
       setState(() {
@@ -86,7 +85,6 @@ class _CardItemState extends State<CardItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Container(
                   padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
                   child: Row(
@@ -126,7 +124,6 @@ class _CardItemState extends State<CardItem> {
                   ),
                 ),
 
-                // Subtítulo com Ver Mais (condicional)
                 if (widget.subtitle != null)
                   Padding(
                     padding: const EdgeInsets.only(
@@ -168,7 +165,6 @@ class _CardItemState extends State<CardItem> {
                     ),
                   ),
 
-                // Imagem do card
                 Container(
                   height: 230.0,
                   decoration: BoxDecoration(

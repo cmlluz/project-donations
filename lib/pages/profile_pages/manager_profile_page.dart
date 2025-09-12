@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
@@ -303,7 +304,12 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        print('Publicação clicada: ${posts[index]}');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PublicationsPage(),
+                          ),
+                        );
                       },
                       child: ExpandableCard(imageUrl: posts[index]),
                     );

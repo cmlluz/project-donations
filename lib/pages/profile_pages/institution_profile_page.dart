@@ -5,6 +5,7 @@ import 'package:appdonationsgestor/components/profile_components/donation_card.d
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
@@ -34,7 +35,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       title: "Agasalhos - Doação",
       description:
           "Doação de agasalhos para famílias em situação de vulnerabilidade.",
-      quantity: 35, 
+      quantity: 35,
       imageUrl: "assets/instituicao.png",
       location: "Barbalho, Salvador",
       institution: "Lar dos Idosos",
@@ -46,7 +47,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       id: "2",
       title: "Vestuário - Doação",
       description: "Doação de roupas variadas para pessoas em situação de rua.",
-      quantity: 50, 
+      quantity: 50,
       imageUrl: "assets/donations.jpg",
       location: "Rio Vermelho, Salvador",
       institution: "Lar dos Idosos",
@@ -124,7 +125,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Header perfil ---
               Row(
                 children: [
                   const CircleAvatar(
@@ -191,7 +191,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
-
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
@@ -206,7 +205,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
-
               if (selectedTab == 0) _buildPosts(),
               if (selectedTab == 1) _buildDonations(),
               if (selectedTab == 2) _buildNotes(),
@@ -258,7 +256,17 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       ),
       itemCount: posts.length,
       itemBuilder: (context, index) {
-        return ExpandableCard(imageUrl: posts[index]);
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PublicationsPage(),
+              ),
+            );
+          },
+          child: ExpandableCard(imageUrl: posts[index]),
+        );
       },
     );
   }
