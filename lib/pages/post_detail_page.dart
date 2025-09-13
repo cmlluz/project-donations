@@ -19,6 +19,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget build(BuildContext context) {
     final post = widget.post;
 
+    final isNeed = post.category == 'necessidade';
+
+    final buttonText = isNeed ? "Quero doar" : "Quero receber";
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
@@ -174,31 +178,30 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 ),
               ),
             ),
-            if (post.category == 'necessidade')
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.blueShade900,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ConstantsColors.blueShade900,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Interesse em doar registrado!'),
-                        backgroundColor: ConstantsColors.blueShade900,
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Quero doar",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text(),
+                  //     backgroundColor: ConstantsColors.blueShade900,
+                  //   ),
+                  // );
+                },
+                child: Text(
+                  buttonText,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
+            ),
             const SizedBox(height: 24),
           ],
         ),
