@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
+import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
-import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
@@ -79,6 +78,19 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "doacao",
+    ),
+    PostModel(
+      id: "5",
+      title: "Cobertores - Necessidade",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "necessidade",
     ),
   ];
 
@@ -218,14 +230,14 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 child: Row(
                   children: [
                     _buildTabButton("Publicações", 0),
-                    _buildTabButton("Doações", 1),
+                    _buildTabButton("Histórico", 1),
                     _buildTabButton("Notas Fiscais", 2),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
               if (selectedTab == 0) _buildPosts(),
-              if (selectedTab == 1) _buildDonations(),
+              if (selectedTab == 1) _buildHistory(),
               if (selectedTab == 2) _buildNotes(),
             ],
           ),
@@ -290,7 +302,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
     );
   }
 
-  Widget _buildDonations() {
+  Widget _buildHistory() {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -304,7 +316,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       itemBuilder: (context, index) {
         final post = donations[index];
 
-        return DonationCard(
+        return HistoryCard(
           titulo: post.title,
           local: post.location,
           quantidade: post.quantity,

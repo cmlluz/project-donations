@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
-class DonationCard extends StatelessWidget {
+class HistoryCard extends StatelessWidget {
   final String titulo;
   final String local;
   final int? quantidade;
   final String imagem;
   final VoidCallback? onTap;
 
-  const DonationCard({
+  const HistoryCard({
     super.key,
     required this.titulo,
     required this.local,

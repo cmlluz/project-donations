@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
-import 'package:appdonationsgestor/components/profile_components/donation_card.dart';
+import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
@@ -79,6 +79,19 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "doacao",
+    ),
+    PostModel(
+      id: "5",
+      title: "Cobertores - Necessidade",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "necessidade",
     ),
   ];
 
@@ -255,7 +268,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                           ),
                           child: Center(
                             child: Text(
-                              "Doações",
+                              "Histórico",
                               style: TextStylesConstants.kpoppinsMedium.merge(
                                 TextStyle(
                                   color: showDonations
@@ -312,7 +325,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   itemBuilder: (context, index) {
                     final post = donations[index];
 
-                    return DonationCard(
+                    return HistoryCard(
                       titulo: post.title,
                       local: post.location,
                       quantidade: post.quantity,
