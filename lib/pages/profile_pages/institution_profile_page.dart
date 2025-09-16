@@ -137,7 +137,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           "Contato",
                           style: TextStylesConstants.kinterBold.merge(
@@ -146,23 +146,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                               color: ConstantsColors.blueShade900,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(Icons.phone,
-                                size: 16, color: ConstantsColors.blueShade900),
-                            const SizedBox(width: 4),
-                            Text(
-                              "(71)1234-5678",
-                              style: TextStylesConstants.kinterRegular.merge(
-                                const TextStyle(
-                                  fontSize: 13,
-                                  color: ConstantsColors.greyShade800,
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                         const SizedBox(height: 2),
                         Row(
