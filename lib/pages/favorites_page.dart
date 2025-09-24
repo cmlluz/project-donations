@@ -28,7 +28,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   int _filtroSelecionadoIndex = 0;
   final List<String> _filtros = [
     'Todos',
-    'Doadores',
+    // 'Doadores',
     'Instituições',
     'Necessidades',
     'Doações'
