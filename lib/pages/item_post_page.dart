@@ -1,18 +1,57 @@
+import 'dart:io';
+import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
+import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:appdonationsgestor/controllers/post_type_controller.dart';
 import 'package:appdonationsgestor/controllers/product_registration_controller.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/components/custom_button.dart';
+import 'package:image_picker/image_picker.dart';
 
-class ItemPostPage extends StatelessWidget {
-  ItemPostPage({super.key});
+class ItemPostPage extends StatefulWidget {
+  const ItemPostPage({super.key});
 
+  @override
+  State<ItemPostPage> createState() => _ItemPostPageState();
+}
+
+class _ItemPostPageState extends State<ItemPostPage> {
   final ProductRegistrationController _controller =
       ProductRegistrationController();
   final PostTypeController _controller1 = PostTypeController();
+
+  File? _selectedImg;
+
+  Future pickImageFromGallery(ImageSource source) async {
+    final selectedImage = await ImagePicker().pickImage(source: source);
+
+    setState(() {
+      if (selectedImage != null) {
+        _selectedImg = File(selectedImage.path);
+      }
+    });
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ImagePickerOptionsSheet(
+          onCameraTap: () {
+            pickImageFromGallery(ImageSource.camera);
+            Navigator.of(context).pop();
+          },
+          onGalleryTap: () {
+            pickImageFromGallery(ImageSource.gallery);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +91,8 @@ class ItemPostPage extends StatelessWidget {
               DonationItemComponent(
                 productRegistrationController: _controller,
                 postTypeController: _controller1,
+                onPickImage: _showImagePickerOptions,
+                selectedImg: _selectedImg,
               ),
               const Row(),
             ],
@@ -65,11 +106,15 @@ class ItemPostPage extends StatelessWidget {
 class DonationItemComponent extends StatelessWidget {
   final ProductRegistrationController productRegistrationController;
   final PostTypeController postTypeController;
+  final VoidCallback onPickImage;
+  final File? selectedImg;
 
   const DonationItemComponent({
     super.key,
     required this.productRegistrationController,
     required this.postTypeController,
+    required this.onPickImage,
+    required this.selectedImg,
   });
 
   @override
@@ -108,6 +153,64 @@ class DonationItemComponent extends StatelessWidget {
               controller: productRegistrationController.crtlDesc,
               keyboardType: TextInputType.multiline,
               labelColor: ConstantsColors.whiteShade700,
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: onPickImage,
+              child: DottedBorder(
+                borderType: BorderType.RRect,
+                radius: const Radius.circular(25.0),
+                color: ConstantsColors.blueShade900,
+                dashPattern: const [5, 5],
+                strokeWidth: 2,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(1, 91, 124, 0.05),
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  child: selectedImg != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Image.file(
+                            selectedImg!,
+                            width: 350,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.image_search_outlined,
+                              size: 60,
+                              color: ConstantsColors.blueShade900,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Adicione a foto aqui',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: ConstantsColors.greyShade600
+                                    .withOpacity(0.8),
+                              ),
+                            ),
+                            const Text(
+                              'Procurar',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: ConstantsColors.blueShade900,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             const Row(
