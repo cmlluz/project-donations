@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/components/popup.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostModel post;
@@ -188,13 +189,44 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
-                onPressed: () {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text(),
-                  //     backgroundColor: ConstantsColors.blueShade900,
-                  //   ),
-                  // );
+                onPressed: () async {
+                  final isNeed = post.category == 'necessidade';
+
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return const Dialog(
+                        child: Popup(
+                          title: "Permissão de compartilhamento",
+                          subtitle:
+                              "Você permite o compartilhamento dos seus dados para que a instituição entre em contato?",
+                          confirmText: "Confirmar",
+                          cancelText: "Cancelar",
+                        ),
+                      );
+                    },
+                  );
+
+                  if (confirmed == true) {
+                    final message = isNeed
+                        ? "Interesse em doar registrado!"
+                        : "Interesse em receber registrado!";
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          message,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: ConstantsColors.blackShade900,
+                          ).merge(TextStylesConstants.kinterRegular),
+                          textAlign: TextAlign.center,
+                        ),
+                        backgroundColor: ConstantsColors.blueShade400,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 },
                 child: Text(
                   buttonText,

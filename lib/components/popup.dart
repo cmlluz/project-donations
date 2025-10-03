@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 
@@ -8,7 +7,6 @@ class Popup extends StatelessWidget {
   final String? subtitle;
   final String? confirmText;
   final String? cancelText;
-  final String? confirmRoute;
   final bool reminderButton;
 
   const Popup({
@@ -17,7 +15,6 @@ class Popup extends StatelessWidget {
     this.subtitle,
     this.confirmText,
     this.cancelText,
-    this.confirmRoute,
     this.reminderButton = true,
   });
 
@@ -28,11 +25,15 @@ class Popup extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          padding: const EdgeInsets.all(4),
-          width: size.width * 0.5,
+          decoration: BoxDecoration(
+            color: ConstantsColors.blueShade400,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+          width: size.width * 0.8,
           constraints: const BoxConstraints(
-            maxWidth: 400,
-            minHeight: 150,
+            maxWidth: 500,
+            minHeight: 180,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -68,7 +69,7 @@ class Popup extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  if (confirmText != null && confirmRoute != null)
+                  if (confirmText != null)
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
@@ -83,8 +84,7 @@ class Popup extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          GoRouter.of(context).go(confirmRoute!);
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(true);
                         },
                         child: Text(
                           confirmText!,
@@ -111,10 +111,9 @@ class Popup extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
-                          foregroundColor:
-                              ConstantsColors.blackShade900, 
+                          foregroundColor: ConstantsColors.blackShade900,
                         ),
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () => Navigator.of(context).pop(false),
                         child: Text(
                           cancelText!,
                           style: TextStylesConstants.kpoppinsRegular.merge(
