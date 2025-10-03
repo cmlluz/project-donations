@@ -2,7 +2,6 @@ import 'package:appdonationsgestor/components/card_item.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/components/popup.dart';
 import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
@@ -43,39 +42,6 @@ class _HomePageState extends State<HomePage> {
       "imageAsset": "assets/donations.jpg",
     },
   ];
-
-  // Display do popup de atualização cadastral
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     showDialog(
-  //       context: context,
-  //       barrierDismissible: false,
-  //       builder: (context) {
-  //         final screenWidth = MediaQuery.of(context).size.width;
-  //         final dialogWidth = screenWidth * 0.9;
-
-  //         return AlertDialog(
-  //           backgroundColor: ConstantsColors.blueShade400,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(20),
-  //           ),
-  //           content: SizedBox(
-  //             width: dialogWidth,
-  //             child: const Popup(
-  //               title: "Seus dados estão desatualizados",
-  //               subtitle:
-  //                   "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
-  //               confirmText: "Atualizar agora",
-  //               cancelText: "Me lembre mais tarde",
-  //               confirmRoute: "/editProfilePage",
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //     );
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
