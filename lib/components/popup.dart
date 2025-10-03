@@ -23,85 +23,116 @@ class Popup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 400.0,
-      height: 180.0,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (title != null) ...[
-            const SizedBox(height: 12.0),
-            Text(
-              title!,
-              style: TextStylesConstants.kpoppinsSemiBold.merge(
-                const TextStyle(
-                    fontSize: 18.0, color: ConstantsColors.greyShade900),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-          if (subtitle != null) ...[
-            const SizedBox(height: 12.0),
-            Text(
-              subtitle!,
-              style: TextStylesConstants.kpoppinsRegular.merge(
-                const TextStyle(
-                    fontSize: 15.0, color: ConstantsColors.blackShade900),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-          const SizedBox(height: 18.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+    final size = MediaQuery.of(context).size;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          padding: const EdgeInsets.all(4),
+          width: size.width * 0.5,
+          constraints: const BoxConstraints(
+            maxWidth: 400,
+            minHeight: 150,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (confirmText != null && confirmRoute != null)
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: ConstantsColors.blueShade900,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 8.0),
-                    minimumSize: const Size(130, 35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0),
+              if (title != null) ...[
+                const SizedBox(height: 12.0),
+                Text(
+                  title!,
+                  style: TextStylesConstants.kpoppinsSemiBold.merge(
+                    const TextStyle(
+                      fontSize: 18.0,
+                      color: ConstantsColors.greyShade900,
                     ),
                   ),
-                  onPressed: () {
-                    GoRouter.of(context).go(confirmRoute!);
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    confirmText!,
-                    style: TextStylesConstants.kpoppinsBold.merge(
-                      const TextStyle(
-                          fontSize: 12.0, color: ConstantsColors.whiteShade900),
-                    ),
-                  ),
+                  textAlign: TextAlign.center,
                 ),
-              if (reminderButton && cancelText != null)
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: ConstantsColors.greyShade300,
-                    minimumSize: const Size(130, 35),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 6.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0),
+              ],
+              if (subtitle != null) ...[
+                const SizedBox(height: 12.0),
+                Text(
+                  subtitle!,
+                  style: TextStylesConstants.kpoppinsRegular.merge(
+                    const TextStyle(
+                      fontSize: 15.0,
+                      color: ConstantsColors.blackShade900,
                     ),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    cancelText!,
-                    style: TextStylesConstants.kpoppinsRegular.merge(
-                      const TextStyle(
-                          fontSize: 12.0, color: ConstantsColors.blackShade900),
-                    ),
-                  ),
+                  textAlign: TextAlign.center,
                 ),
+              ],
+              const SizedBox(height: 18.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (confirmText != null && confirmRoute != null)
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 10.0,
+                          ),
+                          minimumSize: const Size(0, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
+                        ),
+                        onPressed: () {
+                          GoRouter.of(context).go(confirmRoute!);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          confirmText!,
+                          style: TextStylesConstants.kpoppinsBold.merge(
+                            const TextStyle(
+                              fontSize: 13.0,
+                              color: ConstantsColors.whiteShade900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (reminderButton && cancelText != null) ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: ConstantsColors.greyShade300,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 10.0,
+                          ),
+                          minimumSize: const Size(0, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
+                          foregroundColor:
+                              ConstantsColors.blackShade900, 
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(
+                          cancelText!,
+                          style: TextStylesConstants.kpoppinsRegular.merge(
+                            const TextStyle(
+                              fontSize: 13.0,
+                              color: ConstantsColors.blackShade900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
