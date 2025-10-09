@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 29.0),
                 child: CardItem(
-                  onTap: () => print("Clicou no card ${card['title']}"),
                   title: card['title']!,
                   subtitle: card['subtitle'],
                   avatarUrl: card['avatarUrl']!,
