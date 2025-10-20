@@ -18,6 +18,8 @@ class ManagerProfilePage extends StatefulWidget {
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
   bool showDonations = false;
 
+  final bool isManager = true;
+
   final List<String> posts = [
     "assets/donations.jpg",
     "assets/instituicao.png",
@@ -129,14 +131,26 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Lucia Fontes",
-                          style: TextStylesConstants.kpoppinsMedium.merge(
-                            const TextStyle(
-                              fontSize: 16,
-                              color: ConstantsColors.blueShade900,
+                        Row(
+                          children: [
+                            Text(
+                              "Lucia Fontes",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                const TextStyle(
+                                  fontSize: 16,
+                                  color: ConstantsColors.blueShade900,
+                                ),
+                              ),
                             ),
-                          ),
+                            if (isManager) ...[
+                              const SizedBox(width: 5),
+                              Image.asset(
+                                'assets/icons/verifiedIcon.png',
+                                height: 18,
+                                width: 18,
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 4),
                         Text(
