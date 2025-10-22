@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
 
 class ApiService {
-  final String _baseUrl = "http://10.0.2.2:8080/api";
+  final String _baseUrl = "http://192.168.0.21:8080/api";
 
   Future<Map<String, String>> _getAuthHeaders() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -154,6 +155,63 @@ class ApiService {
       }
     } catch (e) {
       print("Erro ao deletar doação: $e");
+    }
+  }
+
+  Future<List<Need>> getNeeds() async {
+    final headers = await _getAuthHeaders();
+    final response =
+        await http.get(Uri.parse('$_baseUrl/needs'), headers: headers);
+    print('Status Code da Resposta (GET Needs): ${response.statusCode}');
+    print('Corpo da Resposta (GET Needs): ${utf8.decode(response.bodyBytes)}');
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Need.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar as necessidades.');
+    }
+  }
+
+  Future<Need> createNeed(Map<String, dynamic> needData) async {
+    final headers = await _getAuthHeaders();
+    print('Enviando para o Backend (POST Need): ${jsonEncode(needData)}');
+    final response = await http.post(
+      Uri.parse('$_baseUrl/needs'),
+      headers: headers,
+      body: jsonEncode(needData),
+    );
+
+    if (response.statusCode == 201) {
+      return Need.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      throw Exception('Falha ao criar a necessidade.');
+    }
+  }
+
+  Future<Need> updateNeed(int id, Map<String, dynamic> needData) async {
+    final headers = await _getAuthHeaders();
+    final response = await http.put(
+      Uri.parse('$_baseUrl/needs/$id'),
+      headers: headers,
+      body: jsonEncode(needData),
+    );
+
+    if (response.statusCode == 200) {
+      return Need.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      throw Exception('Falha ao atualizar a necessidade.');
+    }
+  }
+
+  Future<void> deleteNeed(int id) async {
+    final headers = await _getAuthHeaders();
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/needs/$id'),
+      headers: headers,
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Falha ao deletar a necessidade.');
     }
   }
 }

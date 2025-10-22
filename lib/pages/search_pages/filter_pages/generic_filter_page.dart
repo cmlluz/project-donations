@@ -1,8 +1,8 @@
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -55,12 +55,10 @@ class GenericFilterPage extends StatelessWidget {
   List<SearchItem> _getFilteredItems() {
     var filtered = items;
 
-    // Filter by category
     if (category != SearchCategory.todos) {
       filtered = filtered.where((item) => item.category == category).toList();
     }
 
-    // Filter by search query
     if (searchQuery != null && searchQuery!.isNotEmpty) {
       filtered = filtered
           .where((item) =>
@@ -138,18 +136,28 @@ class GenericFilterPage extends StatelessWidget {
   }
 
   void _navigateToDetail(BuildContext context, SearchItem item) {
-    final post = PostModel(
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      location: item.location,
-      institution: item.institution,
-      institutionImageUrl: item.institutionImageUrl,
-      createdAt: item.createdAt,
-      category: item.category.name,
-    );
+    if (item.category == SearchCategory.necessidade) {
+      final need = Need(
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          authorName: item.institution,
+          category: item.category.toString(),
+          quantity: item.quantity,
+          status: item.status,
+          date: item.date);
 
-    GoRouter.of(context).push('/postDetailPage', extra: post);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NeedDetailPage(need: need),
+        ),
+      );
+    } else {
+      // Mantenha a sua lógica existente para outros tipos de itens, como Posts
+      // Exemplo:
+      // final post = PostModel(...);
+      // GoRouter.of(context).push('/postDetailPage', extra: post);
+    }
   }
 }

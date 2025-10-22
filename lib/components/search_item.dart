@@ -1,13 +1,15 @@
 class SearchItem {
-  final String id;
+  final int id;
   final String title;
   final String description;
   final String imageUrl;
   final SearchCategory category;
-  final DateTime createdAt;
-  final String location;
+  final String? location;
   final String institution;
-  final String institutionImageUrl;
+  final String? institutionImageUrl;
+  final DateTime date;
+  final int quantity;
+  final String status;
 
   const SearchItem({
     required this.id,
@@ -15,10 +17,12 @@ class SearchItem {
     required this.description,
     required this.imageUrl,
     required this.category,
-    required this.createdAt,
-    required this.location,
+    this.location,
     required this.institution,
-    required this.institutionImageUrl,
+    this.institutionImageUrl,
+    required this.date,
+    required this.quantity,
+    required this.status,
   });
 }
 

@@ -1,40 +1,61 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
+import 'package:appdonationsgestor/services/api_services.dart';
 
-class AppSearchController extends ChangeNotifier {
+class AppSearchController with ChangeNotifier {
+  final ApiService _apiService = ApiService();
+
   List<SearchItem> _allItems = [];
-  String _searchQuery = '';
-  SearchCategory _selectedCategory = SearchCategory.todos;
-  bool _isLoading = false;
-
-  // Getters
   List<SearchItem> get allItems => _allItems;
-  String get searchQuery => _searchQuery;
-  SearchCategory get selectedCategory => _selectedCategory;
+
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<SearchItem> get filteredItems {
-    var filtered = _allItems;
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
 
-    if (_selectedCategory != SearchCategory.todos) {
-      filtered =
-          filtered.where((item) => item.category == _selectedCategory).toList();
+  SearchCategory _selectedCategory = SearchCategory.todos;
+  SearchCategory get selectedCategory => _selectedCategory;
+
+  Future<void> loadItems() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final needs = await _apiService.getNeeds();
+      //final donations = await _apiService.getDonations();
+      // final posts = await _apiService.getPosts(); // Descomente quando quiser adicionar posts
+
+      _allItems = [
+        ...needs.map((n) => SearchItem(
+              id: n.id,
+              title: n.title,
+              description: n.description,
+              imageUrl: 'assets/placeholder.png',
+              category: SearchCategory.necessidade,
+              institution: n.authorName,
+              date: n.date ?? DateTime.now(),
+              status: n.status,
+              quantity: n.quantity,
+            )),
+        /*...donations.map((d) => SearchItem(
+              id: d.id,
+              title: d.title,
+              description: d.description,
+              imageUrl: 'assets/placeholder.png',
+              category: SearchCategory.doacao,
+              institution: d.donatorName,
+              createdAt: DateTime.now(),
+            )),*/
+      ];
+    } catch (e) {
+      print('Erro ao carregar itens: $e');
     }
 
-    if (_searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where((item) =>
-              item.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              item.description
-                  .toLowerCase()
-                  .contains(_searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    return filtered;
+    _isLoading = false;
+    notifyListeners();
   }
 
-  // Methods
   void updateSearchQuery(String query) {
     _searchQuery = query;
     notifyListeners();
@@ -43,118 +64,5 @@ class AppSearchController extends ChangeNotifier {
   void updateCategory(SearchCategory category) {
     _selectedCategory = category;
     notifyListeners();
-  }
-
-  Future<void> loadItems() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 500));
-      _allItems = _getMockData();
-    } catch (e) {
-      // Handle error
-      debugPrint('Error loading items: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  List<SearchItem> _getMockData() {
-    return [
-      SearchItem(
-        id: '1',
-        title: 'Doação de Roupas',
-        description: 'Roupas em bom estado para famílias carentes',
-        imageUrl: 'assets/donations.jpg',
-        category: SearchCategory.doacao,
-        createdAt: DateTime.now(),
-        location: 'Centro, Salvador',
-        institution: 'Doador Anônimo',
-        institutionImageUrl: 'assets/profile.jpg',
-      ),
-      SearchItem(
-        id: '2',
-        title: 'Instituto dos Idosos',
-        description: 'Cuidados especializados para a terceira idade',
-        imageUrl: 'assets/instituicao.png',
-        category: SearchCategory.instituicao,
-        createdAt: DateTime.now(),
-        location: 'Barbalho, Salvador',
-        institution: 'Instituto dos Idosos São Francisco',
-        institutionImageUrl: 'assets/instituicao.png',
-      ),
-      SearchItem(
-        id: '3',
-        title: 'Necessidade de Alimentos',
-        description: 'Alimentos não perecíveis para comunidades carentes',
-        imageUrl: 'assets/donations2.jpg',
-        category: SearchCategory.necessidade,
-        createdAt: DateTime.now(),
-        location: 'Liberdade, Salvador',
-        institution: 'Casa da Esperança',
-        institutionImageUrl: 'assets/instituicao.png',
-      ),
-      SearchItem(
-        id: '4',
-        title: 'Doação de Brinquedos',
-        description: 'Brinquedos em bom estado para crianças carentes',
-        imageUrl: 'assets/donations.jpg',
-        category: SearchCategory.doacao,
-        createdAt: DateTime.now(),
-        location: 'Pelourinho, Salvador',
-        institution: 'Família Solidária',
-        institutionImageUrl: 'assets/profile.jpg',
-      ),
-      SearchItem(
-        id: '5',
-        title: 'Necessidade de Agasalhos para Idosos',
-        description:
-            'Precisamos de agasalhos para os idosos devido às baixas temperaturas',
-        imageUrl: 'assets/donations2.jpg',
-        category: SearchCategory.necessidade,
-        createdAt: DateTime.now(),
-        location: 'Barbalho, Salvador',
-        institution: 'Lar dos Idosos São Francisco',
-        institutionImageUrl: 'assets/instituicao.png',
-      ),
-      SearchItem(
-        id: '6',
-        title: 'Instituto Casa de Apoio à Criança',
-        description:
-            'Instituição que atende crianças em situação de risco social',
-        imageUrl: 'assets/instituicao.png',
-        category: SearchCategory.instituicao,
-        createdAt: DateTime.now(),
-        location: 'Federação, Salvador',
-        institution: 'Casa de Apoio à Criança',
-        institutionImageUrl: 'assets/instituicao.png',
-      ),
-      SearchItem(
-        id: '7',
-        title: 'Necessidade de Material Escolar',
-        description:
-            'Cadernos, lápis e materiais escolares para crianças carentes',
-        imageUrl: 'assets/donations.jpg',
-        category: SearchCategory.necessidade,
-        createdAt: DateTime.now(),
-        location: 'Subúrbio, Salvador',
-        institution: 'Escola Comunitária',
-        institutionImageUrl: 'assets/instituicao.png',
-      ),
-      SearchItem(
-        id: '8',
-        title: 'Doação de Livros Infantis',
-        description: 'Doação de livros infantis em bom estado',
-        imageUrl: 'assets/donations2.jpg',
-        category: SearchCategory.doacao,
-        createdAt: DateTime.now(),
-        location: 'Barra, Salvador',
-        institution: 'Biblioteca Comunitária',
-        institutionImageUrl: 'assets/profile.jpg',
-      ),
-    ];
   }
 }

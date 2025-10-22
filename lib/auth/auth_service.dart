@@ -21,10 +21,17 @@ class AuthService {
     final UserCredential userCredential = await firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password);
 
+    User? user = userCredential.user; 
+  if (user != null) {
+    String? token = await user.getIdToken();
+    print('--- FIREBASE TOKEN PARA POSTMAN ---');
+    print(token);
+    print('------------------------------------');
+  }
+
     if (userCredential.user != null) {
       await _apiService.syncUser();
     }
-
     return userCredential;
   }
 

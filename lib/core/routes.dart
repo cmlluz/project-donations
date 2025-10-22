@@ -20,7 +20,6 @@ import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/con
 import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/delete_feedback_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
-import 'package:appdonationsgestor/pages/necessity_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
@@ -225,13 +224,6 @@ class AppRountersConfiguration {
           name: RouteNames.editProfilePage,
           pageBuilder: (context, state) => const MaterialPage(
             child: EditProfilePage(),
-          ),
-        ),
-        GoRoute(
-          path: '/necessityPage',
-          name: RouteNames.necessityPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: NecessityPage(),
           ),
         ),
         GoRoute(
