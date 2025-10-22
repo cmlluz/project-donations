@@ -23,7 +23,7 @@ class AppSearchController with ChangeNotifier {
 
     try {
       final needs = await _apiService.getNeeds();
-      //final donations = await _apiService.getDonations();
+      final donations = await _apiService.getDonations();
       // final posts = await _apiService.getPosts(); // Descomente quando quiser adicionar posts
 
       _allItems = [
@@ -38,15 +38,17 @@ class AppSearchController with ChangeNotifier {
               status: n.status,
               quantity: n.quantity,
             )),
-        /*...donations.map((d) => SearchItem(
+        ...donations.map((d) => SearchItem(
               id: d.id,
               title: d.title,
               description: d.description,
               imageUrl: 'assets/placeholder.png',
               category: SearchCategory.doacao,
               institution: d.donatorName,
-              createdAt: DateTime.now(),
-            )),*/
+              date: d.date ?? DateTime.now(),
+              status: d.status,
+              quantity: d.quantity,
+            )),
       ];
     } catch (e) {
       print('Erro ao carregar itens: $e');

@@ -103,6 +103,7 @@ class _ItemPostPageState extends State<ItemPostPage> {
           'description': description,
           'quantity': quantity,
           'category': category.toUpperCase(),
+          'date': DateTime.now().toIso8601String().split('T').first,
           'status': 'PENDENTE',
           'imageUrl': imageUrl, 
         });

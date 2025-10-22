@@ -1,5 +1,5 @@
-/*import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services.dart';
@@ -117,7 +117,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                   ListTile(
                     leading: const CircleAvatar(child: Icon(Icons.business)),
                     title: Text(
-                      widget.donation.authorName,
+                      widget.donation.donatorName,
                       style: const TextStyle(
                               fontSize: 18, color: ConstantsColors.blueShade900)
                           .merge(TextStylesConstants.kinterSemiBold),
@@ -167,4 +167,4 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
       ),
     );
   }
-}*/
+}

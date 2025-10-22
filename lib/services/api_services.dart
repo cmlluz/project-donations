@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
 
 class ApiService {
   final String _baseUrl = "http://192.168.0.21:8080/api";
@@ -77,44 +78,35 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> getDonations() async {
-    try {
-      final headers = await _getAuthHeaders();
-      final response = await http.get(
-        Uri.parse('$_baseUrl/donations'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        // Converte a resposta JSON numa lista de objetos Dart
-        return jsonDecode(utf8.decode(response.bodyBytes));
-      } else {
-        print("Falha ao buscar doações: ${response.statusCode}");
-        return [];
-      }
-    } catch (e) {
-      print("Erro ao buscar doações: $e");
-      return [];
+  Future<List<Donation>> getDonations() async {
+    final headers = await _getAuthHeaders();
+    final response =
+        await http.get(Uri.parse('$_baseUrl/donations'), headers: headers);
+    print('Status Code da Resposta (GET donations): ${response.statusCode}');
+    print(
+        'Corpo da Resposta (GET donations): ${utf8.decode(response.bodyBytes)}');
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Donation.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar as doações.');
     }
   }
 
-  Future<void> createDonation(Map<String, dynamic> donationData) async {
-    try {
-      final headers = await _getAuthHeaders();
-      final response = await http.post(
-        Uri.parse('$_baseUrl/donations'),
-        headers: headers,
-        body: jsonEncode(donationData), // Converte o mapa para uma string JSON
-      );
+  Future<Donation> createDonation(Map<String, dynamic> donationData) async {
+    final headers = await _getAuthHeaders();
+    print(
+        'Enviando para o Backend (POST Donation): ${jsonEncode(donationData)}');
+    final response = await http.post(
+      Uri.parse('$_baseUrl/donations'),
+      headers: headers,
+      body: jsonEncode(donationData),
+    );
 
-      if (response.statusCode == 201) {
-        print("Doação criada com sucesso.");
-      } else {
-        print("Falha ao criar doação: ${response.statusCode}");
-        print("Corpo da resposta: ${response.body}");
-      }
-    } catch (e) {
-      print("Erro ao criar doação: $e");
+    if (response.statusCode == 201) {
+      return Donation.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      throw Exception('Falha ao criar a necessidade.');
     }
   }
 

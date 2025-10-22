@@ -1,3 +1,5 @@
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
@@ -153,11 +155,23 @@ class GenericFilterPage extends StatelessWidget {
           builder: (context) => NeedDetailPage(need: need),
         ),
       );
-    } else {
-      // Mantenha a sua lógica existente para outros tipos de itens, como Posts
-      // Exemplo:
-      // final post = PostModel(...);
-      // GoRouter.of(context).push('/postDetailPage', extra: post);
+    } else if (item.category == SearchCategory.doacao) {
+      final donation = Donation(
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          donatorName: item.institution,
+          category: item.category.toString(),
+          quantity: item.quantity,
+          status: item.status,
+          date: item.date);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DonationDetailPage(donation: donation),
+        ),
+      );
+      // manter a lógica para outros tipos de itens
     }
   }
 }
