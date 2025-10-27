@@ -3,6 +3,7 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/components/popup.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostModel post;
@@ -15,6 +16,7 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   bool isFavorite = false;
+  bool isConfirmed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -181,60 +183,89 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ConstantsColors.blueShade900,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-                onPressed: () async {
-                  final isNeed = post.category == 'necessidade';
-
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return const Dialog(
-                        child: Popup(
-                          title: "Permissão de compartilhamento",
-                          subtitle:
-                              "Você permite o compartilhamento dos seus dados para que a instituição entre em contato?",
-                          confirmText: "Confirmar",
-                          cancelText: "Cancelar",
+              child: isConfirmed && isNeed
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ConstantsColors.redShade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                  );
-
-                  if (confirmed == true) {
-                    final message = isNeed
-                        ? "Interesse em doar registrado!"
-                        : "Interesse em receber registrado!";
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          message,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: ConstantsColors.blackShade900,
-                          ).merge(TextStylesConstants.kinterRegular),
-                          textAlign: TextAlign.center,
-                        ),
-                        backgroundColor: ConstantsColors.blueShade400,
-                        behavior: SnackBarBehavior.floating,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                    );
-                  }
-                },
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ConfirmDonationPage(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Confirmar a doação",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ).merge(TextStylesConstants.kpoppinsMedium),
+                      ),
+                    )
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ConstantsColors.blueShade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return const Dialog(
+                              child: Popup(
+                                title: "Permissão de compartilhamento",
+                                subtitle:
+                                    "Você permite o compartilhamento dos seus dados para que a instituição entre em contato?",
+                                confirmText: "Confirmar",
+                                cancelText: "Cancelar",
+                              ),
+                            );
+                          },
+                        );
+
+                        if (confirmed == true) {
+                          final message = isNeed
+                              ? "Interesse em doar registrado!"
+                              : "Interesse em receber registrado!";
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                message,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: ConstantsColors.blackShade900,
+                                ).merge(TextStylesConstants.kinterRegular),
+                                textAlign: TextAlign.center,
+                              ),
+                              backgroundColor: ConstantsColors.blueShade400,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+
+                          setState(() {
+                            isConfirmed = true;
+                          });
+                        }
+                      },
+                      child: Text(
+                        buttonText,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ).merge(TextStylesConstants.kpoppinsMedium),
+                      ),
+                    ),
             ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
