@@ -8,6 +8,7 @@ class Popup extends StatelessWidget {
   final String? confirmText;
   final String? cancelText;
   final bool reminderButton;
+  final Color? confirmButtonColor;
 
   const Popup({
     super.key,
@@ -16,15 +17,17 @@ class Popup extends StatelessWidget {
     this.confirmText,
     this.cancelText,
     this.reminderButton = true,
+    this.confirmButtonColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Container(
           decoration: BoxDecoration(
             color: ConstantsColors.blueShade400,
             borderRadius: BorderRadius.circular(12),
@@ -73,7 +76,8 @@ class Popup extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          backgroundColor: ConstantsColors.blueShade900,
+                          backgroundColor: confirmButtonColor ??
+                              ConstantsColors.blueShade900,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8.0,
                             vertical: 10.0,
@@ -82,6 +86,10 @@ class Popup extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
+                          overlayColor: Colors.transparent,
+                          foregroundColor: Colors.transparent,
+                        ).copyWith(
+                          side: WidgetStateProperty.all(BorderSide.none),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(true);
@@ -112,6 +120,7 @@ class Popup extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6.0),
                           ),
                           foregroundColor: ConstantsColors.blackShade900,
+                          overlayColor: Colors.transparent,
                         ),
                         onPressed: () => Navigator.of(context).pop(false),
                         child: Text(
@@ -130,8 +139,8 @@ class Popup extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
