@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/card_item.dart';
+import 'package:appdonationsgestor/components/popup.dart';
 
 class PublicationsPage extends StatefulWidget {
   const PublicationsPage({super.key});
@@ -11,8 +12,9 @@ class PublicationsPage extends StatefulWidget {
 }
 
 class _PublicationsPageState extends State<PublicationsPage> {
-  bool isEditing = false; // modo de edição
-  int? editingIndex; // qual post está sendo editado
+  bool isEditing = false;
+  bool isDeleting = false;
+  int? editingIndex;
   late TextEditingController _subtitleController;
 
   final List<Map<String, dynamic>> publications = [
@@ -83,6 +85,39 @@ class _PublicationsPageState extends State<PublicationsPage> {
     }
   }
 
+  Future<void> confirmDelete(int index) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: Popup(
+          title: "Excluir publicação",
+          subtitle: "Tem certeza de que deseja excluir este post?",
+          confirmText: "Confirmar",
+          cancelText: "Cancelar",
+          confirmButtonColor: ConstantsColors.redShade900,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        publications.removeAt(index);
+        isDeleting = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Publicação excluída com sucesso!"),
+          backgroundColor: ConstantsColors.blueShade900,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      setState(() => isDeleting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,8 +148,26 @@ class _PublicationsPageState extends State<PublicationsPage> {
               if (isEditing) {
                 saveEditing();
               } else {
-                setState(() => isEditing = true);
+                setState(() {
+                  isEditing = true;
+                  isDeleting = false;
+                });
               }
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: isDeleting
+                  ? ConstantsColors.blueShade400
+                  : ConstantsColors.blueShade900,
+            ),
+            onPressed: () {
+              setState(() {
+                isDeleting = !isDeleting;
+                isEditing = false;
+                editingIndex = null;
+              });
             },
           ),
         ],
@@ -128,20 +181,22 @@ class _PublicationsPageState extends State<PublicationsPage> {
           final isThisBeingEdited = isEditing && editingIndex == index;
 
           return GestureDetector(
-            onTap: isEditing ? () => startEditing(index) : null,
+            onTap: isEditing
+                ? () => startEditing(index)
+                : isDeleting
+                    ? () => confirmDelete(index)
+                    : null,
             child: Stack(
               children: [
                 CardItem(
                   title: pub["title"]!,
-                  subtitle: isThisBeingEdited
-                      ? null 
-                      : pub["subtitle"],
+                  subtitle:
+                      isThisBeingEdited ? null : pub["subtitle"] as String?,
                   avatarUrl: pub["avatarUrl"]!,
                   location: pub["location"]!,
                   date: pub["date"]!,
                   imageAsset: pub["imageAsset"]!,
                 ),
-
                 if (isThisBeingEdited)
                   Positioned.fill(
                     child: Container(
