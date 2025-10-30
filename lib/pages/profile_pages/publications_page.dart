@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/card_item.dart';
-import 'package:appdonationsgestor/pages/edit_post_page.dart'; // 🔹 Certifique-se de criar/importar essa página
 
 class PublicationsPage extends StatefulWidget {
   const PublicationsPage({super.key});
@@ -12,9 +11,11 @@ class PublicationsPage extends StatefulWidget {
 }
 
 class _PublicationsPageState extends State<PublicationsPage> {
-  bool isEditing = false; // 🔹 Controla se o modo edição está ativo
+  bool isEditing = false; // modo de edição
+  int? editingIndex; // qual post está sendo editado
+  late TextEditingController _subtitleController;
 
-  final publications = [
+  final List<Map<String, dynamic>> publications = [
     {
       "title": "Lucia Fontes",
       "subtitle":
@@ -44,6 +45,45 @@ class _PublicationsPageState extends State<PublicationsPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _subtitleController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _subtitleController.dispose();
+    super.dispose();
+  }
+
+  void startEditing(int index) {
+    setState(() {
+      editingIndex = index;
+      _subtitleController.text = publications[index]["subtitle"];
+    });
+  }
+
+  void saveEditing() {
+    if (editingIndex != null) {
+      setState(() {
+        publications[editingIndex!]["subtitle"] = _subtitleController.text;
+        editingIndex = null;
+        isEditing = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Alterações salvas com sucesso!"),
+          backgroundColor: ConstantsColors.blueShade900,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      setState(() => isEditing = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
@@ -66,15 +106,15 @@ class _PublicationsPageState extends State<PublicationsPage> {
         actions: [
           IconButton(
             icon: Icon(
-              isEditing
-                  ? Icons.check
-                  : Icons.edit, // Alterna entre lápis e check
+              isEditing ? Icons.check : Icons.edit,
               color: ConstantsColors.blueShade900,
             ),
             onPressed: () {
-              setState(() {
-                isEditing = !isEditing; // Ativa/desativa modo edição
-              });
+              if (isEditing) {
+                saveEditing();
+              } else {
+                setState(() => isEditing = true);
+              }
             },
           ),
         ],
@@ -85,25 +125,59 @@ class _PublicationsPageState extends State<PublicationsPage> {
         itemCount: publications.length,
         itemBuilder: (context, index) {
           final pub = publications[index];
+          final isThisBeingEdited = isEditing && editingIndex == index;
+
           return GestureDetector(
-            onTap: isEditing
-                ? () {
-                    // 🔹 Se estiver em modo de edição, abre a tela de edição
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditPostPage(postData: pub),
+            onTap: isEditing ? () => startEditing(index) : null,
+            child: Stack(
+              children: [
+                CardItem(
+                  title: pub["title"]!,
+                  subtitle: isThisBeingEdited
+                      ? null 
+                      : pub["subtitle"],
+                  avatarUrl: pub["avatarUrl"]!,
+                  location: pub["location"]!,
+                  date: pub["date"]!,
+                  imageAsset: pub["imageAsset"]!,
+                ),
+
+                if (isThisBeingEdited)
+                  Positioned.fill(
+                    child: Container(
+                      alignment: Alignment.bottomCenter,
+                      color: Colors.white.withOpacity(0.9),
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _subtitleController,
+                        maxLines: 2,
+                        style: TextStylesConstants.kpoppinsRegular.merge(
+                          const TextStyle(
+                            color: ConstantsColors.blueShade900,
+                            fontSize: 15,
+                          ),
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "Editar subtítulo...",
+                          filled: true,
+                          fillColor: ConstantsColors.greyShade200,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: ConstantsColors.blueShade900,
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: ConstantsColors.blueShade900,
+                              width: 2,
+                            ),
+                          ),
+                        ),
                       ),
-                    );
-                  }
-                : null,
-            child: CardItem(
-              title: pub["title"]!,
-              subtitle: pub["subtitle"],
-              avatarUrl: pub["avatarUrl"]!,
-              location: pub["location"]!,
-              date: pub["date"]!,
-              imageAsset: pub["imageAsset"]!,
+                    ),
+                  ),
+              ],
             ),
           );
         },
