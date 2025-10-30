@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/services/api_services.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:intl/intl.dart';
 
 class NeedDetailPage extends StatefulWidget {
@@ -15,41 +16,65 @@ class NeedDetailPage extends StatefulWidget {
 }
 
 class _NeedDetailPageState extends State<NeedDetailPage> {
-  final ApiService _apiService = ApiService();
+  final ApiClient _apiClient = ApiClient();
+  late final FavoriteApiService _favoriteApiService;
   late bool _isFavorite;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _favoriteApiService = FavoriteApiService(_apiClient);
     _isFavorite = widget.need.isFavorite;
   }
 
-  /*void _toggleFavorite() async {
+  void _toggleFavorite() async {
+    if (_isLoading) return;
+
     final newFavoriteState = !_isFavorite;
-    const type = 'necessidades';
-    final id = widget.need.id.toString();
+    final needId = widget.need.id;
+
+    setState(() {
+      _isLoading = true;
+      _isFavorite = newFavoriteState;
+    });
 
     try {
       if (newFavoriteState) {
-        await _apiService.addFavorite(type, id);
+        await _favoriteApiService.addFavoriteNeed(needId);
       } else {
-        await _apiService.removeFavorite(type, id);
+        await _favoriteApiService.removeFavoriteNeed(needId);
       }
-      setState(() {
-        _isFavorite = newFavoriteState;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(newFavoriteState ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.'),
-          backgroundColor: ConstantsColors.blueShade900,
-        ),
-      );
+
+      widget.need.isFavorite = newFavoriteState;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newFavoriteState
+                ? 'Adicionado aos favoritos!'
+                : 'Removido dos favoritos.'),
+            backgroundColor: ConstantsColors.blueShade900,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar favorito: $e')),
-      );
+      if (mounted) {
+        setState(() {
+          _isFavorite = !newFavoriteState;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar favorito: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +114,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     backgroundColor: _isFavorite
                         ? ConstantsColors.blueShade900
                         : Colors.grey.withOpacity(0.5),
-                    child: const IconButton(
-                      icon: Icon(Icons.favorite, color: Colors.white),
-                      onPressed: null, //_toggleFavorite,
+                    child: IconButton(
+                      icon: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.white),
+                      onPressed: _isLoading ? null : _toggleFavorite,
                     ),
                   ),
                 ),

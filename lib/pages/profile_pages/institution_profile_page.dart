@@ -1,3 +1,5 @@
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -10,7 +12,21 @@ import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
-  const InstitutionProfilePage({super.key});
+  
+  final String userId;
+  final String userName;
+  final String userEmail;
+  final String userImageUrl;
+  final bool isInitiallyFavorite;
+
+  const InstitutionProfilePage({
+    super.key,
+    required this.userId,
+    required this.userName,
+    required this.userEmail,
+    required this.userImageUrl,
+    this.isInitiallyFavorite = false,
+  });
 
   @override
   State<InstitutionProfilePage> createState() => _InstitutionProfilePageState();
@@ -18,6 +34,63 @@ class InstitutionProfilePage extends StatefulWidget {
 
 class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   int selectedTab = 0;
+
+  late final FavoriteApiService _favoriteApiService;
+  final ApiClient _apiClient = ApiClient();
+  late bool _isFavorite;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _favoriteApiService = FavoriteApiService(_apiClient);
+    _isFavorite = widget.isInitiallyFavorite;
+  }
+
+  void _toggleFavorite() async {
+    if (_isLoading) return;
+
+    final newFavoriteState = !_isFavorite;
+
+    setState(() {
+      _isLoading = true;
+      _isFavorite = newFavoriteState;
+    });
+
+    try {
+      if (newFavoriteState) {
+        await _favoriteApiService.addFavoriteUser(widget.userId);
+      } else {
+        await _favoriteApiService.removeFavoriteUser(widget.userId);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newFavoriteState
+                ? 'Adicionado aos favoritos!'
+                : 'Removido dos favoritos.'),
+            backgroundColor: ConstantsColors.blueShade900,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isFavorite = !newFavoriteState;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar favorito: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   final List<String> posts = [
     "assets/donations.jpg",
@@ -42,68 +115,10 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       createdAt: DateTime(2025, 8, 12),
       category: "doacao",
     ),
-    PostModel(
-      id: "2",
-      title: "Vestuário - Doação",
-      description: "Doação de roupas variadas para pessoas em situação de rua.",
-      quantity: 50,
-      imageUrl: "assets/donations.jpg",
-      location: "Rio Vermelho, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 20),
-      category: "doacao",
-    ),
-    PostModel(
-      id: "3",
-      title: "Sapatos - Doação",
-      description: "Distribuição de sapatos para comunidades carentes.",
-      quantity: 20,
-      imageUrl: "assets/donations2.jpg",
-      location: "Pituba, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 25),
-      category: "doacao",
-    ),
-    PostModel(
-      id: "4",
-      title: "Cobertores - Doação",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "doacao",
-    ),
-    PostModel(
-      id: "5",
-      title: "Cobertores - Necessidade",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "necessidade",
-    ),
   ];
 
   final List<Map<String, String>> notasFiscais = [
     {"titulo": "Exemplo de Nota Fiscal", "dataEmissao": "12/08/2025"},
-    {
-      "titulo": "Nota Fiscal para o Instituto Doação",
-      "dataEmissao": "20/08/2025"
-    },
-    {
-      "titulo": "Nota Fiscal para o Instituto Necessidade",
-      "dataEmissao": "25/08/2025"
-    },
   ];
 
   @override
@@ -129,11 +144,13 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage(
-                      "assets/profile.jpg",
-                    ),
+                    backgroundImage: NetworkImage(widget.userImageUrl),
+                    onBackgroundImageError: (_, __) {},
+                    child: widget.userImageUrl.isEmpty
+                        ? const Icon(Icons.person, size: 40)
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -141,7 +158,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Lucia Fontes",
+                          widget.userName,
                           style: TextStylesConstants.kpoppinsMedium.merge(
                             const TextStyle(
                               fontSize: 16,
@@ -166,7 +183,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                                 size: 16, color: ConstantsColors.blueShade900),
                             const SizedBox(width: 4),
                             Text(
-                              "luciafontes@gmail.com",
+                              widget.userEmail,
                               style: TextStylesConstants.kinterRegular.merge(
                                 const TextStyle(
                                   fontSize: 13,
@@ -182,14 +199,14 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                   Transform.translate(
                     offset: const Offset(5, -25),
                     child: IconButton(
-                      icon: const Icon(
-                        Icons.favorite,
-                        color: ConstantsColors.blueShade900,
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: _isFavorite
+                            ? ConstantsColors.blueShade900
+                            : Colors.grey,
                         size: 30,
                       ),
-                      onPressed: () {
-                        //ação para tirar dos favoritos
-                      },
+                      onPressed: _isLoading ? null : _toggleFavorite,
                     ),
                   ),
                 ],

@@ -5,10 +5,12 @@ import 'package:appdonationsgestor/controllers/post_type_controller.dart';
 import 'package:appdonationsgestor/controllers/product_registration_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:appdonationsgestor/services/api_services.dart';
 import 'package:appdonationsgestor/services/storage_service.dart';
 
 class ItemPostPage extends StatefulWidget {
@@ -22,12 +24,23 @@ class _ItemPostPageState extends State<ItemPostPage> {
   final ProductRegistrationController _controller =
       ProductRegistrationController();
   final PostTypeController _controller1 = PostTypeController();
-  final ApiService _apiService = ApiService();
-  final StorageService _storageService =
-      StorageService(); // Instancie o StorageService
+
+  // 1. Declare os serviços, mas NÃO os inicialize aqui
+  final ApiClient _apiClient = ApiClient();
+  late final NeedApiService _needsApiService;
+  late final DonationApiService _donationApiService;
+  final StorageService _storageService = StorageService();
 
   File? _selectedImg;
   bool _isLoading = false;
+
+  // 2. Inicialize os serviços dependentes no initState
+  @override
+  void initState() {
+    super.initState();
+    _needsApiService = NeedApiService(_apiClient);
+    _donationApiService = DonationApiService(_apiClient);
+  }
 
   Future pickImage(ImageSource source) async {
     final selectedImage = await ImagePicker().pickImage(source: source);
@@ -74,10 +87,20 @@ class _ItemPostPageState extends State<ItemPostPage> {
     setState(() => _isLoading = true);
 
     try {
-      String? imageUrl = r'C:\Users\kkjun\DonationApp\assets\donations.jpg';
+      String? imageUrl;
       if (_selectedImg != null) {
-        imageUrl = await _storageService.uploadImage(_selectedImg!,
-            'post_images'); // CORRIGIR DEPOIS, PELO EMULADOR NÃO GERA URL DE IMAGEM
+        try {
+          imageUrl =
+              await _storageService.uploadImage(_selectedImg!, 'post_images');
+        } catch (e) {
+          print("Erro no upload da imagem: $e");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                    'Erro ao fazer upload da imagem: $e. Usando imagem padrão.')),
+          );
+          imageUrl = 'assets/donations.jpg';
+        }
       }
 
       final itemName = _controller.crtlItemName.text;
@@ -87,7 +110,7 @@ class _ItemPostPageState extends State<ItemPostPage> {
       final postType = _controller1.selectedValueCategory.value!;
 
       if (postType == 'Necessidade') {
-        await _apiService.createNeed({
+        await _needsApiService.createNeed({
           'title': itemName,
           'description': description,
           'quantity': quantity,
@@ -96,25 +119,29 @@ class _ItemPostPageState extends State<ItemPostPage> {
           'date': DateTime.now().toIso8601String().split('T').first,
           'imageUrl': imageUrl,
         });
-        GoRouter.of(context).push('/feedback?text1=Necessidade');
+        if (mounted) GoRouter.of(context).push('/feedback?text1=Necessidade');
       } else if (postType == 'Doação') {
-        await _apiService.createDonation({
+        await _donationApiService.createDonation({
           'title': itemName,
           'description': description,
           'quantity': quantity,
           'category': category.toUpperCase(),
           'date': DateTime.now().toIso8601String().split('T').first,
           'status': 'PENDENTE',
-          'imageUrl': imageUrl, 
+          'imageUrl': imageUrl,
         });
-        GoRouter.of(context).push('/feedback?text1=Doação');
+        if (mounted) GoRouter.of(context).push('/feedback?text1=Doação');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao publicar: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao publicar: $e')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

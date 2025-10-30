@@ -1,20 +1,14 @@
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/favorite_card.dart';
-
-class ItemModel {
-  final String name;
-  final String description;
-  final String imageUrl;
-  final String category;
-
-  ItemModel({
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.category,
-  });
-}
+import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -28,40 +22,27 @@ class _FavoritesPageState extends State<FavoritesPage> {
   int _filtroSelecionadoIndex = 0;
   final List<String> _filtros = [
     'Todos',
-    // 'Doadores',
     'Instituições',
     'Necessidades',
     'Doações'
   ];
 
-  final List<ItemModel> _todosOsFavoritos = [
-    ItemModel(
-        name: 'Lucia Andrade',
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        imageUrl:
-            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-        category: 'Doadores'),
-    ItemModel(
-        name: 'Instituto dos Idosos',
-        description: 'Instituto sem fins lucrativos! Apoie essa causa',
-        imageUrl: 'assets/instituicao.png',
-        category: 'Instituições'),
-    ItemModel(
-        name: 'Marcia Vieira',
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        imageUrl:
-            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-        category: 'Doadores'),
-  ];
+  late final FavoriteApiService _favoriteApiService;
+  final ApiClient _apiClient = ApiClient();
 
-  List<ItemModel> _itensFiltrados = [];
+  List<Donation> _favoriteDonations = [];
+  List<Need> _favoriteNeeds = [];
+  List<Map<String, dynamic>> _favoriteUsers = [];
+
+  List<dynamic> _itensFiltrados = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _itensFiltrados = _todosOsFavoritos;
+    _favoriteApiService = FavoriteApiService(_apiClient);
+    _loadAllFavorites();
     _searchController.addListener(_filtrarFavoritos);
   }
 
@@ -72,28 +53,103 @@ class _FavoritesPageState extends State<FavoritesPage> {
     super.dispose();
   }
 
+  Future<void> _loadAllFavorites() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final donationsFuture =
+          _favoriteApiService.getFavoriteDonations(page: 0, size: 50);
+      final needsFuture =
+          _favoriteApiService.getFavoriteNeeds(page: 0, size: 50);
+      final usersFuture =
+          _favoriteApiService.getFavoriteUsers(page: 0, size: 50);
+
+      final results =
+          await Future.wait([donationsFuture, needsFuture, usersFuture]);
+
+      _favoriteDonations = (results[0] as PaginatedResponse<Donation>).content;
+      _favoriteNeeds = (results[1] as PaginatedResponse<Need>).content;
+      _favoriteUsers =
+          (results[2] as PaginatedResponse<Map<String, dynamic>>).content;
+
+      _filtrarFavoritos();
+    } catch (e) {
+      setState(() {
+        _errorMessage = "Erro ao carregar favoritos: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void _filtrarFavoritos() {
-    List<ItemModel> tempItens = [];
     final categoriaSelecionada = _filtros[_filtroSelecionadoIndex];
     final textoBusca = _searchController.text.toLowerCase();
+    List<dynamic> tempItens = [];
 
-    if (categoriaSelecionada == 'Todos') {
-      tempItens = _todosOsFavoritos;
-    } else {
-      tempItens = _todosOsFavoritos.where((item) {
-        return item.category == categoriaSelecionada;
-      }).toList();
+    switch (categoriaSelecionada) {
+      case 'Instituições':
+        tempItens = _favoriteUsers;
+        break;
+      case 'Necessidades':
+        tempItens = _favoriteNeeds;
+        break;
+      case 'Doações':
+        tempItens = _favoriteDonations;
+        break;
+      case 'Todos':
+      default:
+        tempItens = [
+          ..._favoriteUsers,
+          ..._favoriteNeeds,
+          ..._favoriteDonations
+        ];
     }
 
     if (textoBusca.isNotEmpty) {
       tempItens = tempItens.where((item) {
-        return item.name.toLowerCase().contains(textoBusca);
+        String name = '';
+        if (item is Donation) {
+          name = item.title;
+        } else if (item is Need) {
+          name = item.title;
+        } else if (item is Map) {
+          name = item['name'] ?? '';
+        }
+        return name.toLowerCase().contains(textoBusca);
       }).toList();
     }
 
     setState(() {
       _itensFiltrados = tempItens;
     });
+  }
+
+  Future<void> _removeItem(dynamic item) async {
+    try {
+      if (item is Donation) {
+        await _favoriteApiService.removeFavoriteDonation(item.id);
+        setState(() => _favoriteDonations.remove(item));
+      } else if (item is Need) {
+        await _favoriteApiService.removeFavoriteNeed(item.id);
+        setState(() => _favoriteNeeds.remove(item));
+      } else if (item is Map) {
+        await _favoriteApiService.removeFavoriteUser(item['firebaseUid']);
+        setState(() => _favoriteUsers.remove(item));
+      }
+      _filtrarFavoritos(); // Atualiza a lista exibida
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao remover favorito: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildFilterChip({
@@ -201,31 +257,93 @@ class _FavoritesPageState extends State<FavoritesPage> {
               ),
             ),
             Expanded(
-              child: _itensFiltrados.isEmpty
-                  ? const Center(child: Text('Nenhum favorito encontrado.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      itemCount: _itensFiltrados.length,
-                      itemBuilder: (context, index) {
-                        final item = _itensFiltrados[index];
-                        return FavoriteCard(
-                          name: item.name,
-                          description: item.description,
-                          imageUrl: item.imageUrl,
-                          onDelete: () {
-                            setState(() {
-                              _todosOsFavoritos.removeWhere((originalItem) =>
-                                  originalItem.name == item.name);
-                              _itensFiltrados.remove(item);
-                            });
-                          },
-                        );
-                      },
-                    ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _errorMessage.isNotEmpty
+                      ? Center(
+                          child: Text(_errorMessage,
+                              style: const TextStyle(color: Colors.red)))
+                      : _itensFiltrados.isEmpty
+                          ? const Center(
+                              child: Text('Nenhum favorito encontrado.'))
+                          : ListView.builder(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              itemCount: _itensFiltrados.length,
+                              itemBuilder: (context, index) {
+                                final item = _itensFiltrados[index];
+                                return _buildFavoriteCard(item);
+                              },
+                            ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFavoriteCard(dynamic item) {
+    String name = 'Nome não encontrado';
+    String description = 'Descrição não disponível';
+    String imageUrl = 'assets/placeholder.png';
+    bool isNetwork = false;
+    VoidCallback? onTap;
+
+    if (item is Donation) {
+      name = item.title;
+      description = item.description;
+      // imageUrl = item.imageUrl ?? imageUrl;
+      // isNetwork = item.imageUrl != null;
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DonationDetailPage(donation: item),
+          ),
+        );
+      };
+    } else if (item is Need) {
+      name = item.title;
+      description = item.description;
+      // imageUrl = item.imageUrl ?? imageUrl;
+      // isNetwork = item.imageUrl != null;
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NeedDetailPage(need: item),
+          ),
+        );
+      };
+    } else if (item is Map) {
+      name = item['name'] ?? name;
+      description = item['email'] ?? description;
+      imageUrl = item['profilePictureUrl'] ?? imageUrl;
+      isNetwork = item['profilePictureUrl'] != null &&
+          item['profilePictureUrl'].isNotEmpty;
+
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InstitutionProfilePage(
+              userId: item['firebaseUid'] ?? '',
+              userName: item['name'] ?? 'Usuário',
+              userEmail: item['email'] ?? 'Email não disponível',
+              userImageUrl: item['profilePictureUrl'] ?? '',
+              isInitiallyFavorite: true,
+            ),
+          ),
+        );
+      };
+    }
+
+    return FavoriteCard(
+      name: name,
+      description: description,
+      imageUrl: isNetwork ? imageUrl : 'assets/instituicao.png',
+      isNetwork: isNetwork,
+      onDelete: () => _removeItem(item),
     );
   }
 }

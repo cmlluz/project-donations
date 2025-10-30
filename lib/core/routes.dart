@@ -87,7 +87,7 @@ class AppRountersConfiguration {
           path: '/itemPostPage',
           name: RouteNames.itemPostPage,
           pageBuilder: (context, state) {
-            return MaterialPage(
+            return const MaterialPage(
               child: ItemPostPage(),
             );
           },
@@ -97,7 +97,13 @@ class AppRountersConfiguration {
           name: RouteNames.institutionProfilePage,
           pageBuilder: (context, state) {
             return const MaterialPage(
-              child: InstitutionProfilePage(),
+              child: InstitutionProfilePage(
+                userId: '',
+                isInitiallyFavorite: false,
+                userEmail: '',
+                userImageUrl: '',
+                userName: '',
+              ),
             );
           },
         ),

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
-import 'package:appdonationsgestor/services/api_services.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
 
 class AppSearchController with ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  final ApiClient _apiClient = ApiClient();
+  late final NeedApiService _needsApiService;
+  late final DonationApiService _donationApiService;
+  late final FavoriteApiService _favoriteApiService;
 
   List<SearchItem> _allItems = [];
   List<SearchItem> get allItems => _allItems;
@@ -17,21 +25,48 @@ class AppSearchController with ChangeNotifier {
   SearchCategory _selectedCategory = SearchCategory.todos;
   SearchCategory get selectedCategory => _selectedCategory;
 
+  AppSearchController() {
+    _needsApiService = NeedApiService(_apiClient);
+    _donationApiService = DonationApiService(_apiClient);
+    _favoriteApiService = FavoriteApiService(_apiClient);
+  }
+
   Future<void> loadItems() async {
+    if (_isLoading) return;
     _isLoading = true;
     notifyListeners();
 
     try {
-      final needs = await _apiService.getNeeds();
-      final donations = await _apiService.getDonations();
-      // final posts = await _apiService.getPosts(); // Descomente quando quiser adicionar posts
+      final needsFuture = _needsApiService.getNeeds();
+      final donationsFuture = _donationApiService.getDonations();
+      final favDonationIdsFuture = _favoriteApiService.getFavoriteDonationIds();
+      final favNeedIdsFuture = _favoriteApiService.getFavoriteNeedIds();
+
+      final List<dynamic> results = await Future.wait([
+        needsFuture,
+        donationsFuture,
+        favDonationIdsFuture,
+        favNeedIdsFuture
+      ]);
+
+      final List<Need> needs = results[0] as List<Need>;
+      final List<Donation> donations = results[1] as List<Donation>;
+      final Set<int> favDonationIds = results[2] as Set<int>;
+      final Set<int> favNeedIds = results[3] as Set<int>;
+
+      for (var n in needs) {
+        n.isFavorite = favNeedIds.contains(n.id);
+      }
+      for (var d in donations) {
+        d.isFavorite = favDonationIds.contains(d.id);
+      }
 
       _allItems = [
         ...needs.map((n) => SearchItem(
               id: n.id,
               title: n.title,
               description: n.description,
-              imageUrl: 'assets/placeholder.png',
+              imageUrl: 'assets/donations.png',
               category: SearchCategory.necessidade,
               institution: n.authorName,
               date: n.date ?? DateTime.now(),
@@ -42,7 +77,7 @@ class AppSearchController with ChangeNotifier {
               id: d.id,
               title: d.title,
               description: d.description,
-              imageUrl: 'assets/placeholder.png',
+              imageUrl: 'assets/donations.png',
               category: SearchCategory.doacao,
               institution: d.donatorName,
               date: d.date ?? DateTime.now(),
@@ -51,11 +86,12 @@ class AppSearchController with ChangeNotifier {
             )),
       ];
     } catch (e) {
-      print('Erro ao carregar itens: $e');
+      print('Erro ao carregar itens no AppSearchController: $e');
+      _allItems = [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   void updateSearchQuery(String query) {

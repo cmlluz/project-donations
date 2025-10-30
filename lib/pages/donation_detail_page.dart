@@ -2,54 +2,85 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/services/api_services.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:intl/intl.dart';
 
 class DonationDetailPage extends StatefulWidget {
   final Donation donation;
 
-  const DonationDetailPage({Key? key, required this.donation}) : super(key: key);
+  const DonationDetailPage({Key? key, required this.donation})
+      : super(key: key);
 
   @override
   State<DonationDetailPage> createState() => _DonationDetailPageState();
 }
 
 class _DonationDetailPageState extends State<DonationDetailPage> {
-  final ApiService _apiService = ApiService();
+  // Instancie o ApiClient e o FavoriteApiService
+  final ApiClient _apiClient = ApiClient();
+  late final FavoriteApiService _favoriteApiService;
+
   late bool _isFavorite;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    // Inicialize o serviço
+    _favoriteApiService = FavoriteApiService(_apiClient);
     _isFavorite = widget.donation.isFavorite;
   }
 
-  /*void _toggleFavorite() async {
+  void _toggleFavorite() async {
+    // Evita cliques duplos
+    if (_isLoading) return;
+
     final newFavoriteState = !_isFavorite;
-    const type = 'doacao';
-    final id = widget.donation.id.toString();
+    final donationId = widget.donation.id;
+
+    setState(() {
+      _isLoading = true;
+      // Atualização otimista da UI
+      _isFavorite = newFavoriteState;
+    });
 
     try {
       if (newFavoriteState) {
-        await _apiService.addFavorite(type, id);
+        await _favoriteApiService.addFavoriteDonation(donationId);
       } else {
-        await _apiService.removeFavorite(type, id);
+        await _favoriteApiService.removeFavoriteDonation(donationId);
       }
-      setState(() {
-        _isFavorite = newFavoriteState;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(newFavoriteState ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.'),
-          backgroundColor: ConstantsColors.blueShade900,
-        ),
-      );
+
+      widget.donation.isFavorite = newFavoriteState;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newFavoriteState
+                ? 'Adicionado aos favoritos!'
+                : 'Removido dos favoritos.'),
+            backgroundColor: ConstantsColors.blueShade900,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar favorito: $e')),
-      );
+      if (mounted) {
+        setState(() {
+          _isFavorite = !newFavoriteState;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar favorito: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +120,14 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     backgroundColor: _isFavorite
                         ? ConstantsColors.blueShade900
                         : Colors.grey.withOpacity(0.5),
-                    child: const IconButton(
-                      icon: Icon(Icons.favorite, color: Colors.white),
-                      onPressed: null, //_toggleFavorite,
+                    child: IconButton(
+                      // Removido o 'const'
+                      icon: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.white),
+                      onPressed: _isLoading
+                          ? null
+                          : _toggleFavorite, // Habilita o onPressed
                     ),
                   ),
                 ),
