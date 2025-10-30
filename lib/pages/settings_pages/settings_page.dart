@@ -45,6 +45,12 @@ class _SettingsPage extends State<SettingsPage> {
               },
             ),
             _buildSettingOption(
+              title: 'Vincular a Conta',
+              onTap: () {
+                GoRouter.of(context).pushNamed('linkManagerPage');
+              },
+            ),
+            _buildSettingOption(
               title: 'Notificações',
               icon: isNotificationOn
                   ? Icons.toggle_on
