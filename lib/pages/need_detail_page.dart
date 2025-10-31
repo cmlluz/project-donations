@@ -1,10 +1,10 @@
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class NeedDetailPage extends StatefulWidget {
   final Need need;
@@ -16,23 +16,22 @@ class NeedDetailPage extends StatefulWidget {
 }
 
 class _NeedDetailPageState extends State<NeedDetailPage> {
-  final ApiClient _apiClient = ApiClient();
-  late final FavoriteApiService _favoriteApiService;
   late bool _isFavorite;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _favoriteApiService = FavoriteApiService(_apiClient);
-    _isFavorite = widget.need.isFavorite;
+    _isFavorite = Provider.of<FavoriteController>(context, listen: false)
+        .isNeedFavorite(widget.need.id);
   }
 
   void _toggleFavorite() async {
     if (_isLoading) return;
 
     final newFavoriteState = !_isFavorite;
-    final needId = widget.need.id;
+    final favController =
+        Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
       _isLoading = true;
@@ -41,9 +40,9 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
 
     try {
       if (newFavoriteState) {
-        await _favoriteApiService.addFavoriteNeed(needId);
+        await favController.addFavoriteNeed(widget.need);
       } else {
-        await _favoriteApiService.removeFavoriteNeed(needId);
+        await favController.removeFavoriteNeed(widget.need);
       }
 
       widget.need.isFavorite = newFavoriteState;

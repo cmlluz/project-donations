@@ -1,55 +1,47 @@
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DonationDetailPage extends StatefulWidget {
   final Donation donation;
 
-  const DonationDetailPage({Key? key, required this.donation})
-      : super(key: key);
+  const DonationDetailPage({Key? key, required this.donation}) : super(key: key);
 
   @override
   State<DonationDetailPage> createState() => _DonationDetailPageState();
 }
 
 class _DonationDetailPageState extends State<DonationDetailPage> {
-  // Instancie o ApiClient e o FavoriteApiService
-  final ApiClient _apiClient = ApiClient();
-  late final FavoriteApiService _favoriteApiService;
-
   late bool _isFavorite;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Inicialize o serviço
-    _favoriteApiService = FavoriteApiService(_apiClient);
-    _isFavorite = widget.donation.isFavorite;
+    _isFavorite = Provider.of<FavoriteController>(context, listen: false)
+        .isDonationFavorite(widget.donation.id);
   }
 
   void _toggleFavorite() async {
-    // Evita cliques duplos
     if (_isLoading) return;
 
     final newFavoriteState = !_isFavorite;
-    final donationId = widget.donation.id;
+    final favController = Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
       _isLoading = true;
-      // Atualização otimista da UI
       _isFavorite = newFavoriteState;
     });
 
     try {
       if (newFavoriteState) {
-        await _favoriteApiService.addFavoriteDonation(donationId);
+        await favController.addFavoriteDonation(widget.donation);
       } else {
-        await _favoriteApiService.removeFavoriteDonation(donationId);
+        await favController.removeFavoriteDonation(widget.donation);
       }
 
       widget.donation.isFavorite = newFavoriteState;
@@ -121,13 +113,10 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                         ? ConstantsColors.blueShade900
                         : Colors.grey.withOpacity(0.5),
                     child: IconButton(
-                      // Removido o 'const'
                       icon: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
                           color: Colors.white),
-                      onPressed: _isLoading
-                          ? null
-                          : _toggleFavorite, // Habilita o onPressed
+                      onPressed: _isLoading ? null : _toggleFavorite,
                     ),
                   ),
                 ),

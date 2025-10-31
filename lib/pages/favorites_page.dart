@@ -1,14 +1,13 @@
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/favorite_card.dart';
-import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
+import 'package:provider/provider.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -27,122 +26,33 @@ class _FavoritesPageState extends State<FavoritesPage> {
     'Doações'
   ];
 
-  late final FavoriteApiService _favoriteApiService;
-  final ApiClient _apiClient = ApiClient();
-
-  List<Donation> _favoriteDonations = [];
-  List<Need> _favoriteNeeds = [];
-  List<Map<String, dynamic>> _favoriteUsers = [];
-
-  List<dynamic> _itensFiltrados = [];
-  bool _isLoading = false;
-  String _errorMessage = '';
-
   @override
   void initState() {
     super.initState();
-    _favoriteApiService = FavoriteApiService(_apiClient);
-    _loadAllFavorites();
-    _searchController.addListener(_filtrarFavoritos);
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
-    _searchController.removeListener(_filtrarFavoritos);
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadAllFavorites() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final donationsFuture =
-          _favoriteApiService.getFavoriteDonations(page: 0, size: 50);
-      final needsFuture =
-          _favoriteApiService.getFavoriteNeeds(page: 0, size: 50);
-      final usersFuture =
-          _favoriteApiService.getFavoriteUsers(page: 0, size: 50);
-
-      final results =
-          await Future.wait([donationsFuture, needsFuture, usersFuture]);
-
-      _favoriteDonations = (results[0] as PaginatedResponse<Donation>).content;
-      _favoriteNeeds = (results[1] as PaginatedResponse<Need>).content;
-      _favoriteUsers =
-          (results[2] as PaginatedResponse<Map<String, dynamic>>).content;
-
-      _filtrarFavoritos();
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Erro ao carregar favoritos: $e";
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  void _onSearchChanged() {
+    setState(() {});
   }
 
-  void _filtrarFavoritos() {
-    final categoriaSelecionada = _filtros[_filtroSelecionadoIndex];
-    final textoBusca = _searchController.text.toLowerCase();
-    List<dynamic> tempItens = [];
-
-    switch (categoriaSelecionada) {
-      case 'Instituições':
-        tempItens = _favoriteUsers;
-        break;
-      case 'Necessidades':
-        tempItens = _favoriteNeeds;
-        break;
-      case 'Doações':
-        tempItens = _favoriteDonations;
-        break;
-      case 'Todos':
-      default:
-        tempItens = [
-          ..._favoriteUsers,
-          ..._favoriteNeeds,
-          ..._favoriteDonations
-        ];
-    }
-
-    if (textoBusca.isNotEmpty) {
-      tempItens = tempItens.where((item) {
-        String name = '';
-        if (item is Donation) {
-          name = item.title;
-        } else if (item is Need) {
-          name = item.title;
-        } else if (item is Map) {
-          name = item['name'] ?? '';
-        }
-        return name.toLowerCase().contains(textoBusca);
-      }).toList();
-    }
-
-    setState(() {
-      _itensFiltrados = tempItens;
-    });
-  }
-
-  Future<void> _removeItem(dynamic item) async {
+  Future<void> _removeItem(BuildContext context, dynamic item) async {
+    final controller = context.read<FavoriteController>();
     try {
       if (item is Donation) {
-        await _favoriteApiService.removeFavoriteDonation(item.id);
-        setState(() => _favoriteDonations.remove(item));
+        await controller.removeFavoriteDonation(item);
       } else if (item is Need) {
-        await _favoriteApiService.removeFavoriteNeed(item.id);
-        setState(() => _favoriteNeeds.remove(item));
+        await controller.removeFavoriteNeed(item);
       } else if (item is Map) {
-        await _favoriteApiService.removeFavoriteUser(item['firebaseUid']);
-        setState(() => _favoriteUsers.remove(item));
+        await controller.removeFavoriteUser(item['firebaseUid']);
       }
-      _filtrarFavoritos(); // Atualiza a lista exibida
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -189,96 +99,139 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ConstantsColors.whiteShade700,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'Favoritos',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: ConstantsColors.blueShade900,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'O que você busca?',
-                  suffixIcon: const Icon(Icons.search),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
+    return Consumer<FavoriteController>(
+      builder: (context, controller, child) {
+        final List<dynamic> itensFiltrados;
+        final categoriaSelecionada = _filtros[_filtroSelecionadoIndex];
+        final textoBusca = _searchController.text.toLowerCase();
+        List<dynamic> tempItens = [];
+
+        switch (categoriaSelecionada) {
+          case 'Instituições':
+            tempItens = controller.favoriteUsers;
+            break;
+          case 'Necessidades':
+            tempItens = controller.favoriteNeeds;
+            break;
+          case 'Doações':
+            tempItens = controller.favoriteDonations;
+            break;
+          case 'Todos':
+          default:
+            tempItens = [
+              ...controller.favoriteUsers,
+              ...controller.favoriteNeeds,
+              ...controller.favoriteDonations
+            ];
+        }
+
+        if (textoBusca.isNotEmpty) {
+          itensFiltrados = tempItens.where((item) {
+            String name = '';
+            if (item is Donation) {
+              name = item.title;
+            } else if (item is Need) {
+              name = item.title;
+            } else if (item is Map) {
+              name = item['name'] ?? '';
+            }
+            return name.toLowerCase().contains(textoBusca);
+          }).toList();
+        } else {
+          itensFiltrados = tempItens;
+        }
+
+        return Scaffold(
+          backgroundColor: ConstantsColors.whiteShade700,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Favoritos',
+                    style: TextStyle(
+                      fontSize: 30,
                       color: ConstantsColors.blueShade900,
-                      width: 1.0,
+                      fontFamily: 'Poppins',
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
-                      color: ConstantsColors.blueShade900,
-                      width: 1.5,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'O que você busca?',
+                      suffixIcon: const Icon(Icons.search),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          color: ConstantsColors.blueShade900,
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          color: ConstantsColors.blueShade900,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: ConstantsColors.whiteShade700,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 20),
                     ),
                   ),
-                  filled: true,
-                  fillColor: ConstantsColors.whiteShade700,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                 ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 60,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  children: List.generate(_filtros.length, (index) {
-                    return _buildFilterChip(
-                      text: _filtros[index],
-                      isSelected: _filtroSelecionadoIndex == index,
-                      onTap: () {
-                        setState(() {
-                          _filtroSelecionadoIndex = index;
-                        });
-                        _filtrarFavoritos();
-                      },
-                    );
-                  }),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 60,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: List.generate(_filtros.length, (index) {
+                        return _buildFilterChip(
+                          text: _filtros[index],
+                          isSelected: _filtroSelecionadoIndex == index,
+                          onTap: () {
+                            setState(() {
+                              _filtroSelecionadoIndex = index;
+                            });
+                          },
+                        );
+                      }),
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: controller.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : controller.errorMessage.isNotEmpty
+                          ? Center(
+                              child: Text(controller.errorMessage,
+                                  style: const TextStyle(color: Colors.red)))
+                          : itensFiltrados.isEmpty
+                              ? const Center(
+                                  child: Text('Nenhum favorito encontrado.'))
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  itemCount: itensFiltrados.length,
+                                  itemBuilder: (context, index) {
+                                    final item = itensFiltrados[index];
+                                    return _buildFavoriteCard(item);
+                                  },
+                                ),
+                ),
+              ],
             ),
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _errorMessage.isNotEmpty
-                      ? Center(
-                          child: Text(_errorMessage,
-                              style: const TextStyle(color: Colors.red)))
-                      : _itensFiltrados.isEmpty
-                          ? const Center(
-                              child: Text('Nenhum favorito encontrado.'))
-                          : ListView.builder(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              itemCount: _itensFiltrados.length,
-                              itemBuilder: (context, index) {
-                                final item = _itensFiltrados[index];
-                                return _buildFavoriteCard(item);
-                              },
-                            ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -292,8 +245,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
     if (item is Donation) {
       name = item.title;
       description = item.description;
-      // imageUrl = item.imageUrl ?? imageUrl;
-      // isNetwork = item.imageUrl != null;
       onTap = () {
         Navigator.push(
           context,
@@ -305,8 +256,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } else if (item is Need) {
       name = item.title;
       description = item.description;
-      // imageUrl = item.imageUrl ?? imageUrl;
-      // isNetwork = item.imageUrl != null;
       onTap = () {
         Navigator.push(
           context,
@@ -343,7 +292,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
       description: description,
       imageUrl: isNetwork ? imageUrl : 'assets/instituicao.png',
       isNetwork: isNetwork,
-      onDelete: () => _removeItem(item),
+      onDelete: () => _removeItem(context, item),
+      onTap: onTap,
     );
   }
 }

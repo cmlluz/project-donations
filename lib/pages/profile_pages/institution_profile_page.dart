@@ -1,5 +1,4 @@
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -10,9 +9,9 @@ import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:provider/provider.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
-  
   final String userId;
   final String userName;
   final String userEmail;
@@ -34,23 +33,29 @@ class InstitutionProfilePage extends StatefulWidget {
 
 class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   int selectedTab = 0;
-
-  late final FavoriteApiService _favoriteApiService;
-  final ApiClient _apiClient = ApiClient();
   late bool _isFavorite;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _favoriteApiService = FavoriteApiService(_apiClient);
-    _isFavorite = widget.isInitiallyFavorite;
+    _isFavorite = Provider.of<FavoriteController>(context, listen: false)
+        .isUserFavorite(widget.userId);
   }
 
   void _toggleFavorite() async {
     if (_isLoading) return;
 
     final newFavoriteState = !_isFavorite;
+    final favController =
+        Provider.of<FavoriteController>(context, listen: false);
+
+    final userMap = {
+      'firebaseUid': widget.userId,
+      'name': widget.userName,
+      'email': widget.userEmail,
+      'profilePictureUrl': widget.userImageUrl,
+    };
 
     setState(() {
       _isLoading = true;
@@ -59,9 +64,9 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
 
     try {
       if (newFavoriteState) {
-        await _favoriteApiService.addFavoriteUser(widget.userId);
+        await favController.addFavoriteUser(userMap);
       } else {
-        await _favoriteApiService.removeFavoriteUser(widget.userId);
+        await favController.removeFavoriteUser(userMap);
       }
 
       if (mounted) {
@@ -123,6 +128,14 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider profileImage;
+    if (widget.userImageUrl.isNotEmpty &&
+        widget.userImageUrl.startsWith('http')) {
+      profileImage = NetworkImage(widget.userImageUrl);
+    } else {
+      profileImage = const AssetImage("assets/profile.jpg");
+    }
+
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
       appBar: PreferredSize(
@@ -146,11 +159,8 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage(widget.userImageUrl),
+                    backgroundImage: profileImage,
                     onBackgroundImageError: (_, __) {},
-                    child: widget.userImageUrl.isEmpty
-                        ? const Icon(Icons.person, size: 40)
-                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
