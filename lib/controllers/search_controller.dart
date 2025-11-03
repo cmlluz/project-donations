@@ -155,6 +155,28 @@ class AppSearchController extends ChangeNotifier {
         institution: 'Biblioteca Comunitária',
         institutionImageUrl: 'assets/profile.jpg',
       ),
+      SearchItem(
+        id: '9',
+        title: 'Campanha do Agasalho',
+        description: 'Ajude a aquecer o inverno de quem precisa.',
+        imageUrl: 'assets/campanha_agasalho.png',
+        category: SearchCategory.campanha,
+        createdAt: DateTime(2025, 8, 2),
+        location: 'Barbalho, Salvador',
+        institution: 'Lar dos Idosos',
+        institutionImageUrl: 'assets/instituicao.png',
+      ),
+      SearchItem(
+        id: '10',
+        title: 'Campanha de Alimentos',
+        description: 'Arrecadação de alimentos não perecíveis.',
+        imageUrl: 'assets/campanha_alimentos.png',
+        category: SearchCategory.campanha,
+        createdAt: DateTime(2025, 9, 10),
+        location: 'Liberdade, Salvador',
+        institution: 'Casa da Esperança',
+        institutionImageUrl: 'assets/instituicao.png',
+      ),
     ];
   }
 }

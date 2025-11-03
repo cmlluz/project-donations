@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 import 'package:go_router/go_router.dart';
 
 class GenericFilterPage extends StatelessWidget {
@@ -55,12 +56,10 @@ class GenericFilterPage extends StatelessWidget {
   List<SearchItem> _getFilteredItems() {
     var filtered = items;
 
-    // Filter by category
     if (category != SearchCategory.todos) {
       filtered = filtered.where((item) => item.category == category).toList();
     }
 
-    // Filter by search query
     if (searchQuery != null && searchQuery!.isNotEmpty) {
       filtered = filtered
           .where((item) =>
@@ -150,6 +149,15 @@ class GenericFilterPage extends StatelessWidget {
       category: item.category.name,
     );
 
-    GoRouter.of(context).push('/postDetailPage', extra: post);
+    if (item.category == SearchCategory.campanha) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CampaignDetailsPage(post: post),
+        ),
+      );
+    } else {
+      GoRouter.of(context).push('/postDetailPage', extra: post);
+    }
   }
 }
