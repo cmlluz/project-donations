@@ -35,6 +35,21 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                     width: double.infinity,
                     height: 400,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 400,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: const Icon(
+                          Icons.image,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Positioned(
@@ -136,7 +151,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                     color: ConstantsColors.blueShade900, size: 18),
                 const SizedBox(width: 6),
                 Text(
-                  '27/07/2025 a 27/08/2025', 
+                  '27/07/2025 a 27/08/2025',
                   // importar do back
                   style: const TextStyle(
                     fontSize: 14,
