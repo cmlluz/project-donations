@@ -1,9 +1,11 @@
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
-import 'package:go_router/go_router.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -137,27 +139,40 @@ class GenericFilterPage extends StatelessWidget {
   }
 
   void _navigateToDetail(BuildContext context, SearchItem item) {
-    final post = PostModel(
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      location: item.location,
-      institution: item.institution,
-      institutionImageUrl: item.institutionImageUrl,
-      createdAt: item.createdAt,
-      category: item.category.name,
-    );
+    if (item.category == SearchCategory.necessidade) {
+      final need = Need(
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          authorName: item.institution,
+          category: item.category.toString(),
+          quantity: item.quantity,
+          status: item.status,
+          date: item.date);
 
-    if (item.category == SearchCategory.campanha) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CampaignDetailsPage(post: post),
+          builder: (context) => NeedDetailPage(need: need),
         ),
       );
-    } else {
-      GoRouter.of(context).push('/postDetailPage', extra: post);
+    } else if (item.category == SearchCategory.doacao) {
+      final donation = Donation(
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          donatorName: item.institution,
+          category: item.category.toString(),
+          quantity: item.quantity,
+          status: item.status,
+          date: item.date);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DonationDetailPage(donation: donation),
+        ),
+      );
+      // manter a lógica para outros tipos de itens
     }
   }
 }

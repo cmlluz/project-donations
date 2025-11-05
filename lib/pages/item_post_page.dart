@@ -1,15 +1,17 @@
 import 'dart:io';
-import 'package:appdonationsgestor/components/custom_button.dart';
-import 'package:appdonationsgestor/components/custom_text_field.dart';
+import 'package:appdonationsgestor/components/donation_item_component.dart';
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:appdonationsgestor/controllers/post_type_controller.dart';
 import 'package:appdonationsgestor/controllers/product_registration_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:appdonationsgestor/services/storage_service.dart';
 
 class ItemPostPage extends StatefulWidget {
   const ItemPostPage({super.key});
@@ -23,16 +25,30 @@ class _ItemPostPageState extends State<ItemPostPage> {
       ProductRegistrationController();
   final PostTypeController _controller1 = PostTypeController();
 
+  // 1. Declare os serviços, mas NÃO os inicialize aqui
+  final ApiClient _apiClient = ApiClient();
+  late final NeedApiService _needsApiService;
+  late final DonationApiService _donationApiService;
+  final StorageService _storageService = StorageService();
+
   File? _selectedImg;
+  bool _isLoading = false;
 
-  Future pickImageFromGallery(ImageSource source) async {
+  // 2. Inicialize os serviços dependentes no initState
+  @override
+  void initState() {
+    super.initState();
+    _needsApiService = NeedApiService(_apiClient);
+    _donationApiService = DonationApiService(_apiClient);
+  }
+
+  Future pickImage(ImageSource source) async {
     final selectedImage = await ImagePicker().pickImage(source: source);
-
-    setState(() {
-      if (selectedImage != null) {
+    if (selectedImage != null) {
+      setState(() {
         _selectedImg = File(selectedImage.path);
-      }
-    });
+      });
+    }
   }
 
   void _showImagePickerOptions() {
@@ -41,16 +57,92 @@ class _ItemPostPageState extends State<ItemPostPage> {
       builder: (context) {
         return ImagePickerOptionsSheet(
           onCameraTap: () {
-            pickImageFromGallery(ImageSource.camera);
+            pickImage(ImageSource.camera);
             Navigator.of(context).pop();
           },
           onGalleryTap: () {
-            pickImageFromGallery(ImageSource.gallery);
+            pickImage(ImageSource.gallery);
             Navigator.of(context).pop();
           },
         );
       },
     );
+  }
+
+  void _submitPost() async {
+    if (_controller.crtlItemName.text.isEmpty ||
+        _controller.crtlDesc.text.isEmpty ||
+        _selectedImg == null ||
+        _controller.selectedValueCategory.value == null ||
+        _controller.crtlQtd.text.isEmpty ||
+        _controller1.selectedValueCategory.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Por favor, preencha todos os campos e selecione uma imagem.')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      String? imageUrl;
+      if (_selectedImg != null) {
+        try {
+          imageUrl =
+              await _storageService.uploadImage(_selectedImg!, 'post_images');
+        } catch (e) {
+          print("Erro no upload da imagem: $e");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                    'Erro ao fazer upload da imagem: $e. Usando imagem padrão.')),
+          );
+          imageUrl = 'assets/donations.jpg';
+        }
+      }
+
+      final itemName = _controller.crtlItemName.text;
+      final description = _controller.crtlDesc.text;
+      final category = _controller.selectedValueCategory.value!;
+      final quantity = int.tryParse(_controller.crtlQtd.text) ?? 0;
+      final postType = _controller1.selectedValueCategory.value!;
+
+      if (postType == 'Necessidade') {
+        await _needsApiService.createNeed({
+          'title': itemName,
+          'description': description,
+          'quantity': quantity,
+          'category': category.toUpperCase(),
+          'status': 'PENDENTE',
+          'date': DateTime.now().toIso8601String().split('T').first,
+          'imageUrl': imageUrl,
+        });
+        if (mounted) GoRouter.of(context).push('/feedback?text1=Necessidade');
+      } else if (postType == 'Doação') {
+        await _donationApiService.createDonation({
+          'title': itemName,
+          'description': description,
+          'quantity': quantity,
+          'category': category.toUpperCase(),
+          'date': DateTime.now().toIso8601String().split('T').first,
+          'status': 'PENDENTE',
+          'imageUrl': imageUrl,
+        });
+        if (mounted) GoRouter.of(context).push('/feedback?text1=Doação');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao publicar: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -73,282 +165,26 @@ class _ItemPostPageState extends State<ItemPostPage> {
         centerTitle: true,
       ),
       backgroundColor: ConstantsColors.blueShade900,
-      body: Container(
-        decoration: const BoxDecoration(
-          color: ConstantsColors.whiteShade700,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(35),
-          ),
-        ),
-        padding: const EdgeInsets.all(30.0),
-        width: double.infinity,
-        height: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DonationItemComponent(
-                productRegistrationController: _controller,
-                postTypeController: _controller1,
-                onPickImage: _showImagePickerOptions,
-                selectedImg: _selectedImg,
-              ),
-              const Row(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class DonationItemComponent extends StatelessWidget {
-  final ProductRegistrationController productRegistrationController;
-  final PostTypeController postTypeController;
-  final VoidCallback onPickImage;
-  final File? selectedImg;
-
-  const DonationItemComponent({
-    super.key,
-    required this.productRegistrationController,
-    required this.postTypeController,
-    required this.onPickImage,
-    required this.selectedImg,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        productRegistrationController.selectedValueCategory,
-        productRegistrationController.itemQtdValue,
-        postTypeController.selectedValueCategory,
-        postTypeController.itemQtdValue,
-      ]),
-      builder: (_, __) {
-        return Column(
-          children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Nome do item'),
-            ),
-            const SizedBox(height: 10),
-            CustomTextFields(
-              icon: Icons.label,
-              secret: false,
-              controller: productRegistrationController.crtlItemName,
-              keyboardType: TextInputType.name,
-              labelColor: ConstantsColors.whiteShade700,
-            ),
-            const SizedBox(height: 10),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Descrição', textAlign: TextAlign.start),
-            ),
-            const SizedBox(height: 10),
-            CustomTextFields(
-              icon: Icons.edit_document,
-              secret: false,
-              controller: productRegistrationController.crtlDesc,
-              keyboardType: TextInputType.multiline,
-              labelColor: ConstantsColors.whiteShade700,
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: onPickImage,
-              child: DottedBorder(
-                borderType: BorderType.RRect,
-                radius: const Radius.circular(25.0),
-                color: ConstantsColors.blueShade900,
-                dashPattern: const [5, 5],
-                strokeWidth: 2,
-                child: Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(1, 91, 124, 0.05),
-                    borderRadius: BorderRadius.circular(25.0),
-                  ),
-                  child: selectedImg != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Image.file(
-                            selectedImg!,
-                            width: 350,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.image_search_outlined,
-                              size: 60,
-                              color: ConstantsColors.blueShade900,
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Adicione a foto aqui',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: ConstantsColors.greyShade600
-                                    .withOpacity(0.8),
-                              ),
-                            ),
-                            const Text(
-                              'Procurar',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: ConstantsColors.blueShade900,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Row(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Categoria'),
-                ),
-                SizedBox(width: 165),
-                Text('Quantidade'),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomDropDownButtonComponent(
-                  selected:
-                      productRegistrationController.selectedValueCategory.value,
-                  items: productRegistrationController.category,
-                  color: ConstantsColors.whiteShade700,
-                  onChanged: (item) =>
-                      productRegistrationController.selectedItemCategory = item,
-                ),
-                const SizedBox(width: 40),
-                Flexible(
-                  child: CustomTextFields(
-                    icon: Icons.label,
-                    secret: false,
-                    controller: productRegistrationController.crtlQtd,
-                    keyboardType: TextInputType.number,
-                    labelColor: ConstantsColors.whiteShade700,
-                  ),
-                ),
-              ],
-            ),
-            const Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Tipo de divulgação')),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: CustomDropDownButtonComponent(
-                selected: postTypeController.selectedValueCategory.value,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              decoration: const BoxDecoration(
                 color: ConstantsColors.whiteShade700,
-                items: postTypeController.category,
-                onChanged: (item) =>
-                    postTypeController.selectedPostCategory = item,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
               ),
-            ),
-            const SizedBox(height: 40),
-            CustomButton(
-              height: 40,
-              width: 150,
-              text: 'Publicar',
-              color: ConstantsColors.blueShade900,
-              textColor: ConstantsColors.whiteShade700,
-              onPressed: () {
-                if (postTypeController.selectedValueCategory.value ==
-                    'Doação') {
-                  GoRouter.of(context).push('/feedback?text1=Doação');
-                }
-                if (postTypeController.selectedValueCategory.value ==
-                    'Necessidade') {
-                  GoRouter.of(context).push('/feedback?text1=Necessidade');
-                }
-              },
-            ),
-            const SizedBox(height: 10),
-            Center(
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Cancelar',
-                  style: const TextStyle(
-                    color: ConstantsColors.greyShade600,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ).merge(TextStylesConstants.kpoppinsSemiBold),
+              padding: const EdgeInsets.all(30.0),
+              width: double.infinity,
+              height: double.infinity,
+              child: SingleChildScrollView(
+                child: DonationItemComponent(
+                  productRegistrationController: _controller,
+                  postTypeController: _controller1,
+                  onPickImage: _showImagePickerOptions,
+                  selectedImg: _selectedImg,
+                  onSubmit: _submitPost,
                 ),
               ),
             ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class CustomDropDownButtonComponent extends StatelessWidget {
-  final String? selected;
-  final List<String?> items;
-  final String? hint;
-  final Color? color;
-  final void Function(String?)? onChanged;
-
-  const CustomDropDownButtonComponent({
-    super.key,
-    required this.selected,
-    required this.items,
-    required this.onChanged,
-    this.hint,
-    this.color = ConstantsColors.greyShade200,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: ConstantsColors.blueShade900)),
-      child: DropdownButton<String?>(
-        icon: const Icon(
-          Icons.keyboard_arrow_down_sharp,
-          color: ConstantsColors.blueShade900,
-        ),
-        value: selected,
-        hint: hint != null
-            ? Text(hint!,
-                style: const TextStyle(
-                    fontSize: 16, color: ConstantsColors.blueShade900))
-            : null,
-        borderRadius: BorderRadius.circular(12),
-        dropdownColor: ConstantsColors.whiteShade700,
-        items: items
-            .map((item) => DropdownMenuItem<String?>(
-                  value: item,
-                  child: Text(
-                    item!,
-                    style: const TextStyle(
-                        fontSize: 18, color: ConstantsColors.blueShade900),
-                  ),
-                ))
-            .toList(),
-        onChanged: onChanged,
-      ),
     );
   }
 }

@@ -1,20 +1,13 @@
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/favorite_card.dart';
-
-class ItemModel {
-  final String name;
-  final String description;
-  final String imageUrl;
-  final String category;
-
-  ItemModel({
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.category,
-  });
-}
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
+import 'package:provider/provider.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -28,72 +21,45 @@ class _FavoritesPageState extends State<FavoritesPage> {
   int _filtroSelecionadoIndex = 0;
   final List<String> _filtros = [
     'Todos',
-    // 'Doadores',
     'Instituições',
     'Necessidades',
     'Doações'
   ];
 
-  final List<ItemModel> _todosOsFavoritos = [
-    ItemModel(
-        name: 'Lucia Andrade',
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        imageUrl:
-            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-        category: 'Doadores'),
-    ItemModel(
-        name: 'Instituto dos Idosos',
-        description: 'Instituto sem fins lucrativos! Apoie essa causa',
-        imageUrl: 'assets/instituicao.png',
-        category: 'Instituições'),
-    ItemModel(
-        name: 'Marcia Vieira',
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-        imageUrl:
-            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-        category: 'Doadores'),
-  ];
-
-  List<ItemModel> _itensFiltrados = [];
-
   @override
   void initState() {
     super.initState();
-    _itensFiltrados = _todosOsFavoritos;
-    _searchController.addListener(_filtrarFavoritos);
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
-    _searchController.removeListener(_filtrarFavoritos);
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
-  void _filtrarFavoritos() {
-    List<ItemModel> tempItens = [];
-    final categoriaSelecionada = _filtros[_filtroSelecionadoIndex];
-    final textoBusca = _searchController.text.toLowerCase();
+  void _onSearchChanged() {
+    setState(() {});
+  }
 
-    if (categoriaSelecionada == 'Todos') {
-      tempItens = _todosOsFavoritos;
-    } else {
-      tempItens = _todosOsFavoritos.where((item) {
-        return item.category == categoriaSelecionada;
-      }).toList();
+  Future<void> _removeItem(BuildContext context, dynamic item) async {
+    final controller = context.read<FavoriteController>();
+    try {
+      if (item is Donation) {
+        await controller.removeFavoriteDonation(item);
+      } else if (item is Need) {
+        await controller.removeFavoriteNeed(item);
+      } else if (item is Map) {
+        await controller.removeFavoriteUser(item['firebaseUid']);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao remover favorito: $e')),
+        );
+      }
     }
-
-    if (textoBusca.isNotEmpty) {
-      tempItens = tempItens.where((item) {
-        return item.name.toLowerCase().contains(textoBusca);
-      }).toList();
-    }
-
-    setState(() {
-      _itensFiltrados = tempItens;
-    });
   }
 
   Widget _buildFilterChip({
@@ -133,99 +99,201 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ConstantsColors.whiteShade700,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                'Favoritos',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: ConstantsColors.blueShade900,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'O que você busca?',
-                  suffixIcon: const Icon(Icons.search),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
+    return Consumer<FavoriteController>(
+      builder: (context, controller, child) {
+        final List<dynamic> itensFiltrados;
+        final categoriaSelecionada = _filtros[_filtroSelecionadoIndex];
+        final textoBusca = _searchController.text.toLowerCase();
+        List<dynamic> tempItens = [];
+
+        switch (categoriaSelecionada) {
+          case 'Instituições':
+            tempItens = controller.favoriteUsers;
+            break;
+          case 'Necessidades':
+            tempItens = controller.favoriteNeeds;
+            break;
+          case 'Doações':
+            tempItens = controller.favoriteDonations;
+            break;
+          case 'Todos':
+          default:
+            tempItens = [
+              ...controller.favoriteUsers,
+              ...controller.favoriteNeeds,
+              ...controller.favoriteDonations
+            ];
+        }
+
+        if (textoBusca.isNotEmpty) {
+          itensFiltrados = tempItens.where((item) {
+            String name = '';
+            if (item is Donation) {
+              name = item.title;
+            } else if (item is Need) {
+              name = item.title;
+            } else if (item is Map) {
+              name = item['name'] ?? '';
+            }
+            return name.toLowerCase().contains(textoBusca);
+          }).toList();
+        } else {
+          itensFiltrados = tempItens;
+        }
+
+        return Scaffold(
+          backgroundColor: ConstantsColors.whiteShade700,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Favoritos',
+                    style: TextStyle(
+                      fontSize: 30,
                       color: ConstantsColors.blueShade900,
-                      width: 1.0,
+                      fontFamily: 'Poppins',
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
-                      color: ConstantsColors.blueShade900,
-                      width: 1.5,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'O que você busca?',
+                      suffixIcon: const Icon(Icons.search),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          color: ConstantsColors.blueShade900,
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          color: ConstantsColors.blueShade900,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: ConstantsColors.whiteShade700,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 20),
                     ),
                   ),
-                  filled: true,
-                  fillColor: ConstantsColors.whiteShade700,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                 ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 60,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  children: List.generate(_filtros.length, (index) {
-                    return _buildFilterChip(
-                      text: _filtros[index],
-                      isSelected: _filtroSelecionadoIndex == index,
-                      onTap: () {
-                        setState(() {
-                          _filtroSelecionadoIndex = index;
-                        });
-                        _filtrarFavoritos();
-                      },
-                    );
-                  }),
-                ),
-              ),
-            ),
-            Expanded(
-              child: _itensFiltrados.isEmpty
-                  ? const Center(child: Text('Nenhum favorito encontrado.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      itemCount: _itensFiltrados.length,
-                      itemBuilder: (context, index) {
-                        final item = _itensFiltrados[index];
-                        return FavoriteCard(
-                          name: item.name,
-                          description: item.description,
-                          imageUrl: item.imageUrl,
-                          onDelete: () {
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 60,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: List.generate(_filtros.length, (index) {
+                        return _buildFilterChip(
+                          text: _filtros[index],
+                          isSelected: _filtroSelecionadoIndex == index,
+                          onTap: () {
                             setState(() {
-                              _todosOsFavoritos.removeWhere((originalItem) =>
-                                  originalItem.name == item.name);
-                              _itensFiltrados.remove(item);
+                              _filtroSelecionadoIndex = index;
                             });
                           },
                         );
-                      },
+                      }),
                     ),
+                  ),
+                ),
+                Expanded(
+                  child: controller.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : controller.errorMessage.isNotEmpty
+                          ? Center(
+                              child: Text(controller.errorMessage,
+                                  style: const TextStyle(color: Colors.red)))
+                          : itensFiltrados.isEmpty
+                              ? const Center(
+                                  child: Text('Nenhum favorito encontrado.'))
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  itemCount: itensFiltrados.length,
+                                  itemBuilder: (context, index) {
+                                    final item = itensFiltrados[index];
+                                    return _buildFavoriteCard(item);
+                                  },
+                                ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFavoriteCard(dynamic item) {
+    String name = 'Nome não encontrado';
+    String description = 'Descrição não disponível';
+    String imageUrl = 'assets/placeholder.png';
+    bool isNetwork = false;
+    VoidCallback? onTap;
+
+    if (item is Donation) {
+      name = item.title;
+      description = item.description;
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DonationDetailPage(donation: item),
+          ),
+        );
+      };
+    } else if (item is Need) {
+      name = item.title;
+      description = item.description;
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NeedDetailPage(need: item),
+          ),
+        );
+      };
+    } else if (item is Map) {
+      name = item['name'] ?? name;
+      description = item['email'] ?? description;
+      imageUrl = item['profilePictureUrl'] ?? imageUrl;
+      isNetwork = item['profilePictureUrl'] != null &&
+          item['profilePictureUrl'].isNotEmpty;
+
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InstitutionProfilePage(
+              userId: item['firebaseUid'] ?? '',
+              userName: item['name'] ?? 'Usuário',
+              userEmail: item['email'] ?? 'Email não disponível',
+              userImageUrl: item['profilePictureUrl'] ?? '',
+              isInitiallyFavorite: true,
+            ),
+          ),
+        );
+      };
+    }
+
+    return FavoriteCard(
+      name: name,
+      description: description,
+      imageUrl: isNetwork ? imageUrl : 'assets/instituicao.png',
+      isNetwork: isNetwork,
+      onDelete: () => _removeItem(context, item),
+      onTap: onTap,
     );
   }
 }

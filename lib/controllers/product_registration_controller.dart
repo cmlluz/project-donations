@@ -6,10 +6,11 @@ class ProductRegistrationController {
   final _crtlDesc = TextEditingController();
 
   List<String> category = [
-    'Vestuário',
-    'Construção Civil',
-    'Não Perecíveis',
-    'Perecíveis'
+    'ALIMENTO',
+    'VESTUARIOS',
+    'MOVEIS',
+    'SAUDE',
+    'OUTROS'
   ];
 
   ValueNotifier<String?> selectedValueCategory = ValueNotifier<String?>(null);

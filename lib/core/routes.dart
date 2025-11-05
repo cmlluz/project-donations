@@ -21,7 +21,6 @@ import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/del
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/link_manager_page.dart';
-import 'package:appdonationsgestor/pages/necessity_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
@@ -54,7 +53,6 @@ class RouteNames {
   static const String confirmDeletionPage = "confirmDeletionPage";
   static const String deleteFeedbackPage = "deleteFeedbackPage";
   static const String editProfilePage = "editProfilePage";
-  static const String necessityPage = "necessityPage";
   static const String hystoryPage = "hystoryPage";
   static const String postDetailPage = "postDetailPage";
   static const String confirmedRegistration = "confirmedRegistration";
@@ -92,7 +90,7 @@ class AppRountersConfiguration {
           path: '/itemPostPage',
           name: RouteNames.itemPostPage,
           pageBuilder: (context, state) {
-            return MaterialPage(
+            return const MaterialPage(
               child: ItemPostPage(),
             );
           },
@@ -102,7 +100,13 @@ class AppRountersConfiguration {
           name: RouteNames.institutionProfilePage,
           pageBuilder: (context, state) {
             return const MaterialPage(
-              child: InstitutionProfilePage(),
+              child: InstitutionProfilePage(
+                userId: '',
+                isInitiallyFavorite: false,
+                userEmail: '',
+                userImageUrl: '',
+                userName: '',
+              ),
             );
           },
         ),
@@ -229,13 +233,6 @@ class AppRountersConfiguration {
           name: RouteNames.editProfilePage,
           pageBuilder: (context, state) => const MaterialPage(
             child: EditProfilePage(),
-          ),
-        ),
-        GoRoute(
-          path: '/necessityPage',
-          name: RouteNames.necessityPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: NecessityPage(),
           ),
         ),
         GoRoute(
