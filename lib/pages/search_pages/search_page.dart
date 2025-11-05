@@ -22,7 +22,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _searchControllerProvider = AppSearchController();
     _searchControllerProvider.loadItems();
   }

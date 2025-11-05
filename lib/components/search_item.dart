@@ -28,6 +28,7 @@ class SearchItem {
 
 enum SearchCategory {
   todos('Todos'),
+  campanha('Campanhas'),
   doacao('Doação'),
   necessidade('Necessidade'),
   instituicao('Instituição');

@@ -174,6 +174,7 @@ class _RootPageState extends State<RootPage> {
                 ],
               ),
               const SizedBox(height: 24),
+              // 🔹 Primeira linha de opções
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -198,6 +199,14 @@ class _RootPageState extends State<RootPage> {
                     label: 'Criar \n nota fiscal',
                     onTap: () {
                       GoRouter.of(context).push("/notaFiscalPage");
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  MenuButton(
+                    icon: Icons.campaign_outlined,
+                    label: 'Divulgar \n campanha',
+                    onTap: () {
+                      GoRouter.of(context).push("/publishCampaign");
                       Navigator.of(context).pop();
                     },
                   ),

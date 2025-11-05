@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;

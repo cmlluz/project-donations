@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/components/popup.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
+import 'package:appdonationsgestor/pages/item_edit_page.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostModel post;
+  final String? currentUser;
 
-  const PostDetailPage({Key? key, required this.post}) : super(key: key);
+  const PostDetailPage({
+    Key? key,
+    required this.post,
+    this.currentUser,
+  }) : super(key: key);
 
   @override
   State<PostDetailPage> createState() => _PostDetailPageState();
@@ -14,13 +22,13 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   bool isFavorite = false;
+  bool isConfirmed = false;
 
   @override
   Widget build(BuildContext context) {
     final post = widget.post;
-
+    final bool isAuthor = true; // passar uma lógica aqui depois
     final isNeed = post.category == 'necessidade';
-
     final buttonText = isNeed ? "Quero doar" : "Quero receber";
 
     return Scaffold(
@@ -69,26 +77,102 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: CircleAvatar(
-                    backgroundColor: isFavorite
-                        ? ConstantsColors.blueShade900
-                        : Colors.grey.withOpacity(0.5),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.favorite,
-                        color: Colors.white,
+                if (!isAuthor)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: CircleAvatar(
+                      backgroundColor: isFavorite
+                          ? ConstantsColors.blueShade900
+                          : Colors.grey.withOpacity(0.5),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        setState(() {
-                          isFavorite = !isFavorite;
-                        });
-                      },
                     ),
                   ),
-                ),
+                if (isAuthor)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.edit,
+                              color: ConstantsColors.whiteShade900,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ItemEditPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        CircleAvatar(
+                          backgroundColor: Colors.red.shade700,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: ConstantsColors.whiteShade900,
+                            ),
+                            onPressed: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  insetPadding:
+                                      EdgeInsets.symmetric(horizontal: 24),
+                                  child: Popup(
+                                    title: "Excluir publicação",
+                                    subtitle:
+                                        "Tem certeza de que deseja excluir este post?",
+                                    confirmText: "Excluir",
+                                    cancelText: "Cancelar",
+                                    confirmButtonColor: Colors.redAccent,
+                                  ),
+                                ),
+                              );
+
+                              if (confirmed == true) {
+                                Navigator.of(context).pop(true);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Publicação excluída com sucesso!",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: ConstantsColors.blackShade900,
+                                      ).merge(
+                                          TextStylesConstants.kinterRegular),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    backgroundColor:
+                                        ConstantsColors.blueShade400,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 Positioned(
                   bottom: 16,
                   left: 16,
@@ -160,9 +244,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   style: const TextStyle(
                     fontSize: 22,
                     color: ConstantsColors.blueShade900,
-                  ).merge(
-                    TextStylesConstants.kpoppinsMedium,
-                  ),
+                  ).merge(TextStylesConstants.kpoppinsMedium),
                 ),
               ),
             ),
@@ -173,36 +255,95 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 style: const TextStyle(
                   fontSize: 16,
                   color: ConstantsColors.greyShade600,
-                ).merge(
-                  TextStylesConstants.kpoppinsMedium,
-                ),
+                ).merge(TextStylesConstants.kpoppinsMedium),
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ConstantsColors.blueShade900,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-                onPressed: () {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text(),
-                  //     backgroundColor: ConstantsColors.blueShade900,
-                  //   ),
-                  // );
-                },
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
+            if (!isAuthor)
+              SizedBox(
+                width: double.infinity,
+                child: isConfirmed && isNeed
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.redShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ConfirmDonationPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Confirmar a doação",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return const Dialog(
+                                child: Popup(
+                                  title: "Permissão de compartilhamento",
+                                  subtitle:
+                                      "Você permite o compartilhamento dos seus dados para que a instituição entre em contato?",
+                                  confirmText: "Confirmar",
+                                  cancelText: "Cancelar",
+                                ),
+                              );
+                            },
+                          );
+
+                          if (confirmed == true) {
+                            final message = isNeed
+                                ? "Interesse em doar registrado!"
+                                : "Interesse em receber registrado!";
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  message,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: ConstantsColors.blackShade900,
+                                  ).merge(TextStylesConstants.kinterRegular),
+                                  textAlign: TextAlign.center,
+                                ),
+                                backgroundColor: ConstantsColors.blueShade400,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+
+                            setState(() {
+                              isConfirmed = true;
+                            });
+                          }
+                        },
+                        child: Text(
+                          buttonText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      ),
               ),
-            ),
-            const SizedBox(height: 24),
           ],
         ),
       ),

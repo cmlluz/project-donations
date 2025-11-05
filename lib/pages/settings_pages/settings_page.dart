@@ -83,6 +83,12 @@ class _SettingsPage extends State<SettingsPage> {
                 GoRouter.of(context).pushNamed('editProfilePage');
               },
             ),
+            _buildSettingOption(
+              title: 'Vincular a Conta',
+              onTap: () {
+                GoRouter.of(context).pushNamed('linkManagerPage');
+              },
+            ),
             
             Container(
               decoration: const BoxDecoration(
