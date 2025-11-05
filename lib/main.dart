@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/services/notification_service.dart';
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')

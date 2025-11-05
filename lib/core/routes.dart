@@ -26,6 +26,7 @@ import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.d
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/pages/pending_requests_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -58,6 +59,7 @@ class RouteNames {
   static const String notaFiscalPage = "notaFiscalPage";
   static const String feedbackPage = "feedback";
   static const String notificationsPage = "notificationsPage";
+  static const String pendingRequests = "pendingRequests";
 }
 
 class AppRountersConfiguration {
@@ -84,6 +86,15 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
+          path: '/pendingRequests',
+          name: RouteNames.pendingRequests,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: PendingRequestsPage(),
+            );
+          },
+        ),
+        GoRoute(
           path: '/itemPostPage',
           name: RouteNames.itemPostPage,
           pageBuilder: (context, state) {
@@ -99,10 +110,9 @@ class AppRountersConfiguration {
             return const MaterialPage(
               child: InstitutionProfilePage(
                 userId: '',
-                isInitiallyFavorite: false,
+                userName: 'Usuário',
                 userEmail: '',
                 userImageUrl: '',
-                userName: '',
               ),
             );
           },
@@ -243,10 +253,7 @@ class AppRountersConfiguration {
           path: '/postDetailPage',
           name: RouteNames.postDetailPage,
           pageBuilder: (context, state) {
-            // Obter dados do extra
             final postData = state.extra as PostModel?;
-
-            // Se não houver dados, criar um post padrão
             final post = postData ??
                 PostModel(
                   id: '0',

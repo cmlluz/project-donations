@@ -23,14 +23,14 @@ class Donation {
 
   factory Donation.fromJson(Map<String, dynamic> json) {
     return Donation(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Título não informado',
+      description: json['description'] ?? '',
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      category: json['category'],
-      quantity: json['quantity'],
-      status: json['status'],
-      donatorName: json['donatorName'],
+      category: json['category'] ?? 'OUTROS',
+      quantity: json['quantity'] ?? 0,
+      status: json['status'] ?? 'PENDENTE',
+      donatorName: json['donatorName'] ?? 'Doador anônimo',
     );
   }
 }

@@ -1,10 +1,13 @@
-import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/request_api_service.dart'; // Importar
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 
 class DonationDetailPage extends StatefulWidget {
   final Donation donation;
@@ -16,24 +19,31 @@ class DonationDetailPage extends StatefulWidget {
 }
 
 class _DonationDetailPageState extends State<DonationDetailPage> {
+  late final FavoriteApiService _favoriteApiService;
+  late final RequestApiService _requestApiService; // Adicionar
+  final ApiClient _apiClient = ApiClient();
+
   late bool _isFavorite;
-  bool _isLoading = false;
+  bool _isLoadingFavorite = false;
+  bool _isLoadingRequest = false; 
 
   @override
   void initState() {
     super.initState();
+    _favoriteApiService = FavoriteApiService(_apiClient);
+    _requestApiService = RequestApiService(_apiClient); 
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isDonationFavorite(widget.donation.id);
   }
 
   void _toggleFavorite() async {
-    if (_isLoading) return;
+    if (_isLoadingFavorite) return;
 
     final newFavoriteState = !_isFavorite;
     final favController = Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
-      _isLoading = true;
+      _isLoadingFavorite = true;
       _isFavorite = newFavoriteState;
     });
 
@@ -43,7 +53,6 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
       } else {
         await favController.removeFavoriteDonation(widget.donation);
       }
-
       widget.donation.isFavorite = newFavoriteState;
 
       if (mounted) {
@@ -68,8 +77,41 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     } finally {
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          _isLoadingFavorite = false;
         });
+      }
+    }
+  }
+
+  void _submitRequest() async {
+    setState(() => _isLoadingRequest = true);
+
+    try {
+      await _requestApiService.createRequest(
+        donationId: widget.donation.id,
+        needId: null,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Solicitação enviada com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao enviar solicitação: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingRequest = false);
       }
     }
   }
@@ -116,7 +158,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                       icon: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
                           color: Colors.white),
-                      onPressed: _isLoading ? null : _toggleFavorite,
+                      onPressed: _isLoadingFavorite ? null : _toggleFavorite,
                     ),
                   ),
                 ),
@@ -169,6 +211,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ConstantsColors.blueShade900,
@@ -177,11 +220,14 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      onPressed: () {},
-                      child: const Text(
-                        "Quero Receber",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+                      onPressed: _isLoadingRequest ? null : _submitRequest,
+                      child: _isLoadingRequest
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              "Quero Receber",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
                     ),
                   ),
                 ],

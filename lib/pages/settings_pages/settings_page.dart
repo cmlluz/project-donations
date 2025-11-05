@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/services/notification_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -12,6 +13,44 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPage extends State<SettingsPage> {
   bool isNotificationOn = false;
+  final NotificationService _notificationService = NotificationService();
+  bool _isLoading = false;
+
+  void _toggleNotifications(bool value) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (value) {
+        await _notificationService.initNotifications();
+        setState(() {
+          isNotificationOn = true;
+        });
+      } else {
+        await _notificationService.deleteToken();
+        setState(() {
+          isNotificationOn = false;
+        });
+      }
+    } catch (e) {
+      print("Erro ao alterar notificações: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Falha ao atualizar status de notificação."))
+        );
+      }
+      setState(() {
+        isNotificationOn = !value;
+      });
+    } finally {
+      if(mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,25 +83,44 @@ class _SettingsPage extends State<SettingsPage> {
                 GoRouter.of(context).pushNamed('editProfilePage');
               },
             ),
-            _buildSettingOption(
-              title: 'Notificações',
-              icon: isNotificationOn
-                  ? Icons.toggle_on
-                  : Icons.toggle_off_outlined,
-              iconColor: isNotificationOn
-                  ? ConstantsColors.blueShade900
-                  : ConstantsColors.blueShade900,
-              iconSize: 36,
-              alignment: MainAxisAlignment.spaceBetween,
-              onTap: () {
-                setState(() {
-                  isNotificationOn = !isNotificationOn;
-                });
-              },
+            
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: ConstantsColors.blackShade900,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Notificações',
+                    style: TextStyle(
+                      color: ConstantsColors.blackShade900,
+                      fontSize: 16,
+                    ).merge(TextStylesConstants.kpoppinsLight),
+                  ),
+                  _isLoading 
+                    ? const SizedBox(
+                        height: 24, 
+                        width: 24, 
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                      )
+                    : Switch(
+                        value: isNotificationOn,
+                        onChanged: _toggleNotifications,
+                        activeColor: ConstantsColors.blueShade900,
+                      ),
+                ],
+              ),
             ),
+            
             _buildSettingOption(
               title: 'Deletar conta',
-              // titleSize: 18,
               textColor: ConstantsColors.redShade800,
               onTap: () {
                 GoRouter.of(context).pushNamed('deleteAccountPage');
@@ -77,12 +135,8 @@ class _SettingsPage extends State<SettingsPage> {
   Widget _buildSettingOption({
     required String title,
     double titleSize = 16,
-    IconData? icon,
     Color textColor = ConstantsColors.blackShade900,
-    Color iconColor = ConstantsColors.blackShade900,
-    double iconSize = 28,
     required VoidCallback onTap,
-    MainAxisAlignment alignment = MainAxisAlignment.start,
   }) {
     return Container(
       decoration: const BoxDecoration(
@@ -93,37 +147,25 @@ class _SettingsPage extends State<SettingsPage> {
           ),
         ),
       ),
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: alignment,
-        children: [
-          Expanded(
-            child: TextButton(
-              onPressed: onTap,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: titleSize,
+                ).merge(TextStylesConstants.kpoppinsLight),
               ),
-              child: Row(
-                mainAxisAlignment: alignment,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: titleSize,
-                    ).merge(TextStylesConstants.kpoppinsLight),
-                  ),
-                  Icon(
-                    icon,
-                    color: iconColor,
-                    size: iconSize,
-                  ),
-                ],
-              ),
-            ),
+              Icon(Icons.chevron_right, color: textColor.withOpacity(0.6)),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

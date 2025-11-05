@@ -1,14 +1,20 @@
-import 'package:appdonationsgestor/services/api_services/auth_api_service.dart';
+import 'dart:async';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/auth_api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
 }
 
 class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final AuthApiService _authApiService = AuthApiService(ApiClient());
+
+  static final _navigationStreamController =
+      StreamController<String>.broadcast();
+  Stream<String> get navigationStream => _navigationStreamController.stream;
 
   Future<void> initNotifications() async {
     NotificationSettings settings = await _fcm.requestPermission(
@@ -23,8 +29,8 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
+      await getAndSendToken();
       _setupListeners();
-      getAndSendToken();
     } else {
       print('User declined or has not accepted permission');
     }
@@ -33,18 +39,31 @@ class NotificationService {
   void _setupListeners() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Message clicked!');
-    });
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        _handleMessage(message);
+      }
+    });
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    print('Handling notification tap: ${message.data}');
+    final type = message.data['type'] as String?;
+
+    if (type != null) {
+      _navigationStreamController.add(type);
+    }
+  }
+
+  void disposeStream() {
+    _navigationStreamController.close();
   }
 
   Future<void> getAndSendToken() async {
@@ -56,6 +75,7 @@ class NotificationService {
       }
     } catch (e) {
       print("Erro ao obter e enviar token FCM: $e");
+      rethrow;
     }
   }
 
@@ -66,6 +86,7 @@ class NotificationService {
       print("FCM Token deletado");
     } catch (e) {
       print("Erro ao deletar token FCM: $e");
+      rethrow;
     }
   }
 }
