@@ -35,7 +35,7 @@ class _RootPageState extends State<RootPage> {
     _notificationSubscription =
         _notificationService.navigationStream.listen((type) {
       if (mounted) {
-        _handleNavigation(type);
+        _handleNavigation(type as String);
       }
     });
   }
