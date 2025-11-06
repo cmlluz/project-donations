@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -119,6 +120,18 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 12),
       category: "doacao",
+    ),
+    PostModel(
+      id: '9',
+      title: 'Campanha do Agasalho',
+      description: 'Ajude a aquecer o inverno de quem precisa.',
+      imageUrl: 'assets/campanha_agasalho.png',
+      category: "campanha",
+      quantity: 15,
+      createdAt: DateTime(2025, 8, 2),
+      location: 'Barbalho, Salvador',
+      institution: 'Lar dos Idosos',
+      institutionImageUrl: 'assets/instituicao.png',
     ),
   ];
 
@@ -349,12 +362,21 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
           quantidade: post.quantity,
           imagem: post.imageUrl,
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostDetailPage(post: post),
-              ),
-            );
+            if (donations[index].category == "campanha") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CampaignDetailsPage(post: post),
+                ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostDetailPage(post: post),
+                ),
+              );
+            }
           },
         );
       },
