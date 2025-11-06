@@ -21,10 +21,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
   int _filtroSelecionadoIndex = 0;
   final List<String> _filtros = [
     'Todos',
+    'Campanhas',
     'Instituições',
     'Necessidades',
     'Doações'
   ];
+  //Adicionar lógica pra campanha
 
   @override
   void initState() {
