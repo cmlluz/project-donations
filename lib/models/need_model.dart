@@ -23,14 +23,14 @@ class Need {
 
   factory Need.fromJson(Map<String, dynamic> json) {
     return Need(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Necessidade não informada',
+      description: json['description'] ?? '',
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      category: json['category'],
-      quantity: json['quantity'],
-      status: json['status'],
-      authorName: json['authorName'],
+      category: json['category'] ?? 'OUTROS',
+      quantity: json['quantity'] ?? 0,
+      status: json['status'] ?? 'PENDENTE',
+      authorName: json['authorName'] ?? 'Autor anônimo',
     );
   }
 }

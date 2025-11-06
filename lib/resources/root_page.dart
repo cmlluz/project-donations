@@ -1,16 +1,19 @@
+import 'dart:async';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:appdonationsgestor/auth/app_data.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:appdonationsgestor/components/menu_button.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
+import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/controllers/navigation_controller.dart';
-import 'package:appdonationsgestor/auth/app_data.dart';
-import 'package:appdonationsgestor/auth/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:appdonationsgestor/components/menu_button.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -20,15 +23,40 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  final NotificationService _notificationService = NotificationService();
+  StreamSubscription? _notificationSubscription;
+
   @override
   void initState() {
     super.initState();
     NavigationController.currentIndex.addListener(_updateIndex);
+    _initNotifications();
+
+    _notificationSubscription =
+        _notificationService.navigationStream.listen((type) {
+      if (mounted) {
+        _handleNavigation(type);
+      }
+    });
+  }
+
+  void _handleNavigation(String type) {
+    if (type == 'NEW_REQUEST') {
+      GoRouter.of(context).goNamed(RouteNames.pendingRequests);
+    } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+      GoRouter.of(context).goNamed(RouteNames.hystoryPage);
+    }
+  }
+
+  void _initNotifications() async {
+    await Future.delayed(const Duration(seconds: 1));
+    _notificationService.initNotifications();
   }
 
   @override
   void dispose() {
     NavigationController.currentIndex.removeListener(_updateIndex);
+    _notificationSubscription?.cancel();
     super.dispose();
   }
 
@@ -36,7 +64,6 @@ class _RootPageState extends State<RootPage> {
     setState(() {});
   }
 
-  // Lista de páginas
   final List<Widget> pages = const [
     HomePage(),
     SearchPage(),
@@ -45,7 +72,6 @@ class _RootPageState extends State<RootPage> {
     SizedBox.shrink(),
   ];
 
-  // Lista de imagens dos ícones
   final List<String> iconList = [
     'assets/icons/home_icon.png',
     'assets/icons/welcome_icon.png',
@@ -56,6 +82,7 @@ class _RootPageState extends State<RootPage> {
 
   void logout() async {
     try {
+      await _notificationService.deleteToken();
       await authService.value.signOut();
       AppData.navBarCurrentIndexNotifier.value = 0;
       AppData.onboardingCurrentIndexNotifier.value = 0;
