@@ -8,18 +8,16 @@ import 'package:http/http.dart' as http;
 class ProfileService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final String _baseUrl = 'http://10.0.2.2:8080/api';
+  final String _baseUrl = 'http://192.168.0.21:8080/api';
 
   User? get currentUser => _auth.currentUser;
-
-  // Dentro da classe ProfileService
 
   Future<Map<String, dynamic>> loadUserData() async {
     if (currentUser == null) throw Exception('Usuário não autenticado.');
     final token = await currentUser!.getIdToken();
 
     final response = await http.get(
-      Uri.parse('$_baseUrl/users/${currentUser!.uid}'),
+      Uri.parse('$_baseUrl/users/me'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -27,10 +25,9 @@ class ProfileService {
     );
 
     if (response.statusCode == 200) {
-      // ADICIONE ESTA LINHA PARA VER A RESPOSTA DO SEU SERVIDOR
       print("✅ DADOS RECEBIDOS DO BACKEND: ${response.body}");
 
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       throw Exception('Falha ao carregar dados do usuário do backend.');
     }
@@ -41,7 +38,7 @@ class ProfileService {
     final token = await currentUser!.getIdToken();
 
     final response = await http.put(
-      Uri.parse('$_baseUrl/users/${currentUser!.uid}'),
+      Uri.parse('$_baseUrl/users/me'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -50,6 +47,7 @@ class ProfileService {
     );
 
     if (response.statusCode != 200) {
+      print("Erro ao atualizar perfil: ${response.body}");
       throw Exception('Falha ao atualizar o perfil no backend.');
     }
   }

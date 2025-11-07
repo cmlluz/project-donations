@@ -51,6 +51,7 @@ class AuthService {
     required String email,
     required String password,
     required BuildContext context,
+    required Map<String, dynamic> userData,
   }) async {
     final UserCredential userCredential =
         await firebaseAuth.createUserWithEmailAndPassword(
@@ -60,6 +61,7 @@ class AuthService {
 
     if (userCredential.user != null) {
       await _authApiService.syncUser();
+      await _authApiService.updateUser(userData);
       await Provider.of<UserProvider>(context, listen: false)
           .fetchCurrentUser();
     }

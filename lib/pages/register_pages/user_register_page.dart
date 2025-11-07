@@ -26,6 +26,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
 
   final formKey = GlobalKey<FormState>();
   String errorMessage = '';
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -47,11 +48,23 @@ class _UserRegisterPage extends State<UserRegisterPage> {
       return;
     }
 
+    setState(() => _isLoading = true);
+
     try {
+      final userData = {
+        "name": nameController.text.trim(),
+        "email": emailController.text.trim(),
+        "phone": phoneController.text.trim(),
+        "address": addressController.text.trim(),
+        "cpfOrCnpj": cpfCnpjController.text.trim(),
+        "role": "ROLE_USER",
+      };
+
       await authService.value.createAccount(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         context: context,
+        userData: userData,
       );
 
       if (mounted) {
@@ -72,6 +85,10 @@ class _UserRegisterPage extends State<UserRegisterPage> {
               e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.';
         }
       });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -225,11 +242,13 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       text: 'Confirmar',
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
-                      onPressed: () {
-                        if (formKey.currentState?.validate() ?? false) {
-                          registerUser();
-                        }
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              if (formKey.currentState?.validate() ?? false) {
+                                registerUser();
+                              }
+                            },
                     ),
                     const SizedBox(height: 30),
                   ],

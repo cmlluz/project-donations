@@ -105,7 +105,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     final bool isManager =
         user?.role == 'ROLE_ADMIN' || user?.role == 'ROLE_INSTITUTION';
 
-    ImageProvider profileImage = const AssetImage("assets/profile_default.png");
+    ImageProvider? profileImage;
     if (user?.profilePictureUrl != null &&
         user!.profilePictureUrl!.isNotEmpty) {
       profileImage = NetworkImage(user.profilePictureUrl!);
@@ -135,6 +135,14 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   CircleAvatar(
                     radius: 40,
                     backgroundImage: profileImage,
+                    backgroundColor: Colors.grey.shade200,
+                    child: (profileImage == null)
+                        ? const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: ConstantsColors.greyShade600,
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -225,7 +233,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Esta instituição está comprometida em fazer a diferença na comunidade, promovendo ações sociais e ajudando aqueles que mais precisam.",
+                  user?.bio ??
+                      "Esta instituição ainda não adicionou uma descrição.",
                   style: TextStylesConstants.kpoppinsMedium.merge(
                     const TextStyle(
                       fontSize: 14,

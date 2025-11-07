@@ -26,6 +26,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
 
   final formKey = GlobalKey<FormState>();
   String errorMessage = '';
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -40,11 +41,30 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
   }
 
   void registerUser() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      setState(() {
+        errorMessage = 'As senhas não coincidem';
+      });
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
     try {
+      final userData = {
+        "name": nameController.text.trim(),
+        "email": emailController.text.trim(),
+        "phone": phoneController.text.trim(),
+        "address": addressController.text.trim(),
+        "cpfOrCnpj": cpfCnpjController.text.trim(),
+        "role": "ROLE_ADMIN",
+      };
+
       await authService.value.createAccount(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         context: context,
+        userData: userData,
       );
       if (mounted) {
         GoRouter.of(context).push('/finalizeRegistrationPage');
@@ -53,8 +73,6 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
       setState(() {
         if (e.code == 'weak-password') {
           errorMessage = 'A senha deve ter pelo menos 8 caracteres.';
-        } else if (passwordController.text != confirmPasswordController.text) {
-          errorMessage = 'As senhas não coincidem';
         } else if (e.code == 'email-already-in-use') {
           errorMessage =
               'Este e-mail já está em uso. Tente outro ou faça login.';
@@ -65,6 +83,10 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
               e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.';
         }
       });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -218,11 +240,13 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                       text: 'Confirmar',
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
-                      onPressed: () {
-                        if (formKey.currentState?.validate() ?? false) {
-                          registerUser();
-                        }
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              if (formKey.currentState?.validate() ?? false) {
+                                registerUser();
+                              }
+                            },
                     ),
                     const SizedBox(height: 30),
                   ],
