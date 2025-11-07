@@ -15,6 +15,13 @@ class FeedbackPage extends StatefulWidget {
 class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
+    final bool isAnalise = widget.text1.toLowerCase().contains("análise");
+    String title =
+        isAnalise ? widget.text1 : '${widget.text1} enviada com sucesso!';
+    String subtitle = isAnalise
+        ? 'Sua publicação foi enviada para nossos gestores e será revisada em breve.'
+        : 'Você pode visualizar no seu perfil na aba "${widget.text1}"';
+
     return Scaffold(
       backgroundColor: ConstantsColors.blueShade900,
       appBar: AppBar(
@@ -39,7 +46,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           children: [
             const Image(image: AssetImage('assets/confirmed.png')),
             const SizedBox(height: 10),
-            Text('${widget.text1} enviada com sucesso!',
+            Text(title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                     fontSize: 30,
@@ -48,7 +55,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     color: ConstantsColors.blueShade900)),
             const SizedBox(height: 20),
             Text(
-              'Você pode visualizar no seu perfil na aba "${widget.text1}"',
+              subtitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -65,19 +72,20 @@ class _FeedbackPageState extends State<FeedbackPage> {
               },
             ),
             const SizedBox(height: 10),
-            Center(
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Criar nova ${widget.text1}',
-                  style: const TextStyle(
-                    color: ConstantsColors.greyShade600,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ).merge(TextStylesConstants.kpoppinsSemiBold),
+            if (!isAnalise)
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Criar nova ${widget.text1}',
+                    style: const TextStyle(
+                      color: ConstantsColors.greyShade600,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ).merge(TextStylesConstants.kpoppinsSemiBold),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

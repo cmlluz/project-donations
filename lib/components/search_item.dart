@@ -9,7 +9,7 @@ class SearchItem {
   final String? institutionImageUrl;
   final DateTime date;
   final int quantity;
-  final String status;
+  final String postStatus;
 
   const SearchItem({
     required this.id,
@@ -22,7 +22,7 @@ class SearchItem {
     this.institutionImageUrl,
     required this.date,
     required this.quantity,
-    required this.status,
+    required this.postStatus,
   });
 }
 

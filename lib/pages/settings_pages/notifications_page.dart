@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/models/notification_model.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/allow_post_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
@@ -25,48 +24,11 @@ class _NotificationsPage extends State<NotificationsPage> {
   final ApiClient _apiClient = ApiClient();
   late Future<List<NotificationModel>> _apiNotificationsFuture;
 
-  final PostModel pendingPost = PostModel(
-    id: "2",
-    title: "Vestuário - Doação",
-    description: "Doação de roupas variadas para pessoas em situação de rua.",
-    quantity: 50,
-    imageUrl: "assets/donations.jpg",
-    location: "Rio Vermelho, Salvador",
-    institution: "Lar dos Idosos",
-    institutionImageUrl: "assets/profile.jpg",
-    createdAt: DateTime(2025, 8, 20),
-    category: "doacao",
-  );
-
-  late final List<Map<String, dynamic>> staticNotifications;
-
   @override
   void initState() {
     super.initState();
     _notificationApiService = NotificationApiService(_apiClient);
     _loadApiNotifications();
-
-    staticNotifications = [
-      {
-        "title": "Solicitação de postagem",
-        "time": "Hoje às 10:15",
-        "message":
-            "A instituição Lar dos Idosos quer realizar uma postagem e precisa da sua permissão. Clique aqui para saber mais.",
-        "onTap": () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => AllowPostPage(post: pendingPost),
-              ),
-            ),
-      },
-      {
-        "title": "Exemplo de notificação antiga",
-        "time": "Ontem às 16:45",
-        "message":
-            "There are many variations of passages of Lorem Ipsum available, but the majority",
-        "onTap": null,
-      },
-    ];
   }
 
   void _loadApiNotifications() {
@@ -102,7 +64,10 @@ class _NotificationsPage extends State<NotificationsPage> {
       }
     }
 
-    if (notif.dataPayload == null) return;
+    if (notif.dataPayload == null) {
+      _loadApiNotifications();
+      return;
+    }
 
     try {
       Map<String, dynamic> data = jsonDecode(notif.dataPayload!);
@@ -114,6 +79,17 @@ class _NotificationsPage extends State<NotificationsPage> {
         GoRouter.of(context).goNamed(RouteNames.pendingRequests);
       } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
         GoRouter.of(context).goNamed(RouteNames.hystoryPage);
+      } else if (type == 'POST_VALIDATION_PENDING') {
+        final String? itemId = data['itemId'];
+        final String? itemType = data['itemType'];
+        if (itemId != null && itemType != null) {
+          GoRouter.of(context).pushNamed(
+            RouteNames.allowPostPage,
+            extra: {'itemId': itemId, 'itemType': itemType},
+          );
+        }
+      } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
+        GoRouter.of(context).goNamed(RouteNames.hystoryPage);
       }
     } catch (e) {
       print("Erro ao navegar pela notificação: $e");
@@ -124,14 +100,6 @@ class _NotificationsPage extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final todayStaticNotifications = staticNotifications
-        .where((n) => n["time"]!.toLowerCase().contains("hoje"))
-        .toList();
-
-    final oldStaticNotifications = staticNotifications
-        .where((n) => !n["time"]!.toLowerCase().contains("hoje"))
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notificações'),
@@ -160,23 +128,7 @@ class _NotificationsPage extends State<NotificationsPage> {
                   onRefresh: () async {
                     _loadApiNotifications();
                   },
-                  child: ListView(
-                    children: [
-                      if (todayStaticNotifications.isNotEmpty) ...[
-                        buildSectionTitle("Recente"),
-                        ...todayStaticNotifications
-                            .map(buildStaticNotification),
-                      ],
-                      if (oldStaticNotifications.isNotEmpty) ...[
-                        buildDivider(),
-                        buildSectionTitle("Antigas"),
-                        ...oldStaticNotifications.map(buildStaticNotification),
-                      ],
-                      buildDivider(),
-                      buildSectionTitle("Histórico de Solicitações"),
-                      buildApiNotificationsList(),
-                    ],
-                  ),
+                  child: buildApiNotificationsList(),
                 )
               : buildDisabledNotifications(),
         ),
@@ -206,83 +158,28 @@ class _NotificationsPage extends State<NotificationsPage> {
         if (notifications == null || notifications.isEmpty) {
           return buildEmptyNotifications();
         }
+        
+        final newNotifications = notifications.where((n) => !n.isRead).toList();
+        final oldNotifications = notifications.where((n) => n.isRead).toList();
 
-        return Column(
-          children: notifications
-              .map((notif) => buildApiNotification(notif))
-              .toList(),
+        return ListView(
+          children: [
+            if (newNotifications.isNotEmpty) ...[
+              buildSectionTitle("Recentes"),
+              ...newNotifications
+                  .map((notif) => buildApiNotification(notif))
+                  .toList(),
+            ],
+            if (oldNotifications.isNotEmpty) ...[
+              buildDivider(),
+              buildSectionTitle("Antigas"),
+              ...oldNotifications
+                  .map((notif) => buildApiNotification(notif))
+                  .toList(),
+            ],
+          ],
         );
       },
-    );
-  }
-
-  Widget buildStaticNotification(Map<String, dynamic> notif) {
-    return GestureDetector(
-      onTap: notif["onTap"],
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: ConstantsColors.whiteShade900,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  "•",
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: ConstantsColors.blueShade900,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    notif["title"]!,
-                    style: const TextStyle(
-                      color: ConstantsColors.blueShade900,
-                      fontSize: 17,
-                    ).merge(TextStylesConstants.kinterBold),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 18.0),
-              child: Text(
-                notif["time"]!,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 10,
-                ).merge(TextStylesConstants.kinterRegular),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 18.0),
-              child: Text(
-                notif["message"]!,
-                style: const TextStyle(
-                  color: ConstantsColors.blueShade900,
-                  fontSize: 14,
-                ).merge(TextStylesConstants.kinterRegular),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

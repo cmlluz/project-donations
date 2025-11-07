@@ -19,6 +19,17 @@ class DonationApiService {
     }
   }
 
+  Future<Donation> getDonationById(String id) async {
+    final response = await _apiClient.get('donations/$id');
+
+    if (response.statusCode == 200) {
+      return Donation.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar a doação.');
+    }
+  }
+
   Future<Donation> createDonation(Map<String, dynamic> donationData) async {
     final response = await _apiClient.post('donations', body: donationData);
 
@@ -51,5 +62,27 @@ class DonationApiService {
       throw Exception("Falha ao deletar doação: ${response.statusCode}");
     }
     print("Doação deletada com sucesso.");
+  }
+
+  Future<Donation> approveDonation(String id) async {
+    final response = await _apiClient.post('donations/$id/approve');
+
+    if (response.statusCode == 200) {
+      return Donation.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao aprovar a doação.');
+    }
+  }
+
+  Future<Donation> rejectDonation(String id) async {
+    final response = await _apiClient.post('donations/$id/reject');
+
+    if (response.statusCode == 200) {
+      return Donation.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao rejeitar a doação.');
+    }
   }
 }

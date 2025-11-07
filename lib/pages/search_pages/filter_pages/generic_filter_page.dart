@@ -147,7 +147,7 @@ class GenericFilterPage extends StatelessWidget {
           authorName: item.institution,
           category: item.category.toString(),
           quantity: item.quantity,
-          status: item.status,
+          postStatus: item.postStatus,
           date: item.date);
 
       Navigator.push(
@@ -164,7 +164,7 @@ class GenericFilterPage extends StatelessWidget {
           donatorName: item.institution,
           category: item.category.toString(),
           quantity: item.quantity,
-          status: item.status,
+          postStatus: item.postStatus,
           date: item.date);
       Navigator.push(
         context,
@@ -172,7 +172,6 @@ class GenericFilterPage extends StatelessWidget {
           builder: (context) => DonationDetailPage(donation: donation),
         ),
       );
-      // manter a lógica para outros tipos de itens
     }
   }
 }

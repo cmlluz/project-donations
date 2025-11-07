@@ -5,7 +5,7 @@ class Need {
   final DateTime? date;
   final String category;
   final int quantity;
-  final String status;
+  final String postStatus;
   final String authorName;
   bool isFavorite;
 
@@ -16,7 +16,7 @@ class Need {
     this.date,
     required this.category,
     required this.quantity,
-    required this.status,
+    required this.postStatus,
     required this.authorName,
     this.isFavorite = false,
   });
@@ -29,7 +29,7 @@ class Need {
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
       category: json['category'] ?? 'OUTROS',
       quantity: json['quantity'] ?? 0,
-      status: json['status'] ?? 'PENDENTE',
+      postStatus: json['postStatus'] ?? 'PENDENTE_APROVACAO',
       authorName: json['authorName'] ?? 'Autor anônimo',
     );
   }

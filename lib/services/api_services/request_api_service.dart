@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/models/request_model.dart'; // Criaremos este modelo a seguir
+import 'package:appdonationsgestor/models/request_model.dart'; 
 
 class RequestApiService {
   final ApiClient _apiClient;
@@ -43,6 +43,17 @@ class RequestApiService {
     } else {
       print("Erro ${response.statusCode}: ${response.body}");
       throw Exception('Falha ao rejeitar solicitação');
+    }
+  }
+
+  Future<Request> deliverRequest(int requestId) async {
+    final response = await _apiClient.post('requests/$requestId/deliver');
+
+    if (response.statusCode == 200) {
+      return Request.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao confirmar entrega');
     }
   }
 

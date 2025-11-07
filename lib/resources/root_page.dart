@@ -45,6 +45,17 @@ class _RootPageState extends State<RootPage> {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
     } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
+    } else if (type == 'POST_VALIDATION_PENDING') {
+      final String? itemId = data['itemId'];
+      final String? itemType = data['itemType'];
+      if (itemId != null && itemType != null) {
+        GoRouter.of(context).pushNamed(
+          RouteNames.allowPostPage,
+          extra: {'itemId': itemId, 'itemType': itemType},
+        );
+      }
+    } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
+      GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     }
   }
 

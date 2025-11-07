@@ -19,6 +19,17 @@ class NeedApiService {
     }
   }
 
+  Future<Need> getNeedById(String id) async {
+    final response = await _apiClient.get('needs/$id');
+
+    if (response.statusCode == 200) {
+      return Need.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar a necessidade.');
+    }
+  }
+
   Future<Need> createNeed(Map<String, dynamic> needData) async {
     final response = await _apiClient.post('needs', body: needData);
 
@@ -49,5 +60,27 @@ class NeedApiService {
       throw Exception('Falha ao deletar a necessidade.');
     }
     print("Necessidade $id deletada com sucesso.");
+  }
+
+  Future<Need> approveNeed(String id) async {
+    final response = await _apiClient.post('needs/$id/approve');
+
+    if (response.statusCode == 200) {
+      return Need.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao aprovar a necessidade.');
+    }
+  }
+
+  Future<Need> rejectNeed(String id) async {
+    final response = await _apiClient.post('needs/$id/reject');
+
+    if (response.statusCode == 200) {
+      return Need.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao rejeitar a necessidade.');
+    }
   }
 }

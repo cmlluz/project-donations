@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/pages/allow_post_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
@@ -63,6 +64,7 @@ class RouteNames {
   static const String linkManagerPage = "linkManagerPage";
   static const String publishCampaign = "publishCampaign";
   static const String pendingRequests = "pendingRequests";
+  static const String allowPostPage = "allowPostPage";
 }
 
 class AppRountersConfiguration {
@@ -94,6 +96,19 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: PendingRequestsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/allowPostPage',
+          name: RouteNames.allowPostPage,
+          pageBuilder: (context, state) {
+            final Map<String, String> data = state.extra as Map<String, String>;
+            return MaterialPage(
+              child: AllowPostPage(
+                itemId: data['itemId']!,
+                itemType: data['itemType']!,
+              ),
             );
           },
         ),

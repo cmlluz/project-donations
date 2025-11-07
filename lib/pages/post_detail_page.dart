@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -5,6 +6,7 @@ import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/components/popup.dart';
 import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
+import 'package:provider/provider.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostModel post;
@@ -24,12 +26,36 @@ class _PostDetailPageState extends State<PostDetailPage> {
   bool isFavorite = false;
   bool isConfirmed = false;
 
+  String _traduzirPostStatus(String status) {
+    switch (status) {
+      case 'DISPONIVEL':
+        return 'Disponível';
+      case 'PENDENTE_APROVACAO':
+        return 'Em Análise';
+      case 'CONCLUIDO':
+        return 'Concluído';
+      case 'REJEITADO':
+        return 'Rejeitado';
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final post = widget.post;
-    final bool isAuthor = true; // passar uma lógica aqui depois
+    
+    final currentUserId =
+        context.watch<UserProvider>().currentUser?.firebaseUid ?? '';
+    
+    // TODO: Atualizar esta lógica quando o PostModel tiver o authorId
+    final bool isAuthor = post.institution == "Lar dos Idosos"; 
+    // final bool isAuthor = post.authorId == currentUserId;
+
     final isNeed = post.category == 'necessidade';
     final buttonText = isNeed ? "Quero doar" : "Quero receber";
+    
+    final bool isDisponivel = post.postStatus == 'DISPONIVEL';
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -233,6 +259,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   color: ConstantsColors.blueShade900,
                 ).merge(TextStylesConstants.kinterSemiBold),
               ),
+              subtitle: Text(
+                  'Status: ${_traduzirPostStatus(post.postStatus)} | Quantidade: ${post.quantity}'),
             ),
             const SizedBox(height: 16),
             Align(
@@ -274,7 +302,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ConfirmDonationPage(),
+                              builder: (context) => const ConfirmDonationPage(
+                                requestId: 0, // TODO: Passar o ID da Request real
+                              ),
                             ),
                           );
                         },
@@ -294,7 +324,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
-                        onPressed: () async {
+                        onPressed: isDisponivel ? () async {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (context) {
@@ -311,6 +341,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           );
 
                           if (confirmed == true) {
+                            // TODO: Chamar a API _requestApiService.createRequest aqui
+                            
                             final message = isNeed
                                 ? "Interesse em doar registrado!"
                                 : "Interesse em receber registrado!";
@@ -334,9 +366,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               isConfirmed = true;
                             });
                           }
-                        },
+                        } : null,
                         child: Text(
-                          buttonText,
+                          isDisponivel ? buttonText : _traduzirPostStatus(post.postStatus),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,

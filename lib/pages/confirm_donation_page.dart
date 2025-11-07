@@ -1,3 +1,5 @@
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
@@ -6,7 +8,9 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
 
 class ConfirmDonationPage extends StatefulWidget {
-  const ConfirmDonationPage({Key? key}) : super(key: key);
+  final int requestId;
+  const ConfirmDonationPage({Key? key, required this.requestId})
+      : super(key: key);
 
   @override
   State<ConfirmDonationPage> createState() => _ConfirmDonationPageState();
@@ -15,6 +19,47 @@ class ConfirmDonationPage extends StatefulWidget {
 class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
+
+  final ApiClient _apiClient = ApiClient();
+  late final RequestApiService _requestApiService;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestApiService = RequestApiService(_apiClient);
+  }
+
+  Future<void> _confirmDelivery() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await _requestApiService.deliverRequest(widget.requestId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Entrega confirmada com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.go('/root');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao confirmar entrega: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +165,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
                   text: 'Confirmar doação',
                   color: ConstantsColors.blueShade900,
                   textColor: ConstantsColors.whiteShade900,
-                  onPressed: () {},
+                  onPressed: _isLoading ? null : _confirmDelivery,
                 ),
               ),
               const SizedBox(height: 10),

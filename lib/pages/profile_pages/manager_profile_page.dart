@@ -44,6 +44,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 12),
       category: "doacao",
+      postStatus: "DISPONIVEL",
     ),
     PostModel(
       id: "2",
@@ -56,6 +57,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 20),
       category: "doacao",
+      postStatus: "DISPONIVEL",
     ),
     PostModel(
       id: "3",
@@ -68,6 +70,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 25),
       category: "doacao",
+      postStatus: "CONCLUIDO",
     ),
     PostModel(
       id: "4",
@@ -81,6 +84,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "doacao",
+      postStatus: "CONCLUIDO",
     ),
     PostModel(
       id: "5",
@@ -94,6 +98,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "necessidade",
+      postStatus: "DISPONIVEL",
     ),
   ];
 
@@ -233,8 +238,9 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  user?.bio ??
-                      "Esta instituição ainda não adicionou uma descrição.",
+                  (user?.bio != null && user!.bio!.isNotEmpty)
+                      ? user.bio!
+                      : "Esta instituição ainda não adicionou uma descrição.",
                   style: TextStylesConstants.kpoppinsMedium.merge(
                     const TextStyle(
                       fontSize: 14,
