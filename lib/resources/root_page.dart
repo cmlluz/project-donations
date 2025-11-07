@@ -33,14 +33,14 @@ class _RootPageState extends State<RootPage> {
     _initNotifications();
 
     _notificationSubscription =
-        _notificationService.navigationStream.listen((type) {
+        _notificationService.navigationStream.listen((data) {
       if (mounted) {
-        _handleNavigation(type as String);
+        _handleNavigation(data['type'] as String, data);
       }
     });
   }
 
-  void _handleNavigation(String type) {
+  void _handleNavigation(String type, Map<String, dynamic> data) {
     if (type == 'NEW_REQUEST') {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
     } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
@@ -83,7 +83,7 @@ class _RootPageState extends State<RootPage> {
   void logout() async {
     try {
       await _notificationService.deleteToken();
-      await authService.value.signOut();
+      await authService.value.signOut(context);
       AppData.navBarCurrentIndexNotifier.value = 0;
       AppData.onboardingCurrentIndexNotifier.value = 0;
       if (context.mounted) {
@@ -174,7 +174,6 @@ class _RootPageState extends State<RootPage> {
                 ],
               ),
               const SizedBox(height: 24),
-              // 🔹 Primeira linha de opções
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

@@ -51,6 +51,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
       await authService.value.createAccount(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        context: context,
       );
 
       if (mounted) {
@@ -227,8 +228,6 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       onPressed: () {
                         if (formKey.currentState?.validate() ?? false) {
                           registerUser();
-                          GoRouter.of(context)
-                              .push('/finalizeRegistrationPage');
                         }
                       },
                     ),

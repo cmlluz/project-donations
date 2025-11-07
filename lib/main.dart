@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'firebase_options.dart';
 
@@ -30,8 +31,11 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => FavoriteController(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => FavoriteController()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+      ],
       child: const MyApp(),
     ),
   );

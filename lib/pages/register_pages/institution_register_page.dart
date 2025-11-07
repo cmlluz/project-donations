@@ -44,6 +44,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
       await authService.value.createAccount(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        context: context,
       );
       if (mounted) {
         GoRouter.of(context).push('/finalizeRegistrationPage');
