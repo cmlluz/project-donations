@@ -31,10 +31,21 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
   }
 
   Future<void> _confirmDelivery() async {
+    if (_codeController.text.isEmpty || _codeController.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, insira um código de 6 dígitos.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      await _requestApiService.deliverRequest(widget.requestId);
+      await _requestApiService.deliverRequest(
+          widget.requestId, _codeController.text.trim());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +85,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade900,
+        foregroundColor: ConstantsColors.whiteShade700,
         elevation: 0,
         centerTitle: true,
         bottom: const PreferredSize(
@@ -110,7 +121,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Informe a quantidade e o código da doação para confirmar a entrega.',
+                'Insira o código de 6 dígitos fornecido pelo doador/instituição para confirmar a entrega.',
                 style: TextStylesConstants.kpoppinsRegular.merge(
                   const TextStyle(
                     fontSize: 15,
@@ -123,7 +134,27 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Quantidade entregue',
+                  'Código de Confirmação',
+                  style: TextStyle(
+                    color: ConstantsColors.blackShade900,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              CustomTextFields(
+                icon: Icons.password,
+                secret: false,
+                controller: _codeController,
+                keyboardType: TextInputType.number,
+                labelColor: ConstantsColors.whiteShade700,
+                maxLength: 6,
+              ),
+              const SizedBox(height: 25),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Quantidade entregue (Opcional)',
                   style: TextStyle(
                     color: ConstantsColors.blackShade900,
                     fontWeight: FontWeight.bold,
@@ -136,25 +167,6 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
                 secret: false,
                 controller: _quantityController,
                 keyboardType: TextInputType.number,
-                labelColor: ConstantsColors.whiteShade700,
-              ),
-              const SizedBox(height: 25),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Código da doação',
-                  style: TextStyle(
-                    color: ConstantsColors.blackShade900,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              CustomTextFields(
-                icon: Icons.edit_document,
-                secret: false,
-                controller: _codeController,
-                keyboardType: TextInputType.text,
                 labelColor: ConstantsColors.whiteShade700,
               ),
               const SizedBox(height: 40),

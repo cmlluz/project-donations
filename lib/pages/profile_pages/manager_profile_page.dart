@@ -1,4 +1,11 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -6,7 +13,6 @@ import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
-import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +25,12 @@ class ManagerProfilePage extends StatefulWidget {
 
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
   bool showDonations = false;
+  
+  final ApiClient _apiClient = ApiClient();
+  late final DonationApiService _donationApiService;
+  late final NeedApiService _needApiService;
+  
+  Future<Map<String, dynamic>>? _historyFuture;
 
   final List<String> posts = [
     "assets/donations.jpg",
@@ -31,76 +43,36 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     "assets/instituicao.png",
   ];
 
-  final List<PostModel> donations = [
-    PostModel(
-      id: "1",
-      title: "Agasalhos - Doação",
-      description:
-          "Doação de agasalhos para famílias em situação de vulnerabilidade.",
-      quantity: 35,
-      imageUrl: "assets/instituicao.png",
-      location: "Barbalho, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 12),
-      category: "doacao",
-      postStatus: "DISPONIVEL",
-    ),
-    PostModel(
-      id: "2",
-      title: "Vestuário - Doação",
-      description: "Doação de roupas variadas para pessoas em situação de rua.",
-      quantity: 50,
-      imageUrl: "assets/donations.jpg",
-      location: "Rio Vermelho, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 20),
-      category: "doacao",
-      postStatus: "DISPONIVEL",
-    ),
-    PostModel(
-      id: "3",
-      title: "Sapatos - Doação",
-      description: "Distribuição de sapatos para comunidades carentes.",
-      quantity: 20,
-      imageUrl: "assets/donations2.jpg",
-      location: "Pituba, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 25),
-      category: "doacao",
-      postStatus: "CONCLUIDO",
-    ),
-    PostModel(
-      id: "4",
-      title: "Cobertores - Doação",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "doacao",
-      postStatus: "CONCLUIDO",
-    ),
-    PostModel(
-      id: "5",
-      title: "Cobertores - Necessidade",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "necessidade",
-      postStatus: "DISPONIVEL",
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _donationApiService = DonationApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
+    _loadHistory();
+  }
+
+  void _loadHistory() {
+    _historyFuture = _fetchHistoryItems();
+    setState(() {});
+  }
+
+  Future<Map<String, dynamic>> _fetchHistoryItems() async {
+    try {
+      final donationsFuture = _donationApiService.getMyDonations();
+      final needsFuture = _needApiService.getMyNeeds();
+
+      final results = await Future.wait([donationsFuture, needsFuture]);
+      final List<Donation> donations = results[0] as List<Donation>;
+      final List<Need> needs = results[1] as List<Need>;
+
+      return {'donations': donations, 'needs': needs};
+
+    } catch (e) {
+      print("Erro ao carregar histórico: $e");
+      rethrow;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -351,40 +323,91 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   },
                 )
               else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: donations.length,
-                  itemBuilder: (context, index) {
-                    final post = donations[index];
-
-                    return HistoryCard(
-                      titulo: post.title,
-                      local: post.location,
-                      quantidade: post.quantity,
-                      imagem: post.imageUrl,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PostDetailPage(post: post),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                _buildHistory(),
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHistory() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _historyFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text("Erro ao carregar histórico: ${snapshot.error}"));
+        }
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: Text("Nenhum item no histórico."));
+        }
+
+        final List<Donation> donations = snapshot.data!['donations'];
+        final List<Need> needs = snapshot.data!['needs'];
+        final allItems = [...donations, ...needs];
+
+        if (allItems.isEmpty) {
+          return const Center(child: Text("Nenhum item no histórico."));
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1,
+          ),
+          itemCount: allItems.length,
+          itemBuilder: (context, index) {
+            final item = allItems[index];
+
+            if (item is Donation) {
+              return HistoryCard(
+                titulo: item.title,
+                local: "Local Padrão",
+                quantidade: item.quantity,
+                imagem: "assets/instituicao.png",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DonationDetailPage(
+                        donation: item,
+                        isOwnerView: true, 
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else if (item is Need) {
+              return HistoryCard(
+                titulo: item.title,
+                local: "Local Padrão",
+                quantidade: item.quantity,
+                imagem: "assets/donations.jpg",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NeedDetailPage(
+                        need: item,
+                        isOwnerView: true,
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        );
+      },
     );
   }
 }

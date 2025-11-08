@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/models/request_model.dart'; 
+import 'package:appdonationsgestor/models/request_model.dart';
 
 class RequestApiService {
   final ApiClient _apiClient;
@@ -13,6 +13,7 @@ class RequestApiService {
       body: {
         'donationId': donationId,
         'needId': needId,
+        'code': null,
       },
     );
 
@@ -46,8 +47,15 @@ class RequestApiService {
     }
   }
 
-  Future<Request> deliverRequest(int requestId) async {
-    final response = await _apiClient.post('requests/$requestId/deliver');
+  Future<Request> deliverRequest(int requestId, String code) async {
+    final response = await _apiClient.post(
+      'requests/$requestId/deliver',
+      body: {
+        'donationId': null,
+        'needId': null,
+        'code': code,
+      },
+    );
 
     if (response.statusCode == 200) {
       return Request.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
@@ -78,6 +86,26 @@ class RequestApiService {
     } else {
       print("Erro ${response.statusCode}: ${response.body}");
       throw Exception('Falha ao buscar solicitações enviadas');
+    }
+  }
+
+  Future<List<Request>> getRequestsForItem(
+      {int? donationId, int? needId}) async {
+    String endpoint = 'requests/item?';
+    if (donationId != null) {
+      endpoint += 'donationId=$donationId';
+    } else if (needId != null) {
+      endpoint += 'needId=$needId';
+    }
+
+    final response = await _apiClient.get(endpoint);
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Request.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao buscar solicitações do item');
     }
   }
 }

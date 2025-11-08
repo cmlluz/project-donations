@@ -30,6 +30,7 @@ import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/pending_requests_page.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -65,6 +66,7 @@ class RouteNames {
   static const String publishCampaign = "publishCampaign";
   static const String pendingRequests = "pendingRequests";
   static const String allowPostPage = "allowPostPage";
+  static const String confirmDonationPage = "confirmDonationPage";
 }
 
 class AppRountersConfiguration {
@@ -96,6 +98,16 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: PendingRequestsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/confirmDonationPage',
+          name: RouteNames.confirmDonationPage,
+          pageBuilder: (context, state) {
+            final int requestId = state.extra as int;
+            return MaterialPage(
+              child: ConfirmDonationPage(requestId: requestId),
             );
           },
         ),
