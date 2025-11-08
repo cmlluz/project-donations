@@ -1,312 +1,389 @@
-// import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
+import 'package:appdonationsgestor/components/profile_components/history_card.dart';
+import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
-import 'package:appdonationsgestor/components/post_card.dart';
-import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:provider/provider.dart';
 
 class ManagerProfilePage extends StatefulWidget {
-  const ManagerProfilePage({Key? key}) : super(key: key);
+  const ManagerProfilePage({super.key});
 
   @override
-  State<ManagerProfilePage> createState() => _ManagerProfilePage();
+  State<ManagerProfilePage> createState() => _ManagerProfilePageState();
 }
 
-class _ManagerProfilePage extends State<ManagerProfilePage> {
+class _ManagerProfilePageState extends State<ManagerProfilePage> {
+  bool showDonations = false;
+
+  final List<String> posts = [
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+    "assets/donations2.jpg",
+    "assets/donations.jpg",
+    "assets/instituicao.png",
+  ];
+
+  final List<PostModel> donations = [
+    PostModel(
+      id: "1",
+      title: "Agasalhos - Doação",
+      description:
+          "Doação de agasalhos para famílias em situação de vulnerabilidade.",
+      quantity: 35,
+      imageUrl: "assets/instituicao.png",
+      location: "Barbalho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 12),
+      category: "doacao",
+      postStatus: "DISPONIVEL",
+    ),
+    PostModel(
+      id: "2",
+      title: "Vestuário - Doação",
+      description: "Doação de roupas variadas para pessoas em situação de rua.",
+      quantity: 50,
+      imageUrl: "assets/donations.jpg",
+      location: "Rio Vermelho, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 20),
+      category: "doacao",
+      postStatus: "DISPONIVEL",
+    ),
+    PostModel(
+      id: "3",
+      title: "Sapatos - Doação",
+      description: "Distribuição de sapatos para comunidades carentes.",
+      quantity: 20,
+      imageUrl: "assets/donations2.jpg",
+      location: "Pituba, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 25),
+      category: "doacao",
+      postStatus: "CONCLUIDO",
+    ),
+    PostModel(
+      id: "4",
+      title: "Cobertores - Doação",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "doacao",
+      postStatus: "CONCLUIDO",
+    ),
+    PostModel(
+      id: "5",
+      title: "Cobertores - Necessidade",
+      description:
+          "Cobertores arrecadados para distribuição durante o inverno.",
+      quantity: 15,
+      imageUrl: "assets/instituicao.png",
+      location: "Liberdade, Salvador",
+      institution: "Lar dos Idosos",
+      institutionImageUrl: "assets/profile.jpg",
+      createdAt: DateTime(2025, 8, 30),
+      category: "necessidade",
+      postStatus: "DISPONIVEL",
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final user = userProvider.currentUser;
+
+    final bool isManager =
+        user?.role == 'ROLE_ADMIN' || user?.role == 'ROLE_INSTITUTION';
+
+    ImageProvider? profileImage;
+    if (user?.profilePictureUrl != null &&
+        user!.profilePictureUrl!.isNotEmpty) {
+      profileImage = NetworkImage(user.profilePictureUrl!);
+    }
+
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(vertical: 30.0, horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: ConstantsColors.blueShade900,
-                            width: 4.0,
-                          ),
-                        ),
-                        child: const CircleAvatar(
-                          radius: 70,
-                          backgroundImage: NetworkImage(
-                            "https://media.gettyimages.com/id/1317804578/pt/foto/one-businesswoman-headshot-smiling-at-the-camera.jpg?s=612x612&w=0&k=20&c=RXbgBRAoPeDrPXNLXI74Th6Lexbk6PRQ6q0b4rIzEcc=",
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+          backgroundColor: ConstantsColors.whiteShade900,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back,
+                color: ConstantsColors.blueShade900),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: profileImage,
+                    backgroundColor: Colors.grey.shade200,
+                    child: (profileImage == null)
+                        ? const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: ConstantsColors.greyShade600,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            const SizedBox(height: 5),
                             Text(
-                              'Lucia Fontes ',
-                              style: TextStylesConstants.kinterSemiBold
-                                  .merge(const TextStyle(fontSize: 20.0)),
+                              user?.name ?? "Usuário",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                const TextStyle(
+                                  fontSize: 16,
+                                  color: ConstantsColors.blueShade900,
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 3),
+                            if (isManager) ...[
+                              const SizedBox(width: 5),
+                              Image.asset(
+                                'assets/icons/verifiedIcon.png',
+                                height: 18,
+                                width: 18,
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Contato",
+                          style: TextStylesConstants.kinterBold.merge(
+                            const TextStyle(
+                              fontSize: 13,
+                              color: ConstantsColors.blueShade900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.email,
+                                size: 16, color: ConstantsColors.blueShade900),
+                            const SizedBox(width: 4),
                             Text(
-                              'Contato: ',
-                              style: TextStylesConstants.kinterBold
-                                  .merge(const TextStyle(fontSize: 15.0)),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.phone_in_talk_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '(71)12345-6789',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 15.0)),
+                              user?.email ?? "email@exemplo.com",
+                              style: TextStylesConstants.kinterRegular.merge(
+                                const TextStyle(
+                                  fontSize: 13,
+                                  color: ConstantsColors.greyShade800,
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.email_outlined,
-                                    size: 20.0,
-                                    color: ConstantsColors.blackShade700),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Luciafontes@gmail.com',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(fontSize: 15.0)),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(5, -20),
-                        child: IconButton(
-                          icon: const Icon(Icons.settings_outlined,
-                              color: ConstantsColors.blueShade900, size: 30),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SettingsPage()),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Detalhes:',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(fontSize: 20.0),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ali',
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                              fontSize: 14.0,
-                              color: ConstantsColors.greyShade600),
-                        ),
-                      ),
-                    ],
+                  Transform.translate(
+                    offset: const Offset(5, -25),
+                    child: IconButton(
+                      icon: const Icon(Icons.settings_outlined,
+                          color: ConstantsColors.blueShade900, size: 30),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPage()),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Doações',
-                            style: TextStylesConstants.kpoppinsMedium.merge(
-                              const TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                          TextButton(
-                            child: Text(
-                              'ver todas',
-                              style: TextStylesConstants.kinterRegular.merge(
-                                const TextStyle(
-                                    fontSize: 13.0,
-                                    color: ConstantsColors.greyShade900),
-                              ),
-                            ),
-                            onPressed: () {
-                              GoRouter.of(context).push('/hystoryPage');
-                            },
-                          ),
-                        ],
-                      ),
-                      Card(
-                        elevation: 3,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: const Border(
-                              right: BorderSide(
-                                color: ConstantsColors.blueShade900,
-                                width: 5,
-                              ),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Agasalho',
-                                  style: TextStylesConstants.kpoppinsMedium
-                                      .merge(const TextStyle(fontSize: 15))),
-                              const SizedBox(height: 6),
-                              Text('Quantidade: 3',
-                                  style: TextStylesConstants.kinterRegular
-                                      .merge(const TextStyle(
-                                          fontSize: 12,
-                                          color:
-                                              ConstantsColors.greyShade600))),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_pin,
-                                    color: ConstantsColors.greyShade600,
-                                    size: 15,
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('Barbalho, Salvador',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('10 de Abril de 2024',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(const TextStyle(
-                                              fontSize: 12,
-                                              color: ConstantsColors
-                                                  .greyShade600))),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0, vertical: 2.0),
-                                      minimumSize: const Size(0, 0),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      backgroundColor:
-                                          ConstantsColors.greyShade300,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Vestimentas',
-                                      style: TextStylesConstants.kinterRegular
-                                          .merge(
-                                        const TextStyle(
-                                          fontSize: 12,
-                                          color: ConstantsColors.greyShade900,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding:
-                      const EdgeInsetsDirectional.symmetric(horizontal: 6.0),
-                  child: Text(
-                    'Publicações',
-                    textAlign: TextAlign.start,
-                    style: TextStylesConstants.kpoppinsMedium.merge(
-                      const TextStyle(
-                        fontSize: 20.0,
-                        color: ConstantsColors.blackShade900,
-                      ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Detalhes",
+                  style: TextStylesConstants.kpoppinsRegular.merge(
+                    const TextStyle(
+                      fontSize: 20,
+                      color: ConstantsColors.blueShade900,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  (user?.bio != null && user!.bio!.isNotEmpty)
+                      ? user.bio!
+                      : "Esta instituição ainda não adicionou uma descrição.",
+                  style: TextStylesConstants.kpoppinsMedium.merge(
+                    const TextStyle(
+                      fontSize: 14,
+                      color: ConstantsColors.greyShade600,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: ConstantsColors.blueShade900),
+                  color: ConstantsColors.blueShade900.withOpacity(0.1),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showDonations = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !showDonations
+                                ? ConstantsColors.blueShade900
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Publicações",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                TextStyle(
+                                  color: !showDonations
+                                      ? Colors.white
+                                      : ConstantsColors.blueShade900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showDonations = true;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: showDonations
+                                ? ConstantsColors.blueShade900
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Histórico",
+                              style: TextStylesConstants.kpoppinsMedium.merge(
+                                TextStyle(
+                                  color: showDonations
+                                      ? Colors.white
+                                      : ConstantsColors.blueShade900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (!showDonations)
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    mainAxisSpacing: 1.0,
-                    crossAxisSpacing: 1.0,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 1.0,
+                  ),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PublicationsPage(),
+                          ),
+                        );
+                      },
+                      child: ExpandableCard(imageUrl: posts[index]),
+                    );
+                  },
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
                     childAspectRatio: 1,
                   ),
-                  itemCount: 24,
+                  itemCount: donations.length,
                   itemBuilder: (context, index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                      color: Colors.white,
-                      child: const PostCard(
-                        imageUrl: 'assets/donations.jpg',
-                      ),
+                    final post = donations[index];
+
+                    return HistoryCard(
+                      titulo: post.title,
+                      local: post.location,
+                      quantidade: post.quantity,
+                      imagem: post.imageUrl,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostDetailPage(post: post),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
-              ],
-            ),
+              const SizedBox(height: 24),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

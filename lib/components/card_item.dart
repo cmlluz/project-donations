@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 
-class CardItem extends StatelessWidget {
+class CardItem extends StatefulWidget {
   const CardItem({
     super.key,
     this.onTap,
@@ -23,6 +23,46 @@ class CardItem extends StatelessWidget {
   final String imageAsset;
 
   @override
+  State<CardItem> createState() => _CardItemState();
+}
+
+class _CardItemState extends State<CardItem> {
+  bool _isExpanded = false;
+  bool _isOverflowing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
+  }
+
+  void _checkOverflow() {
+    if (widget.subtitle == null) return;
+
+    final textSpan = TextSpan(
+      text: widget.subtitle,
+      style: const TextStyle(
+        color: ConstantsColors.blueShade900,
+        fontSize: 14,
+      ).merge(TextStylesConstants.kpoppinsMedium),
+    );
+
+    final tp = TextPainter(
+      text: textSpan,
+      maxLines: 2,
+      textDirection: TextDirection.ltr,
+    );
+
+    tp.layout(maxWidth: MediaQuery.of(context).size.width - 60);
+
+    if (mounted) {
+      setState(() {
+        _isOverflowing = tp.didExceedMaxLines;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -31,8 +71,8 @@ class CardItem extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.25),
-            offset: const Offset(0, 4), // deslocamento x e y
-            blurRadius: 4, // desfoque
+            offset: const Offset(0, 4),
+            blurRadius: 4,
           ),
         ],
       ),
@@ -41,7 +81,7 @@ class CardItem extends StatelessWidget {
         child: Material(
           color: ConstantsColors.whiteShade900,
           child: InkWell(
-            onTap: onTap,
+            onTap: widget.onTap,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -54,11 +94,11 @@ class CardItem extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundImage: NetworkImage(avatarUrl),
+                            backgroundImage: NetworkImage(widget.avatarUrl),
                           ),
                           const SizedBox(width: 9),
                           Text(
-                            title,
+                            widget.title,
                             style: const TextStyle(
                               color: ConstantsColors.blueShade900,
                               fontSize: 15,
@@ -69,12 +109,10 @@ class CardItem extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Image.asset(
-                            "assets/icons/location_icon.png",
-                          ),
+                          Image.asset("assets/icons/location_icon.png"),
                           const SizedBox(width: 4),
                           Text(
-                            "$location, $date",
+                            "${widget.location}, ${widget.date}",
                             style: const TextStyle(
                               color: ConstantsColors.greyShade500,
                               fontSize: 10,
@@ -85,28 +123,54 @@ class CardItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Subtitle com limite de 2 linhas e reticências
-                if (subtitle != null)
+
+                if (widget.subtitle != null)
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 27.0, top: 15.0, bottom: 15.0, right: 13.0),
-                    child: Text(
-                      subtitle!,
-                      style: const TextStyle(
-                        color: ConstantsColors.blueShade900,
-                        fontSize: 14,
-                      ).merge(TextStylesConstants.kpoppinsMedium),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.subtitle!,
+                          style: const TextStyle(
+                            color: ConstantsColors.blueShade900,
+                            fontSize: 14,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                          maxLines: _isExpanded ? null : 2,
+                          overflow: _isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                        ),
+                        if (_isOverflowing) ...[
+                          const SizedBox(height: 4),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isExpanded = !_isExpanded;
+                              });
+                            },
+                            child: Text(
+                              _isExpanded ? "Ver menos" : "Ver mais",
+                              style: const TextStyle(
+                                color: ConstantsColors.blueShade900,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ]
+                      ],
                     ),
                   ),
-                // Imagem principal
+
                 Container(
                   height: 230.0,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     image: DecorationImage(
-                      image: AssetImage(imageAsset),
+                      image: AssetImage(widget.imageAsset),
                       fit: BoxFit.cover,
                     ),
                   ),

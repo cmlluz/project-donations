@@ -1,9 +1,10 @@
 import 'package:appdonationsgestor/components/card_item.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/components/popup.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -44,41 +45,17 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  // Display do popup de atualização cadastral
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     showDialog(
-  //       context: context,
-  //       barrierDismissible: false,
-  //       builder: (context) {
-  //         final screenWidth = MediaQuery.of(context).size.width;
-  //         final dialogWidth = screenWidth * 0.9;
-
-  //         return AlertDialog(
-  //           backgroundColor: ConstantsColors.blueShade400,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(20),
-  //           ),
-  //           content: SizedBox(
-  //             width: dialogWidth,
-  //             child: const Popup(
-  //               title: "Seus dados estão desatualizados",
-  //               subtitle:
-  //                   "Complete as suas informações e utilize todas as funcionalidades que <nome do app> tem para lhe oferecer!",
-  //               confirmText: "Atualizar agora",
-  //               cancelText: "Me lembre mais tarde",
-  //               confirmRoute: "/editProfilePage",
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //     );
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final userName = userProvider.currentUser?.name ?? 'Usuário';
+    final userImageUrl = userProvider.currentUser?.profilePictureUrl;
+
+    ImageProvider profileImage = const AssetImage("assets/profile_default.png");
+    if (userImageUrl != null && userImageUrl.isNotEmpty) {
+      profileImage = NetworkImage(userImageUrl);
+    }
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight + 20),
@@ -112,13 +89,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 24,
-                          backgroundImage: AssetImage("assets/profile.jpg"),
+                          backgroundImage: profileImage,
                         ),
                         const SizedBox(width: 11.0),
                         Text(
-                          'Olá, Name 👋',
+                          'Olá, $userName 👋',
                           style: const TextStyle(
                             color: ConstantsColors.blueShade900,
                             fontSize: 20,
@@ -150,7 +127,6 @@ class _HomePageState extends State<HomePage> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 29.0),
                 child: CardItem(
-                  onTap: () => print("Clicou no card ${card['title']}"),
                   title: card['title']!,
                   subtitle: card['subtitle'],
                   avatarUrl: card['avatarUrl']!,

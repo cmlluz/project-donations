@@ -1,9 +1,22 @@
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/components/popup.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
+import 'package:appdonationsgestor/pages/item_edit_page.dart';
+import 'package:provider/provider.dart';
 
 class PostDetailPage extends StatefulWidget {
-  const PostDetailPage({Key? key}) : super(key: key);
+  final PostModel post;
+  final String? currentUser;
+
+  const PostDetailPage({
+    Key? key,
+    required this.post,
+    this.currentUser,
+  }) : super(key: key);
 
   @override
   State<PostDetailPage> createState() => _PostDetailPageState();
@@ -11,161 +24,359 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   bool isFavorite = false;
+  bool isConfirmed = false;
+
+  String _traduzirPostStatus(String status) {
+    switch (status) {
+      case 'DISPONIVEL':
+        return 'Disponível';
+      case 'PENDENTE_APROVACAO':
+        return 'Em Análise';
+      case 'CONCLUIDO':
+        return 'Concluído';
+      case 'REJEITADO':
+        return 'Rejeitado';
+      default:
+        return status;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final post = widget.post;
+    
+    final currentUserId =
+        context.watch<UserProvider>().currentUser?.firebaseUid ?? '';
+    
+    // TODO: Atualizar esta lógica quando o PostModel tiver o authorId
+    final bool isAuthor = post.institution == "Lar dos Idosos"; 
+    // final bool isAuthor = post.authorId == currentUserId;
+
+    final isNeed = post.category == 'necessidade';
+    final buttonText = isNeed ? "Quero doar" : "Quero receber";
+    
+    final bool isDisponivel = post.postStatus == 'DISPONIVEL';
+
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(25), // Arredonda tudo
-                    child: Image.asset(
-                      'assets/instituicao.png',
-                      width: double.infinity,
-                      height: 300,
-                      fit: BoxFit.cover,
+        padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image.asset(
+                    post.imageUrl,
+                    width: double.infinity,
+                    height: 400,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 400,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: const Icon(
+                          Icons.image,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: CircleAvatar(
+                    backgroundColor: ConstantsColors.blueShade900,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: ConstantsColors.whiteShade900,
+                      ),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ),
+                ),
+                if (!isAuthor)
                   Positioned(
                     top: 16,
-                    left: 16,
+                    right: 16,
                     child: CircleAvatar(
-                      backgroundColor:
-                          ConstantsColors.blueShade900.withOpacity(0.5),
+                      backgroundColor: isFavorite
+                          ? ConstantsColors.blueShade900
+                          : Colors.grey.withOpacity(0.5),
                       child: IconButton(
                         icon: const Icon(
-                          Icons.arrow_back,
-                          color: ConstantsColors.whiteShade900,
+                          Icons.favorite,
+                          color: Colors.white,
                         ),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                        },
                       ),
                     ),
                   ),
-                  // Positioned(
-                  //   top: 16,
-                  //   right: 16,
-                  //   child: CircleAvatar(
-                  //     backgroundColor:
-                  //         ConstantsColors.blueShade900.withOpacity(0.5),
-                  //     child: IconButton(
-                  //       icon: Icon(
-                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
-                  //         color: isFavorite
-                  //             ? Colors.red
-                  //             : ConstantsColors.whiteShade900,
-                  //       ),
-                  //       onPressed: () {
-                  //         setState(() {
-                  //           isFavorite = !isFavorite;
-                  //         });
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
+                if (isAuthor)
                   Positioned(
-                    bottom: 16,
-                    left: 16,
+                    top: 16,
                     right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: ConstantsColors.blueShade900.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Agasalhos - Necessidade",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.edit,
+                              color: ConstantsColors.whiteShade900,
                             ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ItemEditPage(),
+                                ),
+                              );
+                            },
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.location_pin,
-                                  color: Colors.white, size: 16),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Barbalho, Salvador",
-                                style:
-                                    TextStylesConstants.kpoppinsRegular.merge(
-                                  const TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.white,
+                        ),
+                        const SizedBox(width: 12),
+                        CircleAvatar(
+                          backgroundColor: Colors.red.shade700,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: ConstantsColors.whiteShade900,
+                            ),
+                            onPressed: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  insetPadding:
+                                      EdgeInsets.symmetric(horizontal: 24),
+                                  child: Popup(
+                                    title: "Excluir publicação",
+                                    subtitle:
+                                        "Tem certeza de que deseja excluir este post?",
+                                    confirmText: "Excluir",
+                                    cancelText: "Cancelar",
+                                    confirmButtonColor: Colors.redAccent,
                                   ),
                                 ),
-                              ),
-                            ],
+                              );
+
+                              if (confirmed == true) {
+                                Navigator.of(context).pop(true);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Publicação excluída com sucesso!",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: ConstantsColors.blackShade900,
+                                      ).merge(
+                                          TextStylesConstants.kinterRegular),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    backgroundColor:
+                                        ConstantsColors.blueShade400,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const CircleAvatar(
-                  backgroundImage: AssetImage('assets/instituicao.png'),
-                ),
-                title: Text(
-                  "Lar dos idosos",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: ConstantsColors.blueShade900,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ).merge(TextStylesConstants.kinterSemiBold),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.location_pin,
+                                color: ConstantsColors.greyShade600, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              post.location,
+                              style: TextStylesConstants.krobotoRegular.merge(
+                                const TextStyle(
+                                  fontSize: 18.0,
+                                  color: ConstantsColors.greyShade600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: AssetImage(post.institutionImageUrl),
+                onBackgroundImageError: (exception, stackTrace) {},
+                child: post.institutionImageUrl.isEmpty
+                    ? const Icon(Icons.business)
+                    : null,
               ),
-              const SizedBox(height: 16),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    "Detalhes",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                ),
+              title: Text(
+                post.institution,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: ConstantsColors.blueShade900,
+                ).merge(TextStylesConstants.kinterSemiBold),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
+              subtitle: Text(
+                  'Status: ${_traduzirPostStatus(post.postStatus)} | Quantidade: ${post.quantity}'),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.",
-                  style: TextStyle(color: Colors.black54),
+                  "Detalhes",
+                  style: const TextStyle(
+                    fontSize: 22,
+                    color: ConstantsColors.blueShade900,
+                  ).merge(TextStylesConstants.kpoppinsMedium),
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                post.description,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: ConstantsColors.greyShade600,
+                ).merge(TextStylesConstants.kpoppinsMedium),
+              ),
+            ),
+            if (!isAuthor)
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ConstantsColors.blueShade900,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    // definir rota
-                  },
-                  child: const Text(
-                    "Quero doar",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
+                child: isConfirmed && isNeed
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.redShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ConfirmDonationPage(
+                                requestId: 0, // TODO: Passar o ID da Request real
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Confirmar a doação",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                        onPressed: isDisponivel ? () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return const Dialog(
+                                child: Popup(
+                                  title: "Permissão de compartilhamento",
+                                  subtitle:
+                                      "Você permite o compartilhamento dos seus dados para que a instituição entre em contato?",
+                                  confirmText: "Confirmar",
+                                  cancelText: "Cancelar",
+                                ),
+                              );
+                            },
+                          );
+
+                          if (confirmed == true) {
+                            // TODO: Chamar a API _requestApiService.createRequest aqui
+                            
+                            final message = isNeed
+                                ? "Interesse em doar registrado!"
+                                : "Interesse em receber registrado!";
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  message,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: ConstantsColors.blackShade900,
+                                  ).merge(TextStylesConstants.kinterRegular),
+                                  textAlign: TextAlign.center,
+                                ),
+                                backgroundColor: ConstantsColors.blueShade400,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+
+                            setState(() {
+                              isConfirmed = true;
+                            });
+                          }
+                        } : null,
+                        child: Text(
+                          isDisponivel ? buttonText : _traduzirPostStatus(post.postStatus),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ).merge(TextStylesConstants.kpoppinsMedium),
+                        ),
+                      ),
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+          ],
         ),
       ),
     );

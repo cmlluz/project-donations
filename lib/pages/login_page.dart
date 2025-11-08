@@ -30,7 +30,7 @@ class _LoginPage extends State<LoginPage> {
     super.dispose();
   }
 
-  /*Future<void> signIn() async {
+  Future<void> signIn() async {
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -40,6 +40,7 @@ class _LoginPage extends State<LoginPage> {
       await firebaseAuth.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        context: context,
       );
       if (mounted) {
         GoRouter.of(context).push('/root');
@@ -53,7 +54,7 @@ class _LoginPage extends State<LoginPage> {
         isLoading = false;
       });
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,24 +74,10 @@ class _LoginPage extends State<LoginPage> {
                   children: [
                     const SizedBox(height: 40),
                     Image.asset(
-                      'assets/appLogo.png',
-                      width: 100,
-                      height: 100,
+                      'assets/LogoName.png',
+                      width: 180,
+                      height: 180,
                     ),
-                    const Text(
-                      'Colab',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontFamily: 'Jacques Francois',
-                        color: ConstantsColors.blueShade900,
-                      ),
-                    ),
-                    const Text("Salvador",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontFamily: 'Jacques Francois',
-                          color: ConstantsColors.blueShade900,
-                        )),
                     const SizedBox(height: 40),
                     CustomTextFields(
                       icon: Icons.email,
@@ -140,10 +127,6 @@ class _LoginPage extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        onPressed: () {
-                          GoRouter.of(context).push('/root');
-                        },
-                        /* 
                         onPressed: isLoading ? null : signIn,
                         child: isLoading
                             ? const SizedBox(
@@ -161,14 +144,6 @@ class _LoginPage extends State<LoginPage> {
                                   fontSize: 18,
                                 ),
                               ),
-                        */
-                        child: const Text(
-                          'Entrar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -224,7 +199,7 @@ class _LoginPage extends State<LoginPage> {
                           child: GoogleAuthButton(
                             onPressed: () async {
                               try {
-                                await firebaseAuth.loginWithGoogle();
+                                await firebaseAuth.loginWithGoogle(context);
                                 if (mounted) {
                                   GoRouter.of(context).push('/root');
                                 }
@@ -245,7 +220,7 @@ class _LoginPage extends State<LoginPage> {
                           child: FacebookAuthButton(
                             onPressed: () async {
                               try {
-                                await firebaseAuth.loginWithFacebook();
+                                await firebaseAuth.loginWithFacebook(context);
                                 if (mounted) {
                                   GoRouter.of(context).push('/root');
                                 }

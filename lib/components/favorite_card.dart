@@ -2,23 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:go_router/go_router.dart';
 
-class ItemModel {
-  final String name;
-  final String description;
-  final String imageUrl;
-
-  ItemModel({
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-  });
-}
-
 class FavoriteCard extends StatelessWidget {
   final String name;
   final String description;
   final String imageUrl;
   final VoidCallback onDelete;
+  final VoidCallback? onTap; 
+  final bool isNetwork;
 
   const FavoriteCard({
     super.key,
@@ -26,16 +16,23 @@ class FavoriteCard extends StatelessWidget {
     required this.description,
     required this.imageUrl,
     required this.onDelete,
+    this.onTap, 
+    this.isNetwork = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider backgroundImage;
+    if (isNetwork && imageUrl.startsWith('http')) {
+      backgroundImage = NetworkImage(imageUrl);
+    } else {
+      backgroundImage = AssetImage(imageUrl.isEmpty ? 'assets/placeholder.png' : imageUrl);
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
-        onTap: () {
-          GoRouter.of(context).push('/institutionProfilePage');
-        },
+        onTap: onTap,
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -56,13 +53,16 @@ class FavoriteCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: CircleAvatar(
                   radius: 25,
-                  backgroundImage: NetworkImage(imageUrl),
+                  backgroundImage: backgroundImage,
+                  onBackgroundImageError: (exception, stackTrace) {},
+                  child: null, 
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,6 +89,7 @@ class FavoriteCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       description,
                       style: const TextStyle(

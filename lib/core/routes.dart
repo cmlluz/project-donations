@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/pages/allow_post_page.dart';
 import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 import 'package:appdonationsgestor/pages/item_edit_page.dart';
@@ -15,15 +16,20 @@ import 'package:appdonationsgestor/pages/forgot_password_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/finalize_registration_page.dart';
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/manager_profile_page.dart';
-import 'package:appdonationsgestor/pages/settings_pages/remove_account_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/delete_account_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/confirm_deletion_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/delete_feedback_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
-import 'package:appdonationsgestor/pages/necessity_page.dart';
+import 'package:appdonationsgestor/pages/settings_pages/link_manager_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/publish_campaign.dart';
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/pages/pending_requests_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -45,15 +51,20 @@ class RouteNames {
   static const String finalizeRegistrationPage = "finalizeRegistrationPage";
   static const String favoritesPage = "favoritesPage";
   static const String managerProfilePage = "managerProfilePage";
-  static const String removeAccountPage = "removeAccountPage";
+  static const String deleteAccountPage = "deleteAccountPage";
+  static const String confirmDeletionPage = "confirmDeletionPage";
+  static const String deleteFeedbackPage = "deleteFeedbackPage";
   static const String editProfilePage = "editProfilePage";
-  static const String necessityPage = "necessityPage";
   static const String hystoryPage = "hystoryPage";
   static const String postDetailPage = "postDetailPage";
   static const String confirmedRegistration = "confirmedRegistration";
   static const String notaFiscalPage = "notaFiscalPage";
   static const String feedbackPage = "feedback";
   static const String notificationsPage = "notificationsPage";
+  static const String linkManagerPage = "linkManagerPage";
+  static const String publishCampaign = "publishCampaign";
+  static const String pendingRequests = "pendingRequests";
+  static const String allowPostPage = "allowPostPage";
 }
 
 class AppRountersConfiguration {
@@ -80,10 +91,32 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
+          path: '/pendingRequests',
+          name: RouteNames.pendingRequests,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: PendingRequestsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/allowPostPage',
+          name: RouteNames.allowPostPage,
+          pageBuilder: (context, state) {
+            final Map<String, String> data = state.extra as Map<String, String>;
+            return MaterialPage(
+              child: AllowPostPage(
+                itemId: data['itemId']!,
+                itemType: data['itemType']!,
+              ),
+            );
+          },
+        ),
+        GoRoute(
           path: '/itemPostPage',
           name: RouteNames.itemPostPage,
           pageBuilder: (context, state) {
-            return MaterialPage(
+            return const MaterialPage(
               child: ItemPostPage(),
             );
           },
@@ -93,7 +126,12 @@ class AppRountersConfiguration {
           name: RouteNames.institutionProfilePage,
           pageBuilder: (context, state) {
             return const MaterialPage(
-              child: InstitutionProfilePage(),
+              child: InstitutionProfilePage(
+                userId: '',
+                userName: 'Usuário',
+                userEmail: '',
+                userImageUrl: '',
+              ),
             );
           },
         ),
@@ -186,18 +224,33 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-            path: '/managerProfilePage',
-            name: RouteNames.managerProfilePage,
-            pageBuilder: (context, state) {
-              return const MaterialPage(
-                child: ManagerProfilePage(),
-              );
-            }),
+          path: '/managerProfilePage',
+          name: RouteNames.managerProfilePage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: ManagerProfilePage(),
+            );
+          },
+        ),
         GoRoute(
-          path: '/removeAccountPage',
-          name: RouteNames.removeAccountPage,
+          path: '/deleteAccountPage',
+          name: RouteNames.deleteAccountPage,
           pageBuilder: (context, state) => const MaterialPage(
-            child: RemoveAccountPage(),
+            child: DeleteAccountPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/confirmDeletionPage',
+          name: RouteNames.confirmDeletionPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: ConfirmDeletionPage(),
+          ),
+        ),
+        GoRoute(
+          path: '/deleteFeedbackPage',
+          name: RouteNames.deleteFeedbackPage,
+          pageBuilder: (context, state) => const MaterialPage(
+            child: DeleteFeedbackPage(),
           ),
         ),
         GoRoute(
@@ -205,13 +258,6 @@ class AppRountersConfiguration {
           name: RouteNames.editProfilePage,
           pageBuilder: (context, state) => const MaterialPage(
             child: EditProfilePage(),
-          ),
-        ),
-        GoRoute(
-          path: '/necessityPage',
-          name: RouteNames.necessityPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: NecessityPage(),
           ),
         ),
         GoRoute(
@@ -224,9 +270,25 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/postDetailPage',
           name: RouteNames.postDetailPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: PostDetailPage(),
-          ),
+          pageBuilder: (context, state) {
+            final postData = state.extra as PostModel?;
+            final post = postData ??
+                PostModel(
+                  id: '0',
+                  title: 'Post não encontrado',
+                  description: 'Não foi possível carregar os dados do post.',
+                  imageUrl: 'assets/instituicao.png',
+                  location: 'Salvador, Bahia',
+                  institution: 'Sistema',
+                  institutionImageUrl: 'assets/instituicao.png',
+                  createdAt: DateTime.now(),
+                  category: 'outros',
+                );
+
+            return MaterialPage(
+              child: PostDetailPage(post: post),
+            );
+          },
         ),
         GoRoute(
           path: '/confirmedRegistration',
@@ -252,6 +314,24 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: NotificationsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/publishCampaign',
+          name: RouteNames.publishCampaign,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: PublishCampaignPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/linkManagerPage',
+          name: RouteNames.linkManagerPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: LinkManagerPage(),
             );
           },
         ),
