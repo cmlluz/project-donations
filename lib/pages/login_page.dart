@@ -40,6 +40,7 @@ class _LoginPage extends State<LoginPage> {
       await firebaseAuth.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+        context: context,
       );
       if (mounted) {
         GoRouter.of(context).push('/root');
@@ -198,7 +199,7 @@ class _LoginPage extends State<LoginPage> {
                           child: GoogleAuthButton(
                             onPressed: () async {
                               try {
-                                await firebaseAuth.loginWithGoogle();
+                                await firebaseAuth.loginWithGoogle(context);
                                 if (mounted) {
                                   GoRouter.of(context).push('/root');
                                 }
@@ -219,7 +220,7 @@ class _LoginPage extends State<LoginPage> {
                           child: FacebookAuthButton(
                             onPressed: () async {
                               try {
-                                await firebaseAuth.loginWithFacebook();
+                                await firebaseAuth.loginWithFacebook(context);
                                 if (mounted) {
                                   GoRouter.of(context).push('/root');
                                 }

@@ -6,8 +6,8 @@ import 'package:appdonationsgestor/services/api_services/request_api_service.dar
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/components/popup.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class HystoryPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _HystoryPage extends State<HystoryPage> {
     _requestApiService = RequestApiService(_apiClient);
     _loadMyRequests();
   }
-  
+
   void _loadMyRequests() {
     _myRequestsFuture = _requestApiService.getMySentRequests();
   }
@@ -68,9 +68,8 @@ class _HystoryPage extends State<HystoryPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () => context.go('/root')),
       ),
       backgroundColor: ConstantsColors.whiteShade900,
       body: FutureBuilder<List<Request>>(
@@ -97,19 +96,23 @@ class _HystoryPage extends State<HystoryPage> {
             itemBuilder: (context, index) {
               final request = requests[index];
               final item = request.donation ?? request.need;
-              
+
               if (item == null) return const SizedBox.shrink();
 
-              final title = item is Donation ? item.title : (item as Need).title;
-              final category = item is Donation ? item.category : (item as Need).category;
-              final quantity = item is Donation ? item.quantity : (item as Need).quantity;
-              
+              final title =
+                  item is Donation ? item.title : (item as Need).title;
+              final category =
+                  item is Donation ? item.category : (item as Need).category;
+              final quantity =
+                  item is Donation ? item.quantity : (item as Need).quantity;
+
               final statusText = _formatStatus(request.status);
               final statusIcon = _getStatusIcon(request.status);
               final statusColor = _getStatusColor(request.status);
-              
-              final formattedDate = DateFormat('dd \'de\' MMMM \'de\' yyyy', 'pt_BR')
-                  .format(request.createdAt);
+
+              final formattedDate =
+                  DateFormat('dd \'de\' MMMM \'de\' yyyy', 'pt_BR')
+                      .format(request.createdAt);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 50.0),
@@ -180,7 +183,8 @@ class _HystoryPage extends State<HystoryPage> {
                                         builder: (_) => AlertDialog(
                                           content: Popup(
                                             title: 'Contato do Doador',
-                                            subtitle: 'Telefone: ${request.dono.phone}',
+                                            subtitle:
+                                                'Telefone: ${request.dono.phone}',
                                             cancelText: 'Fechar',
                                           ),
                                         ),
@@ -190,11 +194,15 @@ class _HystoryPage extends State<HystoryPage> {
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(0, 0),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   child: Text(
-                                    request.status == 'APROVADO' ? 'Ver contato' : 'Detalhes',
-                                    style: TextStylesConstants.kinterRegular.merge(
+                                    request.status == 'APROVADO'
+                                        ? 'Ver contato'
+                                        : 'Detalhes',
+                                    style:
+                                        TextStylesConstants.kinterRegular.merge(
                                       const TextStyle(
                                         fontSize: 13,
                                         color: ConstantsColors.greyShade900,
@@ -225,7 +233,8 @@ class _HystoryPage extends State<HystoryPage> {
                                 const SizedBox(width: 3),
                                 Text(
                                   'Dono: ${request.dono.name}',
-                                  style: TextStylesConstants.kinterRegular.merge(
+                                  style:
+                                      TextStylesConstants.kinterRegular.merge(
                                     const TextStyle(
                                       fontSize: 12,
                                       color: ConstantsColors.greyShade600,
@@ -240,7 +249,8 @@ class _HystoryPage extends State<HystoryPage> {
                               children: [
                                 Text(
                                   formattedDate,
-                                  style: TextStylesConstants.kinterRegular.merge(
+                                  style:
+                                      TextStylesConstants.kinterRegular.merge(
                                     const TextStyle(
                                       fontSize: 12,
                                       color: ConstantsColors.greyShade600,
@@ -256,8 +266,8 @@ class _HystoryPage extends State<HystoryPage> {
                                   ),
                                   child: Text(
                                     category.toString().split('.').last,
-                                    style:
-                                        TextStylesConstants.kpoppinsMedium.merge(
+                                    style: TextStylesConstants.kpoppinsMedium
+                                        .merge(
                                       const TextStyle(
                                         fontSize: 12,
                                         color: ConstantsColors.blackShade900,

@@ -70,7 +70,7 @@ class AppSearchController with ChangeNotifier {
               category: SearchCategory.necessidade,
               institution: n.authorName,
               date: n.date ?? DateTime.now(),
-              status: n.status,
+              postStatus: n.postStatus,
               quantity: n.quantity,
             )),
         ...donations.map((d) => SearchItem(
@@ -81,7 +81,7 @@ class AppSearchController with ChangeNotifier {
               category: SearchCategory.doacao,
               institution: d.donatorName,
               date: d.date ?? DateTime.now(),
-              status: d.status,
+              postStatus: d.postStatus,
               quantity: d.quantity,
             )),
       ];

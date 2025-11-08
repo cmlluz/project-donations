@@ -4,7 +4,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
-import 'package:appdonationsgestor/services/api_services/request_api_service.dart'; // Importar
+import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
@@ -12,7 +12,8 @@ import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 class DonationDetailPage extends StatefulWidget {
   final Donation donation;
 
-  const DonationDetailPage({Key? key, required this.donation}) : super(key: key);
+  const DonationDetailPage({Key? key, required this.donation})
+      : super(key: key);
 
   @override
   State<DonationDetailPage> createState() => _DonationDetailPageState();
@@ -20,18 +21,18 @@ class DonationDetailPage extends StatefulWidget {
 
 class _DonationDetailPageState extends State<DonationDetailPage> {
   late final FavoriteApiService _favoriteApiService;
-  late final RequestApiService _requestApiService; // Adicionar
+  late final RequestApiService _requestApiService;
   final ApiClient _apiClient = ApiClient();
 
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
-  bool _isLoadingRequest = false; 
+  bool _isLoadingRequest = false;
 
   @override
   void initState() {
     super.initState();
     _favoriteApiService = FavoriteApiService(_apiClient);
-    _requestApiService = RequestApiService(_apiClient); 
+    _requestApiService = RequestApiService(_apiClient);
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isDonationFavorite(widget.donation.id);
   }
@@ -40,7 +41,8 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     if (_isLoadingFavorite) return;
 
     final newFavoriteState = !_isFavorite;
-    final favController = Provider.of<FavoriteController>(context, listen: false);
+    final favController =
+        Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
       _isLoadingFavorite = true;
@@ -116,10 +118,27 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     }
   }
 
+  String _traduzirPostStatus(String status) {
+    switch (status) {
+      case 'DISPONIVEL':
+        return 'Disponível';
+      case 'PENDENTE_APROVACAO':
+        return 'Em Análise';
+      case 'CONCLUIDO':
+        return 'Entregue';
+      case 'REJEITADO':
+        return 'Rejeitado';
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final formattedDate =
         DateFormat('dd/MM/yyyy').format(widget.donation.date ?? DateTime.now());
+    final bool isDisponivel = widget.donation.postStatus == 'DISPONIVEL';
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -190,7 +209,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
                     subtitle: Text(
-                        'Status: ${widget.donation.status} | Quantidade: ${widget.donation.quantity}'),
+                        'Status: ${_traduzirPostStatus(widget.donation.postStatus)} | Quantidade: ${widget.donation.quantity}'),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -220,13 +239,18 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      onPressed: _isLoadingRequest ? null : _submitRequest,
+                      onPressed: _isLoadingRequest || !isDisponivel
+                          ? null
+                          : _submitRequest,
                       child: _isLoadingRequest
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Quero Receber",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
+                          : Text(
+                              isDisponivel
+                                  ? "Quero Receber"
+                                  : _traduzirPostStatus(
+                                      widget.donation.postStatus),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
                             ),
                     ),
                   ),

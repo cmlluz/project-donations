@@ -37,8 +37,8 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) return null;
-    final phoneRegex = RegExp(r'^\(\d{2}\)\s\d{4,5}-\d{4}$');
-    return phoneRegex.hasMatch(value) ? null : 'Formato: (11) 99999-9999';
+    final phoneRegex = RegExp(r'^\d{2}\s\d{4,5}-\d{4}$');
+    return phoneRegex.hasMatch(value) ? null : 'Formato: 11 99999-9999';
   }
 
   String? _validatePix(String? value) {
@@ -172,7 +172,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
           controller: controller.phoneController,
           keyboardType: TextInputType.phone,
           validator: _validatePhone,
-          hintText: '(11) 99999-9999',
+          hintText: '11 99999-9999',
         ),
         const SizedBox(height: 20),
         CustomTextFields(

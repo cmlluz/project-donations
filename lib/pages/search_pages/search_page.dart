@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/controllers/search_controller.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/pages/search_pages/filter_pages/generic_filter_page.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   }
 
   PreferredSize _buildAppBar() {
+    final userProvider = context.watch<UserProvider>();
+    final userName = userProvider.currentUser?.name ?? 'Usuário';
+    final userImageUrl = userProvider.currentUser?.profilePictureUrl;
+
+    ImageProvider profileImage = const AssetImage("assets/profile_default.png");
+    if (userImageUrl != null && userImageUrl.isNotEmpty) {
+      profileImage = NetworkImage(userImageUrl);
+    }
+
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight + 20),
       child: Container(
@@ -85,13 +95,13 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   ),
                   child: Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 24,
-                        backgroundImage: AssetImage("assets/profile.jpg"),
+                        backgroundImage: profileImage,
                       ),
                       const SizedBox(width: 11.0),
                       Text(
-                        'Olá, Usuário 👋',
+                        'Olá, $userName 👋',
                         style: const TextStyle(
                           color: ConstantsColors.blueShade900,
                           fontSize: 20,

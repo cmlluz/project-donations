@@ -25,7 +25,6 @@ class _ItemPostPageState extends State<ItemPostPage> {
       ProductRegistrationController();
   final PostTypeController _controller1 = PostTypeController();
 
-  // 1. Declare os serviços, mas NÃO os inicialize aqui
   final ApiClient _apiClient = ApiClient();
   late final NeedApiService _needsApiService;
   late final DonationApiService _donationApiService;
@@ -34,7 +33,6 @@ class _ItemPostPageState extends State<ItemPostPage> {
   File? _selectedImg;
   bool _isLoading = false;
 
-  // 2. Inicialize os serviços dependentes no initState
   @override
   void initState() {
     super.initState();
@@ -115,11 +113,9 @@ class _ItemPostPageState extends State<ItemPostPage> {
           'description': description,
           'quantity': quantity,
           'category': category.toUpperCase(),
-          'status': 'PENDENTE',
           'date': DateTime.now().toIso8601String().split('T').first,
           'imageUrl': imageUrl,
         });
-        if (mounted) GoRouter.of(context).push('/feedback?text1=Necessidade');
       } else if (postType == 'Doação') {
         await _donationApiService.createDonation({
           'title': itemName,
@@ -127,11 +123,12 @@ class _ItemPostPageState extends State<ItemPostPage> {
           'quantity': quantity,
           'category': category.toUpperCase(),
           'date': DateTime.now().toIso8601String().split('T').first,
-          'status': 'PENDENTE',
           'imageUrl': imageUrl,
         });
-        if (mounted) GoRouter.of(context).push('/feedback?text1=Doação');
       }
+
+      if (mounted)
+        GoRouter.of(context).push('/feedback?text1=Item enviado para análise');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -160,7 +157,7 @@ class _ItemPostPageState extends State<ItemPostPage> {
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade900,
+        foregroundColor: ConstantsColors.whiteShade700,
         elevation: 0,
         centerTitle: true,
       ),

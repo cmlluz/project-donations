@@ -1,4 +1,4 @@
-import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -8,6 +8,7 @@ import 'package:appdonationsgestor/components/profile_components/expandable_card
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:provider/provider.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({super.key});
@@ -18,8 +19,6 @@ class ManagerProfilePage extends StatefulWidget {
 
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
   bool showDonations = false;
-
-  final bool isManager = true;
 
   final List<String> posts = [
     "assets/donations.jpg",
@@ -45,6 +44,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 12),
       category: "doacao",
+      postStatus: "DISPONIVEL",
     ),
     PostModel(
       id: "2",
@@ -57,6 +57,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 20),
       category: "doacao",
+      postStatus: "DISPONIVEL",
     ),
     PostModel(
       id: "3",
@@ -69,6 +70,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 25),
       category: "doacao",
+      postStatus: "CONCLUIDO",
     ),
     PostModel(
       id: "4",
@@ -82,6 +84,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "doacao",
+      postStatus: "CONCLUIDO",
     ),
     PostModel(
       id: "5",
@@ -95,23 +98,24 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       institutionImageUrl: "assets/profile.jpg",
       createdAt: DateTime(2025, 8, 30),
       category: "necessidade",
-    ),
-    PostModel(
-      id: '9',
-      title: 'Campanha do Agasalho',
-      description: 'Ajude a aquecer o inverno de quem precisa.',
-      imageUrl: 'assets/campanha_agasalho.png',
-      category: "campanha",
-      quantity: 15,
-      createdAt: DateTime(2025, 8, 2),
-      location: 'Barbalho, Salvador',
-      institution: 'Lar dos Idosos',
-      institutionImageUrl: 'assets/instituicao.png',
+      postStatus: "DISPONIVEL",
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final user = userProvider.currentUser;
+
+    final bool isManager =
+        user?.role == 'ROLE_ADMIN' || user?.role == 'ROLE_INSTITUTION';
+
+    ImageProvider? profileImage;
+    if (user?.profilePictureUrl != null &&
+        user!.profilePictureUrl!.isNotEmpty) {
+      profileImage = NetworkImage(user.profilePictureUrl!);
+    }
+
     return Scaffold(
       backgroundColor: ConstantsColors.whiteShade900,
       appBar: PreferredSize(
@@ -133,11 +137,17 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage(
-                      "assets/profile.jpg",
-                    ),
+                    backgroundImage: profileImage,
+                    backgroundColor: Colors.grey.shade200,
+                    child: (profileImage == null)
+                        ? const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: ConstantsColors.greyShade600,
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -147,7 +157,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                         Row(
                           children: [
                             Text(
-                              "Lucia Fontes",
+                              user?.name ?? "Usuário",
                               style: TextStylesConstants.kpoppinsMedium.merge(
                                 const TextStyle(
                                   fontSize: 16,
@@ -182,7 +192,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                                 size: 16, color: ConstantsColors.blueShade900),
                             const SizedBox(width: 4),
                             Text(
-                              "luciafontes@gmail.com",
+                              user?.email ?? "email@exemplo.com",
                               style: TextStylesConstants.kinterRegular.merge(
                                 const TextStyle(
                                   fontSize: 13,
@@ -228,7 +238,9 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut oil",
+                  (user?.bio != null && user!.bio!.isNotEmpty)
+                      ? user.bio!
+                      : "Esta instituição ainda não adicionou uma descrição.",
                   style: TextStylesConstants.kpoppinsMedium.merge(
                     const TextStyle(
                       fontSize: 14,
@@ -358,22 +370,12 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                       quantidade: post.quantity,
                       imagem: post.imageUrl,
                       onTap: () {
-                        if (donations[index].category == "campanha") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CampaignDetailsPage(post: post),
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PostDetailPage(post: post),
-                            ),
-                          );
-                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostDetailPage(post: post),
+                          ),
+                        );
                       },
                     );
                   },

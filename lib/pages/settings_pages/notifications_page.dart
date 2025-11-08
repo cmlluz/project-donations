@@ -1,8 +1,14 @@
-import 'package:appdonationsgestor/models/post_model.dart';
+import 'dart:convert';
+import 'package:appdonationsgestor/core/routes.dart';
+import 'package:appdonationsgestor/models/notification_model.dart';
 import 'package:appdonationsgestor/pages/allow_post_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/notification_api_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -14,50 +20,86 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPage extends State<NotificationsPage> {
   bool notificationsEnabled = true;
 
-  final PostModel pendingPost = PostModel(
-    id: "2",
-    title: "Vestuário - Doação",
-    description: "Doação de roupas variadas para pessoas em situação de rua.",
-    quantity: 50,
-    imageUrl: "assets/donations.jpg",
-    location: "Rio Vermelho, Salvador",
-    institution: "Lar dos Idosos",
-    institutionImageUrl: "assets/profile.jpg",
-    createdAt: DateTime(2025, 8, 20),
-    category: "doacao",
-  );
+  late final NotificationApiService _notificationApiService;
+  final ApiClient _apiClient = ApiClient();
+  late Future<List<NotificationModel>> _apiNotificationsFuture;
 
-  late final List<Map<String, dynamic>> notifications = [
-    {
-      "title": "Solicitação de postagem",
-      "time": "Hoje às 10:15",
-      "message":
-          "A instituição Lar dos Idosos quer realizar uma postagem e precisa da sua permissão. Clique aqui para saber mais.",
-      "onTap": () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AllowPostPage(post: pendingPost),
-            ),
-          ),
-    },
-    {
-      "title": "Exemplo de notificação antiga",
-      "time": "Ontem às 16:45",
-      "message":
-          "There are many variations of passages of Lorem Ipsum available, but the majority",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _notificationApiService = NotificationApiService(_apiClient);
+    _loadApiNotifications();
+  }
+
+  void _loadApiNotifications() {
+    _apiNotificationsFuture = _notificationApiService.getMyNotifications();
+    setState(() {});
+  }
+
+  String _formatRelativeTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays == 0) {
+      if (difference.inHours < 1) {
+        if (difference.inMinutes < 1) {
+          return "Agora";
+        }
+        return "Hoje às ${DateFormat('HH:mm').format(dateTime)}";
+      }
+      return "Hoje às ${DateFormat('HH:mm').format(dateTime)}";
+    } else if (difference.inDays == 1) {
+      return "Ontem às ${DateFormat('HH:mm').format(dateTime)}";
+    } else {
+      return DateFormat('dd/MM/yy \'às\' HH:mm').format(dateTime);
+    }
+  }
+
+  Future<void> _onNotificationTapped(NotificationModel notif) async {
+    if (!notif.isRead) {
+      try {
+        await _notificationApiService.markAsRead(notif.id);
+      } catch (e) {
+        print("Falha ao marcar como lida: $e");
+      }
+    }
+
+    if (notif.dataPayload == null) {
+      _loadApiNotifications();
+      return;
+    }
+
+    try {
+      Map<String, dynamic> data = jsonDecode(notif.dataPayload!);
+      final type = data['type'] as String?;
+
+      if (!mounted) return;
+
+      if (type == 'NEW_REQUEST') {
+        GoRouter.of(context).goNamed(RouteNames.pendingRequests);
+      } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+        GoRouter.of(context).goNamed(RouteNames.hystoryPage);
+      } else if (type == 'POST_VALIDATION_PENDING') {
+        final String? itemId = data['itemId'];
+        final String? itemType = data['itemType'];
+        if (itemId != null && itemType != null) {
+          GoRouter.of(context).pushNamed(
+            RouteNames.allowPostPage,
+            extra: {'itemId': itemId, 'itemType': itemType},
+          );
+        }
+      } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
+        GoRouter.of(context).goNamed(RouteNames.hystoryPage);
+      }
+    } catch (e) {
+      print("Erro ao navegar pela notificação: $e");
+    } finally {
+      _loadApiNotifications();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final todayNotifications = notifications
-        .where((n) => n["time"]!.toLowerCase().contains("hoje"))
-        .toList();
-
-    final oldNotifications = notifications
-        .where((n) => !n["time"]!.toLowerCase().contains("hoje"))
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notificações'),
@@ -82,42 +124,81 @@ class _NotificationsPage extends State<NotificationsPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: notificationsEnabled
-              ? (notifications.isEmpty
-                  ? buildEmptyNotifications()
-                  : ListView(
-                      children: [
-                        if (todayNotifications.isNotEmpty) ...[
-                          buildSectionTitle("Recente"),
-                          ...todayNotifications.map(buildNotification),
-                        ],
-                        if (oldNotifications.isNotEmpty) ...[
-                          buildDivider(),
-                          buildSectionTitle("Antigas"),
-                          ...oldNotifications.map(buildNotification),
-                        ],
-                      ],
-                    ))
+              ? RefreshIndicator(
+                  onRefresh: () async {
+                    _loadApiNotifications();
+                  },
+                  child: buildApiNotificationsList(),
+                )
               : buildDisabledNotifications(),
         ),
       ),
     );
   }
 
-  Widget buildNotification(Map<String, dynamic> notif) {
+  Widget buildApiNotificationsList() {
+    return FutureBuilder<List<NotificationModel>>(
+      future: _apiNotificationsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Erro ao carregar histórico: ${snapshot.error}',
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+
+        final notifications = snapshot.data;
+
+        if (notifications == null || notifications.isEmpty) {
+          return buildEmptyNotifications();
+        }
+        
+        final newNotifications = notifications.where((n) => !n.isRead).toList();
+        final oldNotifications = notifications.where((n) => n.isRead).toList();
+
+        return ListView(
+          children: [
+            if (newNotifications.isNotEmpty) ...[
+              buildSectionTitle("Recentes"),
+              ...newNotifications
+                  .map((notif) => buildApiNotification(notif))
+                  .toList(),
+            ],
+            if (oldNotifications.isNotEmpty) ...[
+              buildDivider(),
+              buildSectionTitle("Antigas"),
+              ...oldNotifications
+                  .map((notif) => buildApiNotification(notif))
+                  .toList(),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildApiNotification(NotificationModel notif) {
     return GestureDetector(
-      onTap: notif["onTap"],
+      onTap: () => _onNotificationTapped(notif),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: ConstantsColors.whiteShade900,
+          color: notif.isRead
+              ? ConstantsColors.whiteShade700
+              : ConstantsColors.blueShade400.withOpacity(0.3),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-              spreadRadius: 1,
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -127,17 +208,19 @@ class _NotificationsPage extends State<NotificationsPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   "•",
                   style: TextStyle(
                     fontSize: 30,
-                    color: ConstantsColors.blueShade900,
+                    color: notif.isRead
+                        ? Colors.grey.shade400
+                        : ConstantsColors.blueShade900,
                   ),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    notif["title"]!,
+                    notif.title,
                     style: const TextStyle(
                       color: ConstantsColors.blueShade900,
                       fontSize: 17,
@@ -146,20 +229,26 @@ class _NotificationsPage extends State<NotificationsPage> {
                 ),
               ],
             ),
-            Text(
-              notif["time"]!,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 10,
-              ).merge(TextStylesConstants.kinterRegular),
+            Padding(
+              padding: const EdgeInsets.only(left: 18.0),
+              child: Text(
+                _formatRelativeTime(notif.createdAt),
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 10,
+                ).merge(TextStylesConstants.kinterRegular),
+              ),
             ),
             const SizedBox(height: 10),
-            Text(
-              notif["message"]!,
-              style: const TextStyle(
-                color: ConstantsColors.blueShade900,
-                fontSize: 14,
-              ).merge(TextStylesConstants.kinterRegular),
+            Padding(
+              padding: const EdgeInsets.only(left: 18.0),
+              child: Text(
+                notif.body,
+                style: const TextStyle(
+                  color: ConstantsColors.blueShade900,
+                  fontSize: 14,
+                ).merge(TextStylesConstants.kinterRegular),
+              ),
             ),
           ],
         ),

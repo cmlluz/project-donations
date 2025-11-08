@@ -3,9 +3,11 @@ import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:appdonationsgestor/services/profile_services.dart';
+import 'package:appdonationsgestor/services/storage_service.dart';
 
 class EditProfileController extends ChangeNotifier {
   final ProfileService _profileService = ProfileService();
+  final StorageService _storageService = StorageService();
   final picker = ImagePicker();
 
   final nameController = TextEditingController();
@@ -52,9 +54,9 @@ class EditProfileController extends ChangeNotifier {
       emailController.text =
           _profileService.currentUser?.email ?? data['email'] ?? '';
       phoneController.text = data['phone'] ?? '';
-      pixController.text = data['pix'] ?? '';
+      pixController.text = data['pixKey'] ?? '';
       bioController.text = data['bio'] ?? '';
-      _currentProfileImageUrl = data['profileImageUrl'];
+      _currentProfileImageUrl = data['profilePictureUrl'];
     } catch (e) {
       print("Erro ao carregar dados: $e");
     } finally {
@@ -121,23 +123,25 @@ class EditProfileController extends ChangeNotifier {
 
       String? uploadedImageUrl;
       if (_selectedImage != null) {
-        uploadedImageUrl =
-            await _profileService.uploadProfileImage(_selectedImage!);
+        uploadedImageUrl = await _storageService.uploadImage(
+            _selectedImage!, 'profile_images');
       }
 
       final updatedData = <String, dynamic>{
         'name': nameController.text.trim(),
         'phone': phoneController.text.trim(),
-        'pix': pixController.text.trim(),
+        'pixKey': pixController.text.trim(),
         'bio': bioController.text.trim(),
         if (uploadedImageUrl != null) 'profileImageUrl': uploadedImageUrl,
       };
 
-      await _profileService.updateUserProfileBackend(updatedData);
-
       if (emailChanged) {
         await _profileService.updateAuthEmail(emailController.text.trim());
+        updatedData['email'] = emailController.text.trim();
       }
+
+      await _profileService.updateUserProfileBackend(updatedData);
+
       if (passwordChanged) {
         await _profileService
             .updateAuthPassword(newPasswordController.text.trim());

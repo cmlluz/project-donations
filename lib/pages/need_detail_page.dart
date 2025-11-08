@@ -5,7 +5,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
-import 'package:appdonationsgestor/services/api_services/request_api_service.dart'; // Importar
+import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -20,18 +20,18 @@ class NeedDetailPage extends StatefulWidget {
 
 class _NeedDetailPageState extends State<NeedDetailPage> {
   late final FavoriteApiService _favoriteApiService;
-  late final RequestApiService _requestApiService; // Adicionar
+  late final RequestApiService _requestApiService;
   final ApiClient _apiClient = ApiClient();
 
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
-  bool _isLoadingRequest = false; // Loading para o botão principal
+  bool _isLoadingRequest = false;
 
   @override
   void initState() {
     super.initState();
     _favoriteApiService = FavoriteApiService(_apiClient);
-    _requestApiService = RequestApiService(_apiClient); // Inicializar
+    _requestApiService = RequestApiService(_apiClient);
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isNeedFavorite(widget.need.id);
   }
@@ -40,7 +40,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     if (_isLoadingFavorite) return;
 
     final newFavoriteState = !_isFavorite;
-    final favController = Provider.of<FavoriteController>(context, listen: false);
+    final favController =
+        Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
       _isLoadingFavorite = true;
@@ -116,10 +117,27 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     }
   }
 
+  String _traduzirPostStatus(String status) {
+    switch (status) {
+      case 'DISPONIVEL':
+        return 'Disponível';
+      case 'PENDENTE_APROVACAO':
+        return 'Em Análise';
+      case 'CONCLUIDO':
+        return 'Finalizada';
+      case 'REJEITADO':
+        return 'Rejeitada';
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final formattedDate =
         DateFormat('dd/MM/yyyy').format(widget.need.date ?? DateTime.now());
+    final bool isDisponivel = widget.need.postStatus == 'DISPONIVEL';
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -190,7 +208,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
                     subtitle: Text(
-                        'Status: ${widget.need.status} | Quantidade: ${widget.need.quantity}'),
+                        'Status: ${_traduzirPostStatus(widget.need.postStatus)} | Quantidade: ${widget.need.quantity}'),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -220,13 +238,17 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      onPressed: _isLoadingRequest ? null : _submitRequest,
+                      onPressed: _isLoadingRequest || !isDisponivel
+                          ? null
+                          : _submitRequest,
                       child: _isLoadingRequest
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Quero Doar",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
+                          : Text(
+                              isDisponivel
+                                  ? "Quero Doar"
+                                  : _traduzirPostStatus(widget.need.postStatus),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
                             ),
                     ),
                   ),

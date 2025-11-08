@@ -5,6 +5,8 @@ class PublicUser {
   final String email;
   final String? profilePictureUrl;
   final String? phone;
+  final String? bio;
+  final String? pixKey;
 
   PublicUser({
     required this.firebaseUid,
@@ -13,6 +15,8 @@ class PublicUser {
     required this.email,
     this.profilePictureUrl,
     this.phone,
+    this.bio,
+    this.pixKey,
   });
 
   factory PublicUser.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,8 @@ class PublicUser {
       email: json['email'] ?? 'Email não informado',
       profilePictureUrl: json['profilePictureUrl'],
       phone: json['phone'],
+      bio: json['bio'],
+      pixKey: json['pixKey'],
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/auth_api_service.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
@@ -24,6 +26,7 @@ class AuthService {
   Future<UserCredential> signIn({
     required String email,
     required String password,
+    required BuildContext context,
   }) async {
     final UserCredential userCredential = await firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password);
@@ -38,6 +41,8 @@ class AuthService {
 
     if (userCredential.user != null) {
       await _authApiService.syncUser();
+      await Provider.of<UserProvider>(context, listen: false)
+          .fetchCurrentUser();
     }
     return userCredential;
   }
@@ -45,6 +50,8 @@ class AuthService {
   Future<UserCredential> createAccount({
     required String email,
     required String password,
+    required BuildContext context,
+    required Map<String, dynamic> userData,
   }) async {
     final UserCredential userCredential =
         await firebaseAuth.createUserWithEmailAndPassword(
@@ -54,15 +61,19 @@ class AuthService {
 
     if (userCredential.user != null) {
       await _authApiService.syncUser();
+      await _authApiService.updateUser(userData);
+      await Provider.of<UserProvider>(context, listen: false)
+          .fetchCurrentUser();
     }
 
     return userCredential;
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
     await GoogleSignIn().signOut();
     await FacebookAuth.instance.logOut();
     await firebaseAuth.signOut();
+    Provider.of<UserProvider>(context, listen: false).clearUser();
   }
 
   Future<void> resetPassword({
@@ -101,7 +112,7 @@ class AuthService {
     await currentUser!.updatePassword(newPassword);
   }
 
-  Future<UserCredential?> loginWithGoogle() async {
+  Future<UserCredential?> loginWithGoogle(BuildContext context) async {
     try {
       final googleUser = await GoogleSignIn().signIn();
       final googleAuth = await googleUser?.authentication;
@@ -112,6 +123,8 @@ class AuthService {
 
       if (userCredential.user != null) {
         await _authApiService.syncUser();
+        await Provider.of<UserProvider>(context, listen: false)
+            .fetchCurrentUser();
       }
 
       return userCredential;
@@ -121,7 +134,7 @@ class AuthService {
     }
   }
 
-  Future<UserCredential?> loginWithFacebook() async {
+  Future<UserCredential?> loginWithFacebook(BuildContext context) async {
     try {
       final LoginResult loginResult = await FacebookAuth.instance
           .login(permissions: ['public_profile', 'email']);
@@ -134,6 +147,8 @@ class AuthService {
 
       if (userCredential.user != null) {
         await _authApiService.syncUser();
+        await Provider.of<UserProvider>(context, listen: false)
+            .fetchCurrentUser();
       }
 
       return userCredential;

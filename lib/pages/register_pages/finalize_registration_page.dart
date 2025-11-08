@@ -1,10 +1,13 @@
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/profile_services.dart';
+import 'package:appdonationsgestor/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
+import 'package:go_router/go_router.dart';
 
 class FinalizeRegistrationPage extends StatefulWidget {
   const FinalizeRegistrationPage({super.key});
@@ -20,12 +23,58 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
   final TextEditingController bioController = TextEditingController();
   final TextEditingController pixKeyController = TextEditingController();
 
+  final ProfileService _profileService = ProfileService();
+  final StorageService _storageService = StorageService();
+  bool _isLoading = false;
+
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    setState(() => _isLoading = true);
+
+    try {
+      String? uploadedImageUrl;
+      if (_image != null) {
+        uploadedImageUrl =
+            await _storageService.uploadImage(_image!, 'profile_images');
+      }
+
+      final Map<String, dynamic> userData = {
+        "bio": bioController.text.trim(),
+        "pixKey": pixKeyController.text.trim(),
+      };
+
+      if (uploadedImageUrl != null) {
+        userData["profilePictureUrl"] = uploadedImageUrl;
+      }
+
+      if (userData.isNotEmpty) {
+        await _profileService.updateUserProfileBackend(userData);
+      }
+
+      if (mounted) {
+        GoRouter.of(context).push('/confirmedRegistration');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao finalizar cadastro: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -124,9 +173,9 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
                     secret: false,
                   ),
                   const SizedBox(height: 20),
-                  const CustomButton(
+                  CustomButton(
                     text: 'Cadastrar',
-                    route: '/confirmedRegistration',
+                    onPressed: _isLoading ? null : _updateProfile,
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade900,
                     width: 190,

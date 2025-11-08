@@ -9,6 +9,7 @@ class PostModel {
   final String institutionImageUrl;
   final DateTime createdAt;
   final String category;
+  final String postStatus; // ADICIONADO
 
   const PostModel({
     required this.id,
@@ -21,6 +22,7 @@ class PostModel {
     required this.institutionImageUrl,
     required this.createdAt,
     required this.category,
+    this.postStatus = 'DISPONIVEL',
   });
 
   factory PostModel.fromSearchItem(
@@ -34,13 +36,14 @@ class PostModel {
       id: id,
       title: title,
       description: description,
-      quantity: null, 
+      quantity: null,
       imageUrl: imageUrl,
       location: 'Salvador, Bahia',
       institution: 'Instituição Exemplo',
       institutionImageUrl: 'assets/instituicao.png',
       createdAt: DateTime.now(),
       category: category,
+      postStatus: 'DISPONIVEL',
     );
   }
 }

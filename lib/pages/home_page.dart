@@ -1,8 +1,10 @@
 import 'package:appdonationsgestor/components/card_item.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -45,6 +47,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final userName = userProvider.currentUser?.name ?? 'Usuário';
+    final userImageUrl = userProvider.currentUser?.profilePictureUrl;
+
+    ImageProvider profileImage = const AssetImage("assets/profile_default.png");
+    if (userImageUrl != null && userImageUrl.isNotEmpty) {
+      profileImage = NetworkImage(userImageUrl);
+    }
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight + 20),
@@ -78,13 +89,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 24,
-                          backgroundImage: AssetImage("assets/profile.jpg"),
+                          backgroundImage: profileImage,
                         ),
                         const SizedBox(width: 11.0),
                         Text(
-                          'Olá, Name 👋',
+                          'Olá, $userName 👋',
                           style: const TextStyle(
                             color: ConstantsColors.blueShade900,
                             fontSize: 20,
