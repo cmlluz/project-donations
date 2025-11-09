@@ -33,18 +33,36 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
   Future<void> _handleRequest(Request request, bool approve) async {
     try {
       if (approve) {
-        await _requestApiService.approveRequest(request.id);
+        final approvedRequest =
+            await _requestApiService.approveRequest(request.id);
+
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Solicitação Aprovada!"),
+              content: SelectableText(
+                  "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+        }
       } else {
         await _requestApiService.rejectRequest(request.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Solicitação Rejeitada.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              approve ? 'Solicitação Aprovada!' : 'Solicitação Rejeitada.'),
-          backgroundColor: approve ? Colors.green : Colors.orange,
-        ),
-      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

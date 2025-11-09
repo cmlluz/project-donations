@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -8,11 +9,17 @@ import 'package:appdonationsgestor/services/api_services/favorites_api_service.d
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 class NeedDetailPage extends StatefulWidget {
   final Need need;
+  final bool isOwnerView;
 
-  const NeedDetailPage({Key? key, required this.need}) : super(key: key);
+  const NeedDetailPage({
+    Key? key,
+    required this.need,
+    this.isOwnerView = false,
+  }) : super(key: key);
 
   @override
   State<NeedDetailPage> createState() => _NeedDetailPageState();
@@ -27,6 +34,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
 
+  Future<List<Request>>? _requestsFuture;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +43,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     _requestApiService = RequestApiService(_apiClient);
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isNeedFavorite(widget.need.id);
+
+    if (widget.isOwnerView) {
+      _requestsFuture =
+          _requestApiService.getRequestsForItem(needId: widget.need.id);
+    }
   }
 
   void _toggleFavorite() async {
@@ -165,21 +179,24 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 50,
-                  right: 16,
-                  child: CircleAvatar(
-                    backgroundColor: _isFavorite
-                        ? ConstantsColors.blueShade900
-                        : Colors.grey.withOpacity(0.5),
-                    child: IconButton(
-                      icon: Icon(
-                          _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.white),
-                      onPressed: _isLoadingFavorite ? null : _toggleFavorite,
+                if (!widget.isOwnerView)
+                  Positioned(
+                    top: 50,
+                    right: 16,
+                    child: CircleAvatar(
+                      backgroundColor: _isFavorite
+                          ? ConstantsColors.blueShade900
+                          : Colors.grey.withOpacity(0.5),
+                      child: IconButton(
+                        icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.white),
+                        onPressed: _isLoadingFavorite ? null : _toggleFavorite,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             Padding(
@@ -227,37 +244,109 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ConstantsColors.blueShade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  if (widget.isOwnerView)
+                    _buildOwnerView()
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        onPressed: _isLoadingRequest || !isDisponivel
+                            ? null
+                            : _submitRequest,
+                        child: _isLoadingRequest
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : Text(
+                                isDisponivel
+                                    ? "Quero Doar"
+                                    : _traduzirPostStatus(
+                                        widget.need.postStatus),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
                       ),
-                      onPressed: _isLoadingRequest || !isDisponivel
-                          ? null
-                          : _submitRequest,
-                      child: _isLoadingRequest
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                              isDisponivel
-                                  ? "Quero Doar"
-                                  : _traduzirPostStatus(widget.need.postStatus),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                            ),
                     ),
-                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildOwnerView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Solicitações Recebidas",
+          style:
+              const TextStyle(fontSize: 22, color: ConstantsColors.blueShade900)
+                  .merge(TextStylesConstants.kpoppinsMedium),
+        ),
+        const SizedBox(height: 10),
+        FutureBuilder<List<Request>>(
+          future: _requestsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                  child:
+                      Text("Erro ao carregar solicitações: ${snapshot.error}"));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                  child: Text("Nenhuma solicitação para este item."));
+            }
+
+            final requests = snapshot.data!;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: requests.length,
+              itemBuilder: (context, index) {
+                final request = requests[index];
+                return Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: request.solicitante.profilePictureUrl !=
+                              null
+                          ? NetworkImage(request.solicitante.profilePictureUrl!)
+                          : null,
+                      child: request.solicitante.profilePictureUrl == null
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+                    title: Text(request.solicitante.name,
+                        style: TextStylesConstants.kpoppinsMedium),
+                    subtitle: Text("Status: ${request.status}"),
+                    trailing: request.status == 'APROVADO'
+                        ? SelectableText(
+                            request.confirmationCode ?? "SEM COD",
+                            style: TextStylesConstants.kpoppinsBold
+                                .copyWith(color: ConstantsColors.blueShade900),
+                          )
+                        : null,
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 }

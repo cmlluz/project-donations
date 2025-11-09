@@ -1,6 +1,8 @@
+import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,7 @@ class _HystoryPage extends State<HystoryPage> {
 
   void _loadMyRequests() {
     _myRequestsFuture = _requestApiService.getMySentRequests();
+    setState(() {});
   }
 
   String _formatStatus(String status) {
@@ -184,7 +187,7 @@ class _HystoryPage extends State<HystoryPage> {
                                           content: Popup(
                                             title: 'Contato do Doador',
                                             subtitle:
-                                                'Telefone: ${request.dono.phone}',
+                                                'Telefone: ${request.dono.phone ?? "Não informado"}',
                                             cancelText: 'Fechar',
                                           ),
                                         ),
@@ -277,6 +280,25 @@ class _HystoryPage extends State<HystoryPage> {
                                 ),
                               ],
                             ),
+                            if (request.status == 'APROVADO')
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      GoRouter.of(context).pushNamed(
+                                        RouteNames.confirmDonationPage,
+                                        extra: request.id,
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: const Text('Confirmar Entrega'),
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
