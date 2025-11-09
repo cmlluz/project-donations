@@ -26,6 +26,8 @@ import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
 import 'package:appdonationsgestor/pages/campaign_pages/publish_campaign.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_edit_page.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
@@ -64,6 +66,8 @@ class RouteNames {
   static const String notificationsPage = "notificationsPage";
   static const String linkManagerPage = "linkManagerPage";
   static const String publishCampaign = "publishCampaign";
+  static const String campaignEditPage = "campaignEditPage";
+  static const String campaignDetailsPage = "campaignDetailsPage";
   static const String pendingRequests = "pendingRequests";
   static const String allowPostPage = "allowPostPage";
   static const String confirmDonationPage = "confirmDonationPage";
@@ -335,6 +339,26 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: PublishCampaignPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/campaignEdit/:campaignId',
+          name: RouteNames.campaignEditPage,
+          pageBuilder: (context, state) {
+            final campaignId = state.pathParameters['campaignId']!;
+            return MaterialPage(
+              child: CampaignEditPage(campaignId: campaignId),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/campaignDetails/:campaignId',
+          name: RouteNames.campaignDetailsPage,
+          pageBuilder: (context, state) {
+            final campaignId = state.pathParameters['campaignId']!;
+            return MaterialPage(
+              child: CampaignDetailsPage(campaignId: campaignId),
             );
           },
         ),

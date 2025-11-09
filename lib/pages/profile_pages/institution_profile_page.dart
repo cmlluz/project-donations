@@ -1,6 +1,7 @@
+// TODO: Criar endpoint para buscar campanhas por autor/instituição específica ao invés de carregar todas e filtrar no frontend
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
-import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
@@ -363,12 +364,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
           imagem: post.imageUrl,
           onTap: () {
             if (donations[index].category == "campanha") {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CampaignDetailsPage(post: post),
-                ),
-              );
+              GoRouter.of(context).push('/campaignDetails/${post.id}');
             } else {
               Navigator.push(
                 context,

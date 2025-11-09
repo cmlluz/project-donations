@@ -1,11 +1,14 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/campaign_api_service.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:appdonationsgestor/components/profile_components/campaign_history_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
-import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -13,8 +16,8 @@ import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({super.key});
@@ -25,11 +28,12 @@ class ManagerProfilePage extends StatefulWidget {
 
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
   bool showDonations = false;
-  
+
   final ApiClient _apiClient = ApiClient();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
-  
+  late final CampaignApiService _campaignApiService;
+
   Future<Map<String, dynamic>>? _historyFuture;
 
   final List<String> posts = [
@@ -48,6 +52,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     super.initState();
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
+    _campaignApiService = CampaignApiService(_apiClient);
     _loadHistory();
   }
 
@@ -60,19 +65,20 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     try {
       final donationsFuture = _donationApiService.getMyDonations();
       final needsFuture = _needApiService.getMyNeeds();
+      final campaignsFuture = _campaignApiService.getMyCampaigns();
 
-      final results = await Future.wait([donationsFuture, needsFuture]);
+      final results =
+          await Future.wait([donationsFuture, needsFuture, campaignsFuture]);
       final List<Donation> donations = results[0] as List<Donation>;
       final List<Need> needs = results[1] as List<Need>;
+      final List<Campaign> campaigns = results[2] as List<Campaign>;
 
-      return {'donations': donations, 'needs': needs};
-
+      return {'donations': donations, 'needs': needs, 'campaigns': campaigns};
     } catch (e) {
       print("Erro ao carregar histórico: $e");
       rethrow;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +346,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Center(child: Text("Erro ao carregar histórico: ${snapshot.error}"));
+          return Center(
+              child: Text("Erro ao carregar histórico: ${snapshot.error}"));
         }
         if (!snapshot.hasData || snapshot.data == null) {
           return const Center(child: Text("Nenhum item no histórico."));
@@ -348,7 +355,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
         final List<Donation> donations = snapshot.data!['donations'];
         final List<Need> needs = snapshot.data!['needs'];
-        final allItems = [...donations, ...needs];
+        final List<Campaign> campaigns = snapshot.data!['campaigns'];
+        final allItems = [...donations, ...needs, ...campaigns];
 
         if (allItems.isEmpty) {
           return const Center(child: Text("Nenhum item no histórico."));
@@ -379,7 +387,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                     MaterialPageRoute(
                       builder: (context) => DonationDetailPage(
                         donation: item,
-                        isOwnerView: true, 
+                        isOwnerView: true,
                       ),
                     ),
                   );
@@ -401,6 +409,18 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                       ),
                     ),
                   );
+                },
+              );
+            } else if (item is Campaign) {
+              return CampaignHistoryCard(
+                titulo: item.titulo,
+                descricao: item.descricao,
+                local: item.localizacao,
+                imagem: item.urlImagem,
+                dataInicial: item.dataInicial,
+                dataFinal: item.dataFinal,
+                onTap: () {
+                  GoRouter.of(context).push('/campaignDetails/${item.id}');
                 },
               );
             }

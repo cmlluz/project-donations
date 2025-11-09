@@ -2,12 +2,16 @@ import 'dart:io';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/services/storage_service.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class PublishCampaignPage extends StatefulWidget {
   const PublishCampaignPage({super.key});
@@ -18,6 +22,9 @@ class PublishCampaignPage extends StatefulWidget {
 
 class _PublishCampaignPageState extends State<PublishCampaignPage> {
   File? _selectedImg;
+  bool _isLoading = false;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
@@ -52,15 +59,132 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
     );
   }
 
-  void _confirm() {
+  Future<void> _selectStartDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+        _startDateController.text = DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
+  Future<void> _selectEndDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _endDate ??
+          _startDate?.add(const Duration(days: 1)) ??
+          DateTime.now().add(const Duration(days: 1)),
+      firstDate: _startDate ?? DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _endDate = picked;
+        _endDateController.text = DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
+  Future<void> _confirm() async {
+    if (_titleController.text.trim().isEmpty) {
+      _showError('O título é obrigatório');
+      return;
+    }
+
+    if (_descController.text.trim().isEmpty) {
+      _showError('A descrição é obrigatória');
+      return;
+    }
+
+    if (_locationController.text.trim().isEmpty) {
+      _showError('A localização é obrigatória');
+      return;
+    }
+
+    if (_startDate != null && _endDate != null) {
+      if (_endDate!.isBefore(_startDate!)) {
+        _showError('A data final não pode ser anterior à data inicial');
+        return;
+      }
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      String? imageUrl;
+
+      if (_selectedImg != null) {
+        final storageService = StorageService();
+        imageUrl =
+            await storageService.uploadImage(_selectedImg!, 'campaign_images');
+      }
+
+      final campaignData = {
+        'titulo': _titleController.text.trim(),
+        'descricao': _descController.text.trim(),
+        'localizacao': _locationController.text.trim(),
+        'urlImagem': imageUrl ?? '',
+        if (_startDate != null)
+          'dataInicial': _startDate!.toIso8601String().split('T')[0],
+        if (_endDate != null)
+          'dataFinal': _endDate!.toIso8601String().split('T')[0],
+      };
+
+      final success =
+          await context.read<CampaignController>().createCampaign(campaignData);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Campanha publicada com sucesso!'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: ConstantsColors.blueShade900,
+          ),
+        );
+        GoRouter.of(context).go('/root');
+      } else {
+        final errorMessage = context.read<CampaignController>().errorMessage;
+        _showError(errorMessage.isNotEmpty
+            ? errorMessage
+            : 'Erro ao publicar campanha');
+      }
+    } catch (e) {
+      _showError('Erro inesperado: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Campanha publicada com sucesso!'),
+      SnackBar(
+        content: Text(message),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: ConstantsColors.blueShade900,
+        backgroundColor: Colors.red,
       ),
     );
-    GoRouter.of(context).go('/root');
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descController.dispose();
+    _locationController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,7 +252,7 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                               ),
                               const SizedBox(height: 10),
                               const Text(
-                                'Envie a imagem da nota aqui',
+                                'Envie a imagem aqui',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: ConstantsColors.blueShade900,
@@ -179,37 +303,57 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
               Row(
                 children: [
                   Expanded(
-                    child: CustomTextFields(
-                      labelColor: ConstantsColors.whiteShade700,
-                      controller: _startDateController,
-                      secret: false,
-                      icon: Icons.calendar_today,
-                      keyboardType: TextInputType.datetime,
-                      hintText: 'Data inicial',
+                    child: GestureDetector(
+                      onTap: _selectStartDate,
+                      child: AbsorbPointer(
+                        child: CustomTextFields(
+                          labelColor: ConstantsColors.whiteShade700,
+                          controller: _startDateController,
+                          secret: false,
+                          icon: Icons.calendar_today,
+                          keyboardType: TextInputType.datetime,
+                          hintText: 'Data inicial',
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
-                    child: CustomTextFields(
-                      labelColor: ConstantsColors.whiteShade700,
-                      controller: _endDateController,
-                      secret: false,
-                      icon: Icons.calendar_month,
-                      keyboardType: TextInputType.datetime,
-                      hintText: 'Data final',
+                    child: GestureDetector(
+                      onTap: _selectEndDate,
+                      child: AbsorbPointer(
+                        child: CustomTextFields(
+                          labelColor: ConstantsColors.whiteShade700,
+                          controller: _endDateController,
+                          secret: false,
+                          icon: Icons.calendar_month,
+                          keyboardType: TextInputType.datetime,
+                          hintText: 'Data final',
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 30),
-              CustomButton(
-                text: 'Confirmar',
-                color: ConstantsColors.blueShade900,
-                textColor: ConstantsColors.whiteShade700,
-                width: double.infinity,
-                height: 45,
-                onPressed: _confirm,
-              ),
+              _isLoading
+                  ? const SizedBox(
+                      width: double.infinity,
+                      height: 45,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: ConstantsColors.blueShade900,
+                        ),
+                      ),
+                    )
+                  : CustomButton(
+                      text: 'Confirmar',
+                      color: ConstantsColors.blueShade900,
+                      textColor: ConstantsColors.whiteShade700,
+                      width: double.infinity,
+                      height: 45,
+                      onPressed: _confirm,
+                    ),
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () => GoRouter.of(context).pop(),

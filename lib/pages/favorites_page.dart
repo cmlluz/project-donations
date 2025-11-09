@@ -4,6 +4,8 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/favorite_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
@@ -52,6 +54,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
         await controller.removeFavoriteDonation(item);
       } else if (item is Need) {
         await controller.removeFavoriteNeed(item);
+      } else if (item is Campaign) {
+        await controller.removeFavoriteCampaign(item);
       } else if (item is Map) {
         await controller.removeFavoriteUser(item['firebaseUid']);
       }
@@ -109,6 +113,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
         List<dynamic> tempItens = [];
 
         switch (categoriaSelecionada) {
+          case 'Campanhas':
+            tempItens = controller.favoriteCampaigns;
+            break;
           case 'Instituições':
             tempItens = controller.favoriteUsers;
             break;
@@ -123,7 +130,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
             tempItens = [
               ...controller.favoriteUsers,
               ...controller.favoriteNeeds,
-              ...controller.favoriteDonations
+              ...controller.favoriteDonations,
+              ...controller.favoriteCampaigns
             ];
         }
 
@@ -134,6 +142,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
               name = item.title;
             } else if (item is Need) {
               name = item.title;
+            } else if (item is Campaign) {
+              name = item.titulo;
             } else if (item is Map) {
               name = item['name'] ?? '';
             }
@@ -265,6 +275,15 @@ class _FavoritesPageState extends State<FavoritesPage> {
             builder: (context) => NeedDetailPage(need: item),
           ),
         );
+      };
+    } else if (item is Campaign) {
+      name = item.titulo;
+      description = item.descricao;
+      imageUrl =
+          item.urlImagem.isNotEmpty ? item.urlImagem : 'assets/donations.jpg';
+      isNetwork = item.urlImagem.isNotEmpty;
+      onTap = () {
+        GoRouter.of(context).push('/campaignDetails/${item.id}');
       };
     } else if (item is Map) {
       name = item['name'] ?? name;
