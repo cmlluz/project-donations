@@ -29,6 +29,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
       final userProvider = context.read<UserProvider>();
       context.read<CampaignController>().loadCampaignByIdWithAuthor(
             widget.campaignId,
+            userProvider.currentUser?.firebaseUid,
             userProvider.currentUser?.name,
             userProvider.currentUser?.profilePictureUrl,
           );
@@ -43,8 +44,8 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
         final isLoading = campaignController.isLoading;
         final errorMessage = campaignController.errorMessage;
 
-        final bool isAuthor =
-            campaign?.authorName == (userProvider.currentUser?.name ?? '');
+        final bool isAuthor = campaign?.authorUid ==
+            (userProvider.currentUser?.firebaseUid ?? '');
 
         if (isLoading) {
           return const Scaffold(
@@ -291,7 +292,8 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                     radius: 22,
                   ),
                   title: Text(
-                    campaign.authorName,
+                    campaignController.selectedCampaignAuthor?.name ??
+                        'Autor não encontrado',
                     style: TextStylesConstants.kpoppinsSemiBold.merge(
                       const TextStyle(
                         color: ConstantsColors.blueShade900,

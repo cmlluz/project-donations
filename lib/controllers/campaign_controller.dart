@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:appdonationsgestor/models/campaign_author_model.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/campaign_api_service.dart';
+import 'package:appdonationsgestor/services/profile_services.dart';
 
 class CampaignController with ChangeNotifier {
   late final CampaignApiService _campaignApiService;
+  late final ProfileService _profileService;
   final ApiClient _apiClient = ApiClient();
 
   List<Campaign> _campaigns = [];
   List<Campaign> _filteredCampaigns = [];
   Campaign? _selectedCampaign;
-  String? _authorProfilePictureUrl;
+  CampaignAuthor? _selectedCampaignAuthor;
 
   List<Campaign> get campaigns =>
       _filteredCampaigns.isEmpty ? _campaigns : _filteredCampaigns;
 
   Campaign? get selectedCampaign => _selectedCampaign;
 
-  // URL da foto do autor da campanha selecionada
-  String? get authorProfilePictureUrl => _authorProfilePictureUrl;
+  // Informações do autor da campanha selecionada
+  CampaignAuthor? get selectedCampaignAuthor => _selectedCampaignAuthor;
+
+  // URL da foto do autor da campanha selecionada (por compatibilidade)
+  String? get authorProfilePictureUrl =>
+      _selectedCampaignAuthor?.profilePictureUrl;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -31,6 +38,7 @@ class CampaignController with ChangeNotifier {
 
   CampaignController() {
     _campaignApiService = CampaignApiService(_apiClient);
+    _profileService = ProfileService();
   }
 
   // Para Histórico do perfil, Busca "Todos" e "Campanhas"
@@ -227,29 +235,51 @@ class CampaignController with ChangeNotifier {
     return _campaigns.any((campaign) => campaign.id == campaignId);
   }
 
-  // Para Campaign Details Page - versão com carregamento automático da foto
-  Future<void> loadCampaignByIdWithAuthor(
-      String id, String? currentUserName, String? currentUserProfileUrl) async {
+  // Para Campaign Details Page - versão com carregamento automático do autor
+  Future<void> loadCampaignByIdWithAuthor(String id, String? currentUserUid,
+      String? currentUserName, String? currentUserProfileUrl) async {
     await loadCampaignById(id);
     if (_selectedCampaign != null) {
-      loadAuthorProfilePicture(_selectedCampaign!.authorName, currentUserName,
-          currentUserProfileUrl);
+      await loadAuthorByUid(_selectedCampaign!.authorUid, currentUserUid,
+          currentUserName, currentUserProfileUrl);
     }
   }
 
-  // Para Campaign Details Page - carregar foto do autor
-  void loadAuthorProfilePicture(String? authorName, String? currentUserName,
-      String? currentUserProfileUrl) {
-    if (authorName == null || authorName.isEmpty) {
-      _authorProfilePictureUrl = null;
-    } else if (authorName == currentUserName) {
-      // Se é o usuário atual, usa a foto do perfil atual
-      _authorProfilePictureUrl = currentUserProfileUrl;
+  // Para Campaign Details Page - carregar informações do autor via UID
+  Future<void> loadAuthorByUid(String authorUid, String? currentUserUid,
+      String? currentUserName, String? currentUserProfileUrl) async {
+    if (authorUid.isEmpty) {
+      _selectedCampaignAuthor = null;
+    } else if (authorUid == currentUserUid) {
+      // Se é o usuário atual, usa as informações locais
+      _selectedCampaignAuthor = CampaignAuthor(
+        uid: authorUid,
+        name: currentUserName ?? 'Usuário atual',
+        profilePictureUrl: currentUserProfileUrl,
+      );
     } else {
-      // Para outros usuários, por enquanto usa a imagem padrão
-      // TODO: Implementar endpoint para buscar outros usuários quando disponível no backend
-      _authorProfilePictureUrl = null;
+      // Para outros usuários, busca via endpoint /users/{uid}
+      try {
+        final userData = await _profileService.getUserById(authorUid);
+        _selectedCampaignAuthor = CampaignAuthor.fromJson(userData);
+      } catch (e) {
+        print('Erro ao carregar dados do autor $authorUid: $e');
+        _selectedCampaignAuthor = CampaignAuthor(
+          uid: authorUid,
+          name: 'Autor não encontrado',
+          profilePictureUrl: null,
+        );
+      }
     }
     notifyListeners();
+  }
+
+  // Método de conveniência para carregar autor da campanha selecionada
+  Future<void> loadSelectedCampaignAuthor(String? currentUserUid,
+      String? currentUserName, String? currentUserProfileUrl) async {
+    if (_selectedCampaign != null) {
+      await loadAuthorByUid(_selectedCampaign!.authorUid, currentUserUid,
+          currentUserName, currentUserProfileUrl);
+    }
   }
 }

@@ -6,7 +6,7 @@ class Campaign {
   final String urlImagem;
   final DateTime? dataInicial;
   final DateTime? dataFinal;
-  final String authorName;
+  final String authorUid;
   bool isFavorite;
 
   Campaign({
@@ -17,7 +17,7 @@ class Campaign {
     required this.urlImagem,
     this.dataInicial,
     this.dataFinal,
-    required this.authorName,
+    required this.authorUid,
     this.isFavorite = false,
   });
 
@@ -33,7 +33,7 @@ class Campaign {
           : null,
       dataFinal:
           json['dataFinal'] != null ? DateTime.parse(json['dataFinal']) : null,
-      authorName: json['authorName'] ?? 'Autor anônimo',
+      authorUid: json['authorUid'] ?? '',
     );
   }
 
@@ -46,7 +46,7 @@ class Campaign {
       'urlImagem': urlImagem,
       'dataInicial': dataInicial?.toIso8601String().split('T')[0],
       'dataFinal': dataFinal?.toIso8601String().split('T')[0],
-      'authorName': authorName,
+      'authorUid': authorUid,
     };
   }
 

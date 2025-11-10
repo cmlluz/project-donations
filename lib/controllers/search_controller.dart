@@ -104,7 +104,8 @@ class AppSearchController with ChangeNotifier {
               imageUrl:
                   c.urlImagem.isNotEmpty ? c.urlImagem : 'assets/donations.png',
               category: SearchCategory.campanha,
-              institution: c.authorName,
+              institution:
+                  'Carregando...', // TODO: Buscar nome via UID c.authorUid
               date: c.dataInicial ?? DateTime.now(),
               postStatus: 'ATIVO', // Campanhas sempre ativas por padrão
               quantity: 0, // Campanhas não têm quantidade

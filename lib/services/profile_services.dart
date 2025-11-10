@@ -80,4 +80,23 @@ class ProfileService {
     if (currentUser == null) throw Exception('Usuário não autenticado.');
     await currentUser!.updatePassword(newPassword);
   }
+
+  Future<Map<String, dynamic>> getUserById(String uid) async {
+    if (currentUser == null) throw Exception('Usuário não autenticado.');
+    final token = await currentUser!.getIdToken();
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/users/$uid'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      throw Exception('Falha ao carregar dados do usuário $uid.');
+    }
+  }
 }
