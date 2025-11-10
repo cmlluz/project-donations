@@ -44,8 +44,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
         final isLoading = campaignController.isLoading;
         final errorMessage = campaignController.errorMessage;
 
-        final bool isAuthor = campaign?.authorUid ==
-            (userProvider.currentUser?.firebaseUid ?? '');
+        final bool isAuthor = campaign?.isAuthoredBy(userProvider.currentUser?.firebaseUid) ?? false;
 
         if (isLoading) {
           return const Scaffold(

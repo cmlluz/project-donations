@@ -64,4 +64,23 @@ class Campaign {
     if (now.isAfter(dataFinal!)) return 0;
     return dataFinal!.difference(now).inDays;
   }
+
+  // Verifica se o usuário é o autor desta campanha
+  bool isAuthoredBy(String? userUid) {
+    if (userUid == null || userUid.isEmpty) return false;
+    return authorUid == userUid;
+  }
+
+  // Verifica se a campanha tem um autor válido
+  bool get hasValidAuthor {
+    return authorUid.isNotEmpty;
+  }
+
+  // Getter para verificar se é uma campanha válida (tem autor e dados básicos)
+  bool get isValid {
+    return hasValidAuthor &&
+        titulo.isNotEmpty &&
+        descricao.isNotEmpty &&
+        localizacao.isNotEmpty;
+  }
 }
