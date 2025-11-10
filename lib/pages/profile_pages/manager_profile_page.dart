@@ -1,8 +1,8 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
-import 'package:appdonationsgestor/services/api_services/campaign_api_service.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:appdonationsgestor/components/profile_components/campaign_history_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
@@ -32,7 +32,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   final ApiClient _apiClient = ApiClient();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
-  late final CampaignApiService _campaignApiService;
+  late final CampaignController _campaignController;
 
   Future<Map<String, dynamic>>? _historyFuture;
 
@@ -52,7 +52,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     super.initState();
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
-    _campaignApiService = CampaignApiService(_apiClient);
+    _campaignController = CampaignController();
     _loadHistory();
   }
 
@@ -65,13 +65,14 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     try {
       final donationsFuture = _donationApiService.getMyDonations();
       final needsFuture = _needApiService.getMyNeeds();
-      final campaignsFuture = _campaignApiService.getMyCampaigns();
 
-      final results =
-          await Future.wait([donationsFuture, needsFuture, campaignsFuture]);
+      // Usar controller para carregar campanhas
+      await _campaignController.loadMyCampaigns(notify: false);
+
+      final results = await Future.wait([donationsFuture, needsFuture]);
       final List<Donation> donations = results[0] as List<Donation>;
       final List<Need> needs = results[1] as List<Need>;
-      final List<Campaign> campaigns = results[2] as List<Campaign>;
+      final List<Campaign> campaigns = _campaignController.campaigns;
 
       return {'donations': donations, 'needs': needs, 'campaigns': campaigns};
     } catch (e) {
@@ -429,5 +430,11 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _campaignController.dispose();
+    super.dispose();
   }
 }

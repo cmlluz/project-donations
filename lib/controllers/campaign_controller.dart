@@ -51,6 +51,24 @@ class CampaignController with ChangeNotifier {
     }
   }
 
+  // Para Histórico do perfil - carrega apenas campanhas do usuário atual
+  Future<void> loadMyCampaigns({bool notify = true}) async {
+    _isLoading = true;
+    _errorMessage = '';
+    if (notify) notifyListeners();
+
+    try {
+      _campaigns = await _campaignApiService.getMyCampaigns();
+      _filteredCampaigns.clear();
+    } catch (e) {
+      _errorMessage = 'Erro ao carregar minhas campanhas: $e';
+      print('Erro no CampaignController (getMyCampaigns): $e');
+    } finally {
+      _isLoading = false;
+      if (notify) notifyListeners();
+    }
+  }
+
   // Para Campaign Details Page
   Future<void> loadCampaignById(String id) async {
     _isLoading = true;
@@ -196,8 +214,12 @@ class CampaignController with ChangeNotifier {
   }
 
   // Para Pull-to-refresh nas páginas de listagem
-  Future<void> refresh() async {
-    await loadCampaigns();
+  Future<void> refresh({bool myOnly = false}) async {
+    if (myOnly) {
+      await loadMyCampaigns();
+    } else {
+      await loadCampaigns();
+    }
   }
 
   // Para Verificar se uma campanha específica existe na lista

@@ -64,23 +64,15 @@ class CampaignApiService {
     print("Campanha deletada com sucesso.");
   }
 
-  // TODO: Implementar endpoint '/campaigns/me' no backend para buscar campanhas do usuário autenticado
-  // Future<List<Campaign>> getMyCampaigns() async {
-  //   final response = await _apiClient.get('campaigns/me');
-
-  //   if (response.statusCode == 200) {
-  //     List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-  //     return body.map((dynamic item) => Campaign.fromJson(item)).toList();
-  //   } else {
-  //     print("Erro ${response.statusCode}: ${response.body}");
-  //     throw Exception('Falha ao carregar as minhas campanhas.');
-  //   }
-  // }
-
-  // Método temporário até o endpoint ser implementado
   Future<List<Campaign>> getMyCampaigns() async {
-    // Por enquanto, retorna todas as campanhas
-    // TODO: Remover este método quando o endpoint '/campaigns/my' estiver disponível
-    return getCampaigns();
+    final response = await _apiClient.get('campaigns/me');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Campaign.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar as minhas campanhas.');
+    }
   }
 }
