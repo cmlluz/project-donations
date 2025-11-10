@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/popup.dart';
@@ -20,11 +21,16 @@ class CampaignDetailsPage extends StatefulWidget {
 }
 
 class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
-  bool isFavorite = false;
+  late bool _isFavorite;
+  bool _isLoadingFavorite = false;
 
   @override
   void initState() {
     super.initState();
+    final campaignIdInt = int.tryParse(widget.campaignId) ?? 0;
+    _isFavorite = Provider.of<FavoriteController>(context, listen: false)
+        .isCampaignFavorite(campaignIdInt);
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = context.read<UserProvider>();
       context.read<CampaignController>().loadCampaignByIdWithAuthor(
@@ -36,10 +42,63 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
     });
   }
 
+  void _toggleFavorite() async {
+    if (_isLoadingFavorite) return;
+
+    final campaign = context.read<CampaignController>().selectedCampaign;
+    if (campaign == null) return;
+
+    final newFavoriteState = !_isFavorite;
+    final favController = Provider.of<FavoriteController>(context, listen: false);
+
+    setState(() {
+      _isLoadingFavorite = true;
+      _isFavorite = newFavoriteState;
+    });
+
+    try {
+      if (newFavoriteState) {
+        await favController.addFavoriteCampaign(campaign);
+      } else {
+        await favController.removeFavoriteCampaign(campaign);
+      }
+      campaign.isFavorite = newFavoriteState;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newFavoriteState
+                ? 'Campanha adicionada aos favoritos!'
+                : 'Campanha removida dos favoritos.'),
+            backgroundColor: ConstantsColors.blueShade900,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _isFavorite = !newFavoriteState;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao atualizar favoritos: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingFavorite = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<CampaignController, UserProvider>(
-      builder: (context, campaignController, userProvider, child) {
+    return Consumer3<CampaignController, UserProvider, FavoriteController>(
+      builder: (context, campaignController, userProvider, favoriteController, child) {
         final campaign = campaignController.selectedCampaign;
         final isLoading = campaignController.isLoading;
         final errorMessage = campaignController.errorMessage;
@@ -47,6 +106,21 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
         final bool isAuthor =
             campaign?.isAuthoredBy(userProvider.currentUser?.firebaseUid) ??
                 false;
+
+        // Atualiza o estado do favorito baseado no FavoriteController
+        if (campaign != null) {
+          final campaignIdInt = int.tryParse(widget.campaignId) ?? 0;
+          final isFavoriteFromController = favoriteController.isCampaignFavorite(campaignIdInt);
+          if (_isFavorite != isFavoriteFromController) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _isFavorite = isFavoriteFromController;
+                });
+              }
+            });
+          }
+        }
 
         if (isLoading) {
           return const Scaffold(
@@ -263,19 +337,15 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                         top: 16,
                         right: 16,
                         child: CircleAvatar(
-                          backgroundColor: isFavorite
+                          backgroundColor: _isFavorite
                               ? ConstantsColors.blueShade900
                               : Colors.grey.withOpacity(0.5),
                           child: IconButton(
-                            icon: const Icon(
-                              Icons.favorite,
+                            icon: Icon(
+                              _isFavorite ? Icons.favorite : Icons.favorite_border,
                               color: Colors.white,
                             ),
-                            onPressed: () {
-                              setState(() {
-                                isFavorite = !isFavorite;
-                              });
-                            },
+                            onPressed: _isLoadingFavorite ? null : _toggleFavorite,
                           ),
                         ),
                       ),
