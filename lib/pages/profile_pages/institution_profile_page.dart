@@ -1,5 +1,6 @@
-// TODO: Criar endpoint para buscar campanhas por autor/instituição específica ao invés de carregar todas e filtrar no frontend
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -37,12 +38,26 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   int selectedTab = 0;
   late bool _isFavorite;
   bool _isLoading = false;
+  late final CampaignController _campaignController;
+  List<Campaign> _institutionCampaigns = [];
 
   @override
   void initState() {
     super.initState();
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isUserFavorite(widget.userId);
+    _campaignController = CampaignController();
+    _loadInstitutionCampaigns();
+  }
+
+  void _loadInstitutionCampaigns() async {
+    await _campaignController.loadCampaignsByAuthor(widget.userId,
+        notify: false);
+    if (mounted) {
+      setState(() {
+        _institutionCampaigns = _campaignController.campaigns;
+      });
+    }
   }
 
   void _toggleFavorite() async {
@@ -272,14 +287,16 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                   children: [
                     _buildTabButton("Publicações", 0),
                     _buildTabButton("Histórico", 1),
-                    _buildTabButton("Notas Fiscais", 2),
+                    _buildTabButton("Campanhas", 2),
+                    _buildTabButton("Notas Fiscais", 3),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
               if (selectedTab == 0) _buildPosts(),
               if (selectedTab == 1) _buildHistory(),
-              if (selectedTab == 2) _buildNotes(),
+              if (selectedTab == 2) _buildInstitutionCampaigns(),
+              if (selectedTab == 3) _buildNotes(),
             ],
           ),
         ),
@@ -402,5 +419,56 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
         );
       }).toList(),
     );
+  }
+
+  Widget _buildInstitutionCampaigns() {
+    if (_institutionCampaigns.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text(
+            'Esta instituição ainda não possui campanhas.',
+            style: TextStyle(
+              fontSize: 16,
+              color: ConstantsColors.blueShade900,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1,
+      ),
+      itemCount: _institutionCampaigns.length,
+      itemBuilder: (context, index) {
+        final campaign = _institutionCampaigns[index];
+
+        return HistoryCard(
+          titulo: campaign.titulo,
+          local: campaign.localizacao,
+          quantidade: 0, // Campanhas não têm quantidade
+          imagem: campaign.urlImagem.isNotEmpty
+              ? campaign.urlImagem
+              : "assets/donations.jpg",
+          onTap: () {
+            GoRouter.of(context).push('/campaignDetails/${campaign.id}');
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _campaignController.dispose();
+    super.dispose();
   }
 }

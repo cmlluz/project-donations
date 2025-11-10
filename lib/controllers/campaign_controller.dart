@@ -282,4 +282,23 @@ class CampaignController with ChangeNotifier {
           currentUserName, currentUserProfileUrl);
     }
   }
+
+  // Para Perfil de instituições - carrega campanhas de um autor específico
+  Future<void> loadCampaignsByAuthor(String authorUid,
+      {bool notify = true}) async {
+    _isLoading = true;
+    _errorMessage = '';
+    if (notify) notifyListeners();
+
+    try {
+      _campaigns = await _campaignApiService.getCampaignsByAuthor(authorUid);
+      _filteredCampaigns.clear();
+    } catch (e) {
+      _errorMessage = 'Erro ao carregar campanhas do autor: $e';
+      print('Erro no CampaignController (loadCampaignsByAuthor): $e');
+    } finally {
+      _isLoading = false;
+      if (notify) notifyListeners();
+    }
+  }
 }

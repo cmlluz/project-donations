@@ -75,4 +75,16 @@ class CampaignApiService {
       throw Exception('Falha ao carregar as minhas campanhas.');
     }
   }
+
+  Future<List<Campaign>> getCampaignsByAuthor(String authorUid) async {
+    final response = await _apiClient.get('campaigns/author/$authorUid');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Campaign.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar campanhas do autor $authorUid.');
+    }
+  }
 }
