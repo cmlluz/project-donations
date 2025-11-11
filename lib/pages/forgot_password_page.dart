@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 
@@ -31,11 +32,24 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
   }
 
   void resetPassword() async {
+    setState(() {
+      errorMessage = '';
+    });
+
     try {
       await authService.value.resetPassword(email: emailController.text);
       showSnackBar();
     } on FirebaseAuthException catch (e) {
-      errorMessage = e.message ?? 'This is not working';
+      setState(() {
+        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+        errorMessage = translatedMessage.isEmpty
+            ? (e.message ?? 'Erro desconhecido ao resetar senha')
+            : translatedMessage;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Erro inesperado. Tente novamente.';
+      });
     }
   }
 
@@ -96,6 +110,18 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Text(
+                      errorMessage,
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ConstantsColors.blueShade900,

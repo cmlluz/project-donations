@@ -1,6 +1,7 @@
 import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
@@ -73,17 +74,10 @@ class _UserRegisterPage extends State<UserRegisterPage> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       setState(() {
-        if (e.code == 'weak-password') {
-          errorMessage = 'A senha deve ter pelo menos 8 caracteres.';
-        } else if (e.code == 'email-already-in-use') {
-          errorMessage =
-              'Este e-mail já está em uso. Tente outro ou faça login.';
-        } else if (e.code == 'invalid-email') {
-          errorMessage = 'O formato do e-mail é inválido.';
-        } else {
-          errorMessage =
-              e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.';
-        }
+        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+        errorMessage = translatedMessage.isEmpty
+            ? (e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.')
+            : translatedMessage;
       });
     } finally {
       if (mounted) {
