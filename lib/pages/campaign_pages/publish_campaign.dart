@@ -32,6 +32,29 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
+  Widget _buildRequiredLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: ConstantsColors.blueShade900,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const Text(
+          ' *',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
     if (pickedImage != null) {
@@ -107,11 +130,24 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
       return;
     }
 
-    if (_startDate != null && _endDate != null) {
-      if (_endDate!.isBefore(_startDate!)) {
-        _showError('A data final não pode ser anterior à data inicial');
-        return;
-      }
+    if (_startDate == null) {
+      _showError('A data inicial é obrigatória');
+      return;
+    }
+
+    if (_endDate == null) {
+      _showError('A data final é obrigatória');
+      return;
+    }
+
+    if (_selectedImg == null) {
+      _showError('A imagem da campanha é obrigatória');
+      return;
+    }
+
+    if (_endDate!.isBefore(_startDate!)) {
+      _showError('A data final não pode ser anterior à data inicial');
+      return;
     }
 
     setState(() {
@@ -216,6 +252,11 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Imagem da Campanha'),
+              ),
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: _showImagePickerOptions,
                 child: DottedBorder(
@@ -252,7 +293,7 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                               ),
                               const SizedBox(height: 10),
                               const Text(
-                                'Envie a imagem aqui',
+                                'Envie a imagem da campanha',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: ConstantsColors.blueShade900,
@@ -273,64 +314,93 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                 ),
               ),
               const SizedBox(height: 25),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Título'),
+              ),
+              const SizedBox(height: 5),
               CustomTextFields(
                 labelColor: ConstantsColors.whiteShade700,
                 controller: _titleController,
                 secret: false,
                 icon: Icons.title_outlined,
                 keyboardType: TextInputType.text,
-                hintText: 'Título',
+                hintText: 'Digite o título da campanha',
               ),
               const SizedBox(height: 15),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Descrição'),
+              ),
+              const SizedBox(height: 5),
               CustomTextFields(
                 labelColor: ConstantsColors.whiteShade700,
                 controller: _descController,
                 secret: false,
                 icon: Icons.description_outlined,
                 keyboardType: TextInputType.multiline,
-                hintText: 'Descrição',
+                hintText: 'Descreva os detalhes da campanha',
               ),
               const SizedBox(height: 15),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Localização'),
+              ),
+              const SizedBox(height: 5),
               CustomTextFields(
                 labelColor: ConstantsColors.whiteShade700,
                 controller: _locationController,
                 secret: false,
                 icon: Icons.location_on_outlined,
                 keyboardType: TextInputType.text,
-                hintText: 'Localização',
+                hintText: 'Informe o local da campanha',
               ),
               const SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
-                    child: GestureDetector(
-                      onTap: _selectStartDate,
-                      child: AbsorbPointer(
-                        child: CustomTextFields(
-                          labelColor: ConstantsColors.whiteShade700,
-                          controller: _startDateController,
-                          secret: false,
-                          icon: Icons.calendar_today,
-                          keyboardType: TextInputType.datetime,
-                          hintText: 'Data inicial',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildRequiredLabel('Data Inicial'),
+                        const SizedBox(height: 5),
+                        GestureDetector(
+                          onTap: _selectStartDate,
+                          child: AbsorbPointer(
+                            child: CustomTextFields(
+                              labelColor: ConstantsColors.whiteShade700,
+                              controller: _startDateController,
+                              secret: false,
+                              icon: Icons.calendar_today,
+                              keyboardType: TextInputType.datetime,
+                              hintText: 'Selecione a data inicial',
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: _selectEndDate,
-                      child: AbsorbPointer(
-                        child: CustomTextFields(
-                          labelColor: ConstantsColors.whiteShade700,
-                          controller: _endDateController,
-                          secret: false,
-                          icon: Icons.calendar_month,
-                          keyboardType: TextInputType.datetime,
-                          hintText: 'Data final',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildRequiredLabel('Data Final'),
+                        const SizedBox(height: 5),
+                        GestureDetector(
+                          onTap: _selectEndDate,
+                          child: AbsorbPointer(
+                            child: CustomTextFields(
+                              labelColor: ConstantsColors.whiteShade700,
+                              controller: _endDateController,
+                              secret: false,
+                              icon: Icons.calendar_month,
+                              keyboardType: TextInputType.datetime,
+                              hintText: 'Selecione a data final',
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
