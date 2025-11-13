@@ -95,8 +95,8 @@ class GenericFilterPage extends StatelessWidget {
                 child: AbsorbPointer(
                   child: ImageCard(
                     imageUrl: item.imageUrl,
-                    title: 'Doação',
-                    location: 'Salvador, Bahia',
+                    title: _getCardTitle(item),
+                    location: item.location ?? 'Salvador, Bahia',
                     onTap: null,
                   ),
                 ),
@@ -174,6 +174,25 @@ class GenericFilterPage extends StatelessWidget {
       );
     } else if (item.category == SearchCategory.campanha) {
       GoRouter.of(context).push('/campaignDetails/${item.id}');
+    }
+  }
+
+  String _getCardTitle(SearchItem item) {
+    switch (item.category) {
+      case SearchCategory.campanha:
+        // Para campanhas, mostra o título truncado se for muito longo
+        if (item.title.length > 15) {
+          return '${item.title.substring(0, 15)}...';
+        }
+        return item.title;
+      case SearchCategory.doacao:
+        return 'Doação';
+      case SearchCategory.necessidade:
+        return 'Necessidade';
+      case SearchCategory.instituicao:
+        return 'Instituição';
+      default:
+        return item.category.label;
     }
   }
 }
