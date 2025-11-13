@@ -28,11 +28,107 @@ class AppSearchController with ChangeNotifier {
   SearchCategory _selectedCategory = SearchCategory.todos;
   SearchCategory get selectedCategory => _selectedCategory;
 
+  List<Campaign> _externalCampaigns = [];
+
   AppSearchController() {
     _needsApiService = NeedApiService(_apiClient);
     _donationApiService = DonationApiService(_apiClient);
     _campaignApiService = CampaignApiService(_apiClient);
     _favoriteApiService = FavoriteApiService(_apiClient);
+  }
+
+  // Método para atualizar campanhas externas
+  void updateCampaigns(List<Campaign> campaigns) {
+    _externalCampaigns = campaigns;
+    _refreshItems();
+  }
+
+  // Método para recarregar apenas os itens com as campanhas atualizadas
+  void _refreshItems() async {
+    if (_isLoading) return;
+
+    try {
+      final needsFuture = _needsApiService.getNeeds();
+      final donationsFuture = _donationApiService.getDonations();
+      final favDonationIdsFuture = _favoriteApiService.getFavoriteDonationIds();
+      final favNeedIdsFuture = _favoriteApiService.getFavoriteNeedIds();
+      final favCampaignIdsFuture = _favoriteApiService.getFavoriteCampaignIds();
+
+      final List<dynamic> results = await Future.wait([
+        needsFuture,
+        donationsFuture,
+        favDonationIdsFuture,
+        favNeedIdsFuture,
+        favCampaignIdsFuture,
+      ]);
+
+      final List<Need> needs = results[0] as List<Need>;
+      final List<Donation> donations = results[1] as List<Donation>;
+      final Set<int> favDonationIds = results[2] as Set<int>;
+      final Set<int> favNeedIds = results[3] as Set<int>;
+      final Set<int> favCampaignIds = results[4] as Set<int>;
+
+      // Usar campanhas externas se disponíveis
+      final List<Campaign> campaigns = _externalCampaigns.isNotEmpty
+          ? _externalCampaigns
+          : await _campaignApiService.getCampaigns();
+
+      for (var n in needs) {
+        n.isFavorite = favNeedIds.contains(n.id);
+      }
+      for (var d in donations) {
+        d.isFavorite = favDonationIds.contains(d.id);
+      }
+      for (var c in campaigns) {
+        c.isFavorite = favCampaignIds.contains(c.id);
+      }
+
+      _buildSearchItems(needs, donations, campaigns);
+      notifyListeners();
+    } catch (e) {
+      print('Erro ao atualizar itens de busca: $e');
+    }
+  }
+
+  void _buildSearchItems(
+      List<Need> needs, List<Donation> donations, List<Campaign> campaigns) {
+    _allItems = [
+      ...needs.map((n) => SearchItem(
+            id: n.id,
+            title: n.title,
+            description: n.description,
+            imageUrl: 'assets/donations.png',
+            category: SearchCategory.necessidade,
+            institution: n.authorName,
+            date: n.date ?? DateTime.now(),
+            postStatus: n.postStatus,
+            quantity: n.quantity,
+          )),
+      ...donations.map((d) => SearchItem(
+            id: d.id,
+            title: d.title,
+            description: d.description,
+            imageUrl: 'assets/donations.png',
+            category: SearchCategory.doacao,
+            institution: d.donatorName,
+            date: d.date ?? DateTime.now(),
+            postStatus: d.postStatus,
+            quantity: d.quantity,
+          )),
+      ...campaigns.map((c) => SearchItem(
+            id: c.id,
+            title: c.titulo,
+            description: c.descricao,
+            imageUrl:
+                c.urlImagem.isNotEmpty ? c.urlImagem : 'assets/donations.png',
+            category: SearchCategory.campanha,
+            institution:
+                'Carregando...', // TODO: Buscar nome via UID c.authorUid
+            date: c.dataInicial ?? DateTime.now(),
+            postStatus: 'ATIVO', // Campanhas sempre ativas por padrão
+            quantity: 0, // Campanhas não têm quantidade
+          )),
+    ];
   }
 
   Future<void> loadItems() async {
@@ -74,43 +170,7 @@ class AppSearchController with ChangeNotifier {
         c.isFavorite = favCampaignIds.contains(c.id);
       }
 
-      _allItems = [
-        ...needs.map((n) => SearchItem(
-              id: n.id,
-              title: n.title,
-              description: n.description,
-              imageUrl: 'assets/donations.png',
-              category: SearchCategory.necessidade,
-              institution: n.authorName,
-              date: n.date ?? DateTime.now(),
-              postStatus: n.postStatus,
-              quantity: n.quantity,
-            )),
-        ...donations.map((d) => SearchItem(
-              id: d.id,
-              title: d.title,
-              description: d.description,
-              imageUrl: 'assets/donations.png',
-              category: SearchCategory.doacao,
-              institution: d.donatorName,
-              date: d.date ?? DateTime.now(),
-              postStatus: d.postStatus,
-              quantity: d.quantity,
-            )),
-        ...campaigns.map((c) => SearchItem(
-              id: c.id,
-              title: c.titulo,
-              description: c.descricao,
-              imageUrl:
-                  c.urlImagem.isNotEmpty ? c.urlImagem : 'assets/donations.png',
-              category: SearchCategory.campanha,
-              institution:
-                  'Carregando...', // TODO: Buscar nome via UID c.authorUid
-              date: c.dataInicial ?? DateTime.now(),
-              postStatus: 'ATIVO', // Campanhas sempre ativas por padrão
-              quantity: 0, // Campanhas não têm quantidade
-            )),
-      ];
+      _buildSearchItems(needs, donations, campaigns);
     } catch (e) {
       print('Erro ao carregar itens no AppSearchController: $e');
       _allItems = [];
