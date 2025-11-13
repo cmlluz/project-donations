@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -40,6 +41,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => FavoriteController()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => CampaignController()),
       ],
       child: const MyApp(),
     ),
