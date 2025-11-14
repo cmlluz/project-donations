@@ -2,7 +2,6 @@ import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
-import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:go_router/go_router.dart';
 
