@@ -30,7 +30,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
     final campaignIdInt = int.tryParse(widget.campaignId) ?? 0;
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isCampaignFavorite(campaignIdInt);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = context.read<UserProvider>();
       context.read<CampaignController>().loadCampaignByIdWithAuthor(
@@ -49,7 +49,8 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
     if (campaign == null) return;
 
     final newFavoriteState = !_isFavorite;
-    final favController = Provider.of<FavoriteController>(context, listen: false);
+    final favController =
+        Provider.of<FavoriteController>(context, listen: false);
 
     setState(() {
       _isLoadingFavorite = true;
@@ -71,6 +72,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                 ? 'Campanha adicionada aos favoritos!'
                 : 'Campanha removida dos favoritos.'),
             backgroundColor: ConstantsColors.blueShade900,
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -83,6 +85,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
           SnackBar(
             content: Text('Erro ao atualizar favoritos: $error'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -98,7 +101,8 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Consumer3<CampaignController, UserProvider, FavoriteController>(
-      builder: (context, campaignController, userProvider, favoriteController, child) {
+      builder: (context, campaignController, userProvider, favoriteController,
+          child) {
         final campaign = campaignController.selectedCampaign;
         final isLoading = campaignController.isLoading;
         final errorMessage = campaignController.errorMessage;
@@ -110,7 +114,8 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
         // Atualiza o estado do favorito baseado no FavoriteController
         if (campaign != null) {
           final campaignIdInt = int.tryParse(widget.campaignId) ?? 0;
-          final isFavoriteFromController = favoriteController.isCampaignFavorite(campaignIdInt);
+          final isFavoriteFromController =
+              favoriteController.isCampaignFavorite(campaignIdInt);
           if (_isFavorite != isFavoriteFromController) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
@@ -342,10 +347,13 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                               : Colors.grey.withOpacity(0.5),
                           child: IconButton(
                             icon: Icon(
-                              _isFavorite ? Icons.favorite : Icons.favorite_border,
+                              _isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                               color: Colors.white,
                             ),
-                            onPressed: _isLoadingFavorite ? null : _toggleFavorite,
+                            onPressed:
+                                _isLoadingFavorite ? null : _toggleFavorite,
                           ),
                         ),
                       ),
@@ -450,7 +458,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 15),
                             ),
-                            backgroundColor: ConstantsColors.blueShade400,
+                            backgroundColor: ConstantsColors.blueShade900,
                             behavior: SnackBarBehavior.floating,
                           ),
                         );

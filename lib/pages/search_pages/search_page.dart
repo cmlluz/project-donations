@@ -4,6 +4,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/controllers/search_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/pages/search_pages/filter_pages/generic_filter_page.dart';
 import 'package:go_router/go_router.dart';
@@ -26,10 +27,36 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     _tabController = TabController(length: 5, vsync: this);
     _searchControllerProvider = AppSearchController();
     _searchControllerProvider.loadItems();
+
+    // Conecta com o CampaignController para receber atualizações
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final campaignController =
+          Provider.of<CampaignController>(context, listen: false);
+      _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+
+      // Adiciona listener para atualizar quando campanhas mudarem
+      campaignController.addListener(() {
+        _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+      });
+    });
   }
 
   @override
   void dispose() {
+    // Remove listener do CampaignController se ainda estiver montado
+    if (mounted) {
+      try {
+        final campaignController =
+            Provider.of<CampaignController>(context, listen: false);
+        campaignController.removeListener(() {
+          _searchControllerProvider
+              .updateCampaigns(campaignController.campaigns);
+        });
+      } catch (e) {
+        // Ignora erro se o Provider não estiver mais disponível
+      }
+    }
+
     _tabController.dispose();
     _searchController.dispose();
     _searchControllerProvider.dispose();

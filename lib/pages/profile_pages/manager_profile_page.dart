@@ -36,6 +36,11 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   Future<Map<String, dynamic>>? _historyFuture;
 
+  // Cache local para otimização
+  List<Donation>? _cachedDonations;
+  List<Need>? _cachedNeeds;
+  String? _cachedUserId;
+
   final List<String> posts = [
     "assets/donations.jpg",
     "assets/instituicao.png",
@@ -52,7 +57,12 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     super.initState();
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
-    _campaignController = CampaignController();
+    _campaignController =
+        Provider.of<CampaignController>(context, listen: false);
+
+    // Listener para atualizar o histórico quando campanhas mudarem
+    _campaignController.addListener(_refreshHistory);
+
     _loadHistory();
   }
 
@@ -61,23 +71,97 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     setState(() {});
   }
 
+  void _refreshHistory() {
+    if (mounted) {
+      // Limpa cache para forçar atualização completa
+      _clearCache();
+      _loadHistory();
+    }
+  }
+
+  // Verifica se o cache de campanhas é válido (contém apenas campanhas do usuário atual)
+  bool _isCampaignCacheValid() {
+    final userProvider = context.read<UserProvider>();
+    final currentUserId = userProvider.currentUser?.firebaseUid;
+
+    // Se não há usuário logado ou não há campanhas, cache não é válido
+    if (currentUserId == null || _campaignController.campaigns.isEmpty) {
+      return false;
+    }
+
+    // Verifica se todas as campanhas em cache são do usuário atual
+    // (assumindo que getMyCampaigns só retorna campanhas do usuário)
+    // Como não temos o campo do autor diretamente no modelo Campaign,
+    // vamos confiar que se loadMyCampaigns foi chamado por último, o cache é válido
+    return _cachedUserId == currentUserId;
+  }
+
+  // Limpa o cache quando necessário (ex: mudança de usuário)
+  void _clearCache() {
+    _cachedDonations = null;
+    _cachedNeeds = null;
+    _cachedUserId = null;
+  }
+
   Future<Map<String, dynamic>> _fetchHistoryItems() async {
     try {
-      final donationsFuture = _donationApiService.getMyDonations();
-      final needsFuture = _needApiService.getMyNeeds();
+      final userProvider = context.read<UserProvider>();
+      final currentUserId = userProvider.currentUser?.firebaseUid;
 
-      // Usar controller para carregar campanhas
-      await _campaignController.loadMyCampaigns(notify: false);
+      List<Donation> donations = [];
+      List<Need> needs = [];
+      List<Campaign> campaigns = [];
 
-      final results = await Future.wait([donationsFuture, needsFuture]);
-      final List<Donation> donations = results[0] as List<Donation>;
-      final List<Need> needs = results[1] as List<Need>;
-      final List<Campaign> campaigns = _campaignController.campaigns;
+      // Cache inteligente para doações
+      if (_cachedDonations != null && _cachedUserId == currentUserId) {
+        donations = _cachedDonations!;
+      } else {
+        try {
+          donations = await _donationApiService.getMyDonations();
+          _cachedDonations = donations;
+          _cachedUserId = currentUserId;
+        } catch (e) {
+          print("Erro ao carregar doações: $e");
+          donations = [];
+        }
+      }
+
+      // Cache inteligente para necessidades
+      if (_cachedNeeds != null && _cachedUserId == currentUserId) {
+        needs = _cachedNeeds!;
+      } else {
+        try {
+          needs = await _needApiService.getMyNeeds();
+          _cachedNeeds = needs;
+          _cachedUserId = currentUserId;
+        } catch (e) {
+          print("Erro ao carregar necessidades: $e");
+          needs = [];
+        }
+      }
+
+      // Cache inteligente para campanhas
+      if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
+        campaigns = _campaignController.campaigns;
+      } else {
+        try {
+          await _campaignController.loadMyCampaigns(notify: false);
+          campaigns = _campaignController.campaigns;
+        } catch (e) {
+          print("Erro ao carregar campanhas: $e");
+          campaigns = [];
+        }
+      }
 
       return {'donations': donations, 'needs': needs, 'campaigns': campaigns};
     } catch (e) {
-      print("Erro ao carregar histórico: $e");
-      rethrow;
+      print("Erro geral ao carregar histórico: $e");
+      // Retornar listas vazias em caso de erro geral
+      return {
+        'donations': <Donation>[],
+        'needs': <Need>[],
+        'campaigns': <Campaign>[]
+      };
     }
   }
 
@@ -340,92 +424,237 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   }
 
   Widget _buildHistory() {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: _historyFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(
-              child: Text("Erro ao carregar histórico: ${snapshot.error}"));
-        }
-        if (!snapshot.hasData || snapshot.data == null) {
-          return const Center(child: Text("Nenhum item no histórico."));
-        }
-
-        final List<Donation> donations = snapshot.data!['donations'];
-        final List<Need> needs = snapshot.data!['needs'];
-        final List<Campaign> campaigns = snapshot.data!['campaigns'];
-        final allItems = [...donations, ...needs, ...campaigns];
-
-        if (allItems.isEmpty) {
-          return const Center(child: Text("Nenhum item no histórico."));
-        }
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1,
-          ),
-          itemCount: allItems.length,
-          itemBuilder: (context, index) {
-            final item = allItems[index];
-
-            if (item is Donation) {
-              return HistoryCard(
-                titulo: item.title,
-                local: "Local Padrão",
-                quantidade: item.quantity,
-                imagem: "assets/instituicao.png",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DonationDetailPage(
-                        donation: item,
-                        isOwnerView: true,
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else if (item is Need) {
-              return HistoryCard(
-                titulo: item.title,
-                local: "Local Padrão",
-                quantidade: item.quantity,
-                imagem: "assets/donations.jpg",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NeedDetailPage(
-                        need: item,
-                        isOwnerView: true,
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else if (item is Campaign) {
-              return CampaignHistoryCard(
-                titulo: item.titulo,
-                descricao: item.descricao,
-                local: item.localizacao,
-                imagem: item.urlImagem,
-                dataInicial: item.dataInicial,
-                dataFinal: item.dataFinal,
-                onTap: () {
-                  GoRouter.of(context).push('/campaignDetails/${item.id}');
-                },
+    return Consumer<CampaignController>(
+      builder: (context, campaignController, child) {
+        return FutureBuilder<Map<String, dynamic>>(
+          future: _historyFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(
+                    color: ConstantsColors.blueShade900,
+                  ),
+                ),
               );
             }
-            return const SizedBox.shrink();
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: ConstantsColors.redShade800,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Erro ao carregar histórico: ${snapshot.error}",
+                        textAlign: TextAlign.center,
+                        style: TextStylesConstants.kpoppinsMedium.merge(
+                          const TextStyle(
+                            color: ConstantsColors.redShade800,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadHistory,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ConstantsColors.blueShade900,
+                        ),
+                        child: const Text(
+                          "Tentar novamente",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data == null) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    "Esse usuário não registrou nenhuma doação, necessidade ou campanha.",
+                    textAlign: TextAlign.center,
+                    style: TextStylesConstants.kpoppinsMedium.merge(
+                      const TextStyle(
+                        color: ConstantsColors.greyShade600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            final List<Donation> donations = snapshot.data!['donations'] ?? [];
+            final List<Need> needs = snapshot.data!['needs'] ?? [];
+            final List<Campaign> campaigns = snapshot.data!['campaigns'] ?? [];
+            final allItems = [...donations, ...needs, ...campaigns];
+
+            if (allItems.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.history,
+                        size: 48,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Esse usuário não registrou nenhuma doação, necessidade ou campanha.",
+                        textAlign: TextAlign.center,
+                        style: TextStylesConstants.kpoppinsMedium.merge(
+                          const TextStyle(
+                            color: ConstantsColors.greyShade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
+              itemCount: allItems.length,
+              itemBuilder: (context, index) {
+                try {
+                  if (index >= allItems.length) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final item = allItems[index];
+
+                  if (item is Donation) {
+                    return HistoryCard(
+                      titulo: item.title,
+                      local: "Local não informado",
+                      quantidade: item.quantity,
+                      imagem: null,
+                      onTap: () {
+                        try {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DonationDetailPage(
+                                donation: item,
+                                isOwnerView: true,
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          print("Erro ao navegar para detalhes da doação: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Erro ao abrir detalhes da doação"),
+                              backgroundColor: ConstantsColors.redShade800,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  } else if (item is Need) {
+                    return HistoryCard(
+                      titulo: item.title,
+                      local: "Local não informado",
+                      quantidade: item.quantity,
+                      imagem: null,
+                      onTap: () {
+                        try {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NeedDetailPage(
+                                need: item,
+                                isOwnerView: true,
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          print(
+                              "Erro ao navegar para detalhes da necessidade: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("Erro ao abrir detalhes da necessidade"),
+                              backgroundColor: ConstantsColors.redShade800,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  } else if (item is Campaign) {
+                    return CampaignHistoryCard(
+                      titulo: item.titulo,
+                      descricao: item.descricao,
+                      local: item.localizacao.isNotEmpty
+                          ? item.localizacao
+                          : "Local não informado",
+                      imagem: item.urlImagem,
+                      dataInicial: item.dataInicial,
+                      dataFinal: item.dataFinal,
+                      onTap: () {
+                        try {
+                          GoRouter.of(context)
+                              .push('/campaignDetails/${item.id}');
+                        } catch (e) {
+                          print(
+                              "Erro ao navegar para detalhes da campanha: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("Erro ao abrir detalhes da campanha"),
+                              backgroundColor: ConstantsColors.redShade800,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                } catch (e) {
+                  print(
+                      "Erro ao construir item do histórico no índice $index: $e");
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: ConstantsColors.greyShade200,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                    ),
+                  );
+                }
+              },
+            );
           },
         );
       },
@@ -434,7 +663,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   @override
   void dispose() {
-    _campaignController.dispose();
+    // Remove o listener antes de fazer dispose
+    _campaignController.removeListener(_refreshHistory);
     super.dispose();
   }
 }

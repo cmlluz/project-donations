@@ -13,6 +13,7 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:go_router/go_router.dart';
 
 class RootPage extends StatefulWidget {
@@ -101,7 +102,20 @@ class _RootPageState extends State<RootPage> {
         context.go('/');
       }
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+      final errorMsg = translatedMessage.isEmpty
+          ? (e.message ?? 'Erro desconhecido ao fazer logout')
+          : translatedMessage;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
