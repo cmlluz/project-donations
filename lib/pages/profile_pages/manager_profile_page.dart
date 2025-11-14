@@ -36,6 +36,11 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   Future<Map<String, dynamic>>? _historyFuture;
 
+  // Cache local para otimização
+  List<Donation>? _cachedDonations;
+  List<Need>? _cachedNeeds;
+  String? _cachedUserId;
+
   final List<String> posts = [
     "assets/donations.jpg",
     "assets/instituicao.png",
@@ -68,37 +73,77 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   void _refreshHistory() {
     if (mounted) {
+      // Limpa cache para forçar atualização completa
+      _clearCache();
       _loadHistory();
     }
   }
 
+  // Verifica se o cache de campanhas é válido (contém apenas campanhas do usuário atual)
+  bool _isCampaignCacheValid() {
+    final userProvider = context.read<UserProvider>();
+    final currentUserId = userProvider.currentUser?.firebaseUid;
+
+    // Se não há usuário logado ou não há campanhas, cache não é válido
+    if (currentUserId == null || _campaignController.campaigns.isEmpty) {
+      return false;
+    }
+
+    // Verifica se todas as campanhas em cache são do usuário atual
+    // (assumindo que getMyCampaigns só retorna campanhas do usuário)
+    // Como não temos o campo do autor diretamente no modelo Campaign,
+    // vamos confiar que se loadMyCampaigns foi chamado por último, o cache é válido
+    return _cachedUserId == currentUserId;
+  }
+
+  // Limpa o cache quando necessário (ex: mudança de usuário)
+  void _clearCache() {
+    _cachedDonations = null;
+    _cachedNeeds = null;
+    _cachedUserId = null;
+  }
+
   Future<Map<String, dynamic>> _fetchHistoryItems() async {
     try {
+      final userProvider = context.read<UserProvider>();
+      final currentUserId = userProvider.currentUser?.firebaseUid;
+
       List<Donation> donations = [];
       List<Need> needs = [];
       List<Campaign> campaigns = [];
 
-      // Carregar doações com tratamento de erro individual
-      try {
-        donations = await _donationApiService.getMyDonations();
-      } catch (e) {
-        print("Erro ao carregar doações: $e");
-        donations = [];
+      // Cache inteligente para doações
+      if (_cachedDonations != null && _cachedUserId == currentUserId) {
+        donations = _cachedDonations!;
+      } else {
+        try {
+          donations = await _donationApiService.getMyDonations();
+          _cachedDonations = donations;
+          _cachedUserId = currentUserId;
+        } catch (e) {
+          print("Erro ao carregar doações: $e");
+          donations = [];
+        }
       }
 
-      // Carregar necessidades com tratamento de erro individual
-      try {
-        needs = await _needApiService.getMyNeeds();
-      } catch (e) {
-        print("Erro ao carregar necessidades: $e");
-        needs = [];
+      // Cache inteligente para necessidades
+      if (_cachedNeeds != null && _cachedUserId == currentUserId) {
+        needs = _cachedNeeds!;
+      } else {
+        try {
+          needs = await _needApiService.getMyNeeds();
+          _cachedNeeds = needs;
+          _cachedUserId = currentUserId;
+        } catch (e) {
+          print("Erro ao carregar necessidades: $e");
+          needs = [];
+        }
       }
 
-      // Usar campanhas do controller (já carregadas e atualizadas automaticamente)
-      campaigns = _campaignController.campaigns;
-
-      // Se a lista estiver vazia, tentar carregar
-      if (campaigns.isEmpty) {
+      // Cache inteligente para campanhas
+      if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
+        campaigns = _campaignController.campaigns;
+      } else {
         try {
           await _campaignController.loadMyCampaigns(notify: false);
           campaigns = _campaignController.campaigns;
