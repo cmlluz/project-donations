@@ -132,7 +132,7 @@ class EditProfileController extends ChangeNotifier {
         'phone': phoneController.text.trim(),
         'pixKey': pixController.text.trim(),
         'bio': bioController.text.trim(),
-        if (uploadedImageUrl != null) 'profileImageUrl': uploadedImageUrl,
+        if (uploadedImageUrl != null) 'profilePictureUrl': uploadedImageUrl,
       };
 
       if (emailChanged) {
