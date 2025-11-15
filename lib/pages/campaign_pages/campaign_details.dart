@@ -23,6 +23,7 @@ class CampaignDetailsPage extends StatefulWidget {
 class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
+  bool _hasShownExpiredMessage = false;
 
   @override
   void initState() {
@@ -98,6 +99,33 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
     }
   }
 
+  bool _isCampaignExpired(DateTime? dataFinal) {
+    if (dataFinal == null) return false;
+    return DateTime.now().isAfter(dataFinal);
+  }
+
+  void _showExpiredCampaignMessage() {
+    if (_hasShownExpiredMessage) return;
+
+    _hasShownExpiredMessage = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Esta campanha já chegou ao final.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15),
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer3<CampaignController, UserProvider, FavoriteController>(
@@ -110,6 +138,13 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
         final bool isAuthor =
             campaign?.isAuthoredBy(userProvider.currentUser?.firebaseUid) ??
                 false;
+
+        final bool isCampaignExpired = _isCampaignExpired(campaign?.dataFinal);
+
+        // Mostra mensagem de campanha expirada se necessário
+        if (isCampaignExpired && !isAuthor && !_hasShownExpiredMessage) {
+          _showExpiredCampaignMessage();
+        }
 
         // Atualiza o estado do favorito baseado no FavoriteController
         if (campaign != null) {
@@ -439,7 +474,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 30),
-                if (!isAuthor)
+                if (!isAuthor && !isCampaignExpired)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -470,6 +505,26 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                             color: Colors.white,
                             fontSize: 16,
                           ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (!isAuthor && isCampaignExpired)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade400),
+                    ),
+                    child: Text(
+                      "Campanha Finalizada",
+                      textAlign: TextAlign.center,
+                      style: TextStylesConstants.kpoppinsMedium.merge(
+                        TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 16,
                         ),
                       ),
                     ),
