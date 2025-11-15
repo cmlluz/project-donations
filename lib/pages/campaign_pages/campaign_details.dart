@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/controllers/campaign_participant_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/popup.dart';
@@ -25,10 +26,13 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _hasShownExpiredMessage = false;
+  late CampaignParticipantController _participantController;
 
   @override
   void initState() {
     super.initState();
+    _participantController = CampaignParticipantController.withApiClient();
+
     final campaignIdInt = int.tryParse(widget.campaignId) ?? 0;
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isCampaignFavorite(campaignIdInt);
@@ -41,7 +45,16 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
             userProvider.currentUser?.name,
             userProvider.currentUser?.profilePictureUrl,
           );
+
+      // Carregar apenas o interesse do usuário (sem contagem)
+      _participantController.checkUserInterest(widget.campaignId);
     });
+  }
+
+  @override
+  void dispose() {
+    _participantController.dispose();
+    super.dispose();
   }
 
   void _toggleFavorite() async {
@@ -476,39 +489,74 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                 ),
                 const SizedBox(height: 30),
                 if (!isAuthor && !isCampaignExpired)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ConstantsColors.blueShade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Interesse registrado! Contamos com a sua presença.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15),
-                            ),
+                  ListenableBuilder(
+                    listenable: _participantController,
+                    builder: (context, child) {
+                      final hasInterest = _participantController
+                          .getUserInterest(widget.campaignId);
+                      final isSubmitting = _participantController
+                          .isSubmittingInterest(widget.campaignId);
+                      final isLoadingInterest = _participantController
+                          .isLoadingInterest(widget.campaignId);
+
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
                             backgroundColor: ConstantsColors.blueShade900,
-                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                        );
-                      },
-                      child: Text(
-                        "Quero Participar",
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
+                          onPressed: (isSubmitting || isLoadingInterest)
+                              ? null
+                              : () async {
+                                  final success = await _participantController
+                                      .toggleParticipation(widget.campaignId);
+
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          success
+                                              ? "Interesse registrado! Contamos com a sua presença."
+                                              : "Erro ao registrar interesse. Tente novamente.",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                        backgroundColor: success
+                                            ? ConstantsColors.blueShade900
+                                            : Colors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                },
+                          child: isSubmitting || isLoadingInterest
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  hasInterest
+                                      ? "✅ Participando"
+                                      : "Quero Participar",
+                                  style:
+                                      TextStylesConstants.kpoppinsMedium.merge(
+                                    const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 if (!isAuthor && isCampaignExpired)
                   Container(
@@ -541,22 +589,31 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CampaignDataPage(
-                              title: campaign.titulo,
-                              startDate: campaign.dataInicial != null
-                                  ? _formatDate(campaign.dataInicial!)
-                                  : 'Data não definida',
-                              endDate: campaign.dataFinal != null
-                                  ? _formatDate(campaign.dataFinal!)
-                                  : 'Data não definida',
-                              interestedPeople: const [],
+                      onPressed: () async {
+                        // Carregar lista de participantes antes de navegar
+                        await _participantController
+                            .loadParticipantList(widget.campaignId);
+
+                        if (mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CampaignDataPage(
+                                title: campaign.titulo,
+                                startDate: campaign.dataInicial != null
+                                    ? _formatDate(campaign.dataInicial!)
+                                    : 'Data não definida',
+                                endDate: campaign.dataFinal != null
+                                    ? _formatDate(campaign.dataFinal!)
+                                    : 'Data não definida',
+                                interestedPeople: _participantController
+                                    .getParticipantList(widget.campaignId)
+                                    .map((p) => p.participantName)
+                                    .toList(),
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                       child: Text(
                         "Ver Dados da Campanha",
