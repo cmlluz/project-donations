@@ -6,6 +6,7 @@ import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/popup.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_data_page.dart';
 import 'package:provider/provider.dart';
 
 class CampaignDetailsPage extends StatefulWidget {
@@ -525,6 +526,45 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                         TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (isAuthor)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ConstantsColors.blueShade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CampaignDataPage(
+                              title: campaign.titulo,
+                              startDate: campaign.dataInicial != null
+                                  ? _formatDate(campaign.dataInicial!)
+                                  : 'Data não definida',
+                              endDate: campaign.dataFinal != null
+                                  ? _formatDate(campaign.dataFinal!)
+                                  : 'Data não definida',
+                              interestedPeople: const [],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Ver Dados da Campanha",
+                        style: TextStylesConstants.kpoppinsMedium.merge(
+                          const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
