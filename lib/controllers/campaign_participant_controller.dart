@@ -91,7 +91,8 @@ class CampaignParticipantController extends ChangeNotifier {
         if (success) {
           _userInterests[campaignId] = false;
           // Atualizar contagem
-          _participantCounts[campaignId] = (_participantCounts[campaignId] ?? 1) - 1;
+          _participantCounts[campaignId] =
+              (_participantCounts[campaignId] ?? 1) - 1;
           return true;
         }
       } else {
