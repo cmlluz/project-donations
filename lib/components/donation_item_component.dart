@@ -27,6 +27,29 @@ class DonationItemComponent extends StatelessWidget {
     required this.onSubmit,
   });
 
+  Widget _buildRequiredLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: ConstantsColors.blueShade900,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const Text(
+          ' *',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -39,9 +62,9 @@ class DonationItemComponent extends StatelessWidget {
       builder: (_, __) {
         return Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text('Nome do item'),
+              child: _buildRequiredLabel('Nome do item'),
             ),
             const SizedBox(height: 10),
             CustomTextFields(
@@ -52,9 +75,9 @@ class DonationItemComponent extends StatelessWidget {
               labelColor: ConstantsColors.whiteShade700,
             ),
             const SizedBox(height: 10),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text('Descrição', textAlign: TextAlign.start),
+              child: _buildRequiredLabel('Descrição'),
             ),
             const SizedBox(height: 10),
             CustomTextFields(
@@ -63,6 +86,11 @@ class DonationItemComponent extends StatelessWidget {
               controller: productRegistrationController.crtlDesc,
               keyboardType: TextInputType.multiline,
               labelColor: ConstantsColors.whiteShade700,
+            ),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _buildRequiredLabel('Imagem do item'),
             ),
             const SizedBox(height: 10),
             GestureDetector(
@@ -123,14 +151,11 @@ class DonationItemComponent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Row(
+            Row(
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Categoria'),
-                ),
-                SizedBox(width: 165),
-                Text('Quantidade'),
+                _buildRequiredLabel('Categoria'),
+                const SizedBox(width: 165),
+                _buildRequiredLabel('Quantidade'),
               ],
             ),
             const SizedBox(height: 10),
@@ -158,9 +183,9 @@ class DonationItemComponent extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            const Align(
+            Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Tipo de divulgação')),
+                child: _buildRequiredLabel('Tipo de divulgação')),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,

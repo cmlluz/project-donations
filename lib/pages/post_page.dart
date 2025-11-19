@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:appdonationsgestor/components/custom_button.dart';
-import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -22,6 +21,30 @@ class _PostPageState extends State<PostPage> {
   File? _selectedImg;
   final PostController _controller = PostController();
   String mensagem = '';
+  final TextEditingController _descController = TextEditingController();
+
+  Widget _buildRequiredLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 15,
+            color: ConstantsColors.greyShade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const Text(
+          ' *',
+          style: TextStyle(
+            fontSize: 15,
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
 
   Future pickImageFromGallery(ImageSource source) async {
     final selectedImage = await ImagePicker().pickImage(source: source);
@@ -51,11 +74,39 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
-  /*Future<void> publicar() async {
-    String authorUid = authService.value.currentUser?.uid ?? '';
-    String token = await authService.value.currentUser?.getIdToken() ?? '';
+  bool _validateRequiredFields() {
+    if (_selectedImg == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, selecione uma imagem para o post.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+
+    if (_descController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, insira uma descrição para o post.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> publicar() async {
+    if (!_validateRequiredFields()) {
+      return;
+    }
+
+    String authorUid = AuthService().currentUser?.uid ?? '';
+    String token = await AuthService().currentUser?.getIdToken() ?? '';
     String imageUrl = _controller.crtlPic.text;
-    String caption = _controller.crtlDesc.text;
+    String caption = _descController.text.trim();
     bool favorited = false;
 
     String resultado = await _controller.publicarPost(
@@ -68,7 +119,7 @@ class _PostPageState extends State<PostPage> {
     setState(() {
       mensagem = resultado;
     });
-  } */
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +154,11 @@ class _PostPageState extends State<PostPage> {
           child: Column(
             children: [
               const SizedBox(height: 30),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Imagem do Post'),
+              ),
+              const SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
                   _showImagePickerOptions();
@@ -167,22 +223,17 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
               const SizedBox(height: 40),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "Descrição",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: ConstantsColors.greyShade600,
-                  ),
-                ),
+                child: _buildRequiredLabel('Descrição'),
               ),
               const SizedBox(height: 10),
-              const Material(
+              Material(
                 elevation: 2,
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
                 color: ConstantsColors.whiteShade700,
                 child: TextField(
+                  controller: _descController,
                   maxLines: 3,
                   maxLength: 150,
                   decoration: InputDecoration(
@@ -222,10 +273,10 @@ class _PostPageState extends State<PostPage> {
                     color: ConstantsColors.blueShade900,
                     textColor: ConstantsColors.whiteShade700,
                     onPressed: () {
-                      // publicar();
-                      // if (mensagem.isNotEmpty) {
-                      GoRouter.of(context).push('/feedback?text1=Publicação');
-                      // }
+                      if (_validateRequiredFields()) {
+                        // publicar();
+                        GoRouter.of(context).push('/feedback?text1=Publicação');
+                      }
                     },
                   ),
                   const SizedBox(height: 10),

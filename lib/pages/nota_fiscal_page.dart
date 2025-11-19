@@ -21,6 +21,29 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
   final TextEditingController customerNameController = TextEditingController();
   final List<File> _selectedImages = [];
 
+  Widget _buildRequiredLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: ConstantsColors.blueShade900,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const Text(
+          ' *',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   void _showImagePickerOptions() {
     showModalBottomSheet(
       context: context,
@@ -90,15 +113,18 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildRequiredLabel('Título/Descrição'),
+                    const SizedBox(height: 10),
                     CustomTextFields(
                       icon: Icons.description_outlined,
-                      label: 'Título/Descrição',
                       controller: customerNameController,
                       keyboardType: TextInputType.text,
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10)),
                     ),
                     const SizedBox(height: 25),
+                    _buildRequiredLabel('Imagens da Nota Fiscal'),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: _showImagePickerOptions,
                       child: DottedBorder(
@@ -207,6 +233,29 @@ class _NotaFiscalPageState extends State<NotaFiscalPage> {
                       color: ConstantsColors.blueShade900,
                       textColor: ConstantsColors.whiteShade900,
                       onPressed: () {
+                        if (customerNameController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('O título/descrição é obrigatório'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (_selectedImages.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'É obrigatório adicionar pelo menos uma imagem'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+
                         if (mounted) {
                           GoRouter.of(context)
                               .push('/feedback?text1=Nota Fiscal');
