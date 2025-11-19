@@ -27,7 +27,16 @@ class FavoriteController with ChangeNotifier {
 
   FavoriteController() {
     _favoriteApiService = FavoriteApiService(_apiClient);
-    loadFavorites(); // Carrega os favoritos quando o app inicia
+    loadFavorites(notify: false);
+  }
+
+  void clearFavorites() {
+    _favoriteDonations = [];
+    _favoriteNeeds = [];
+    _favoriteCampaigns = [];
+    _favoriteUsers = [];
+    _errorMessage = '';
+    notifyListeners();
   }
 
   Future<void> loadFavorites({bool notify = true}) async {
@@ -54,17 +63,20 @@ class FavoriteController with ChangeNotifier {
       _favoriteUsers =
           (results[3] as PaginatedResponse<Map<String, dynamic>>).content;
     } catch (e) {
-      _errorMessage = "Erro ao carregar favoritos: $e";
+      if (!e.toString().contains("não autenticado")) {
+        _errorMessage = "Erro ao carregar favoritos: $e";
+        print(_errorMessage);
+      }
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (notify) notifyListeners();
     }
   }
 
   Future<void> addFavoriteDonation(Donation donation) async {
     try {
       await _favoriteApiService.addFavoriteDonation(donation.id);
-      _favoriteDonations.add(donation); // Atualização otimista
+      _favoriteDonations.add(donation);
       notifyListeners();
     } catch (e) {
       print("Erro ao adicionar favorito: $e");
@@ -150,7 +162,6 @@ class FavoriteController with ChangeNotifier {
     }
   }
 
-  // Verifica se um item já está favoritado (para as páginas de detalhe)
   bool isDonationFavorite(int id) {
     return _favoriteDonations.any((d) => d.id == id);
   }
