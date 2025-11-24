@@ -236,7 +236,7 @@ class _PostPageState extends State<PostPage> {
                   controller: _descController,
                   maxLines: 3,
                   maxLength: 150,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     counterText: '',
                     labelStyle: TextStyle(color: ConstantsColors.whiteShade700),
                     hintText: 'Escreva uma descrição para o post',
