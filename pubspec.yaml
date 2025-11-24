@@ -34,9 +34,8 @@ dependencies:
     sdk: flutter
   flutter_custom_clippers: ^2.1.0
   flutter_launcher_icons: ^0.13.1
-  dotted_border: ^2.1.0 
-  cpf_cnpj_validator: ^2.0.0
-  mask_text_input_formatter: ^2.9.0
+  dotted_border: ^2.1.0
+  brasil_fields: ^1.15.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

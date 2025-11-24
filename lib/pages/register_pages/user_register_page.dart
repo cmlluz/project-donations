@@ -7,6 +7,8 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/services.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -78,6 +80,11 @@ class _UserRegisterPage extends State<UserRegisterPage> {
         errorMessage = translatedMessage.isEmpty
             ? (e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.')
             : translatedMessage;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+         errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -184,9 +191,15 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       secret: false,
                       controller: phoneController,
                       keyboardType: TextInputType.number,
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Campo obrigatório'
-                          : null,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        TelefoneInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Campo obrigatório';
+                        if (value.length < 14) return 'Telefone inválido';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -195,6 +208,15 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       secret: false,
                       controller: cpfCnpjController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CpfInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Campo obrigatório';
+                        if (!CPFValidator.isValid(value)) return 'CPF inválido';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -231,6 +253,7 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       Text(
                         errorMessage,
                         style: const TextStyle(color: Colors.redAccent),
+                        textAlign: TextAlign.center,
                       ),
                     CustomButton(
                       text: 'Confirmar',

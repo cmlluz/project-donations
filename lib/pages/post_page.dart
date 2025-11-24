@@ -102,7 +102,7 @@ class _PostPageState extends State<PostPage> {
           padding: const EdgeInsets.all(30),
           child: Column(
             children: [
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
                   _showImagePickerOptions();
@@ -116,7 +116,7 @@ class _PostPageState extends State<PostPage> {
                   child: Container(
                     alignment: Alignment.center,
                     width: double.infinity,
-                    height: 250,
+                    height: 220,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(1, 91, 124, 0.05),
                       borderRadius: BorderRadius.circular(25.0),
@@ -130,7 +130,7 @@ class _PostPageState extends State<PostPage> {
                                 child: Image.file(
                                   _selectedImg!,
                                   width: 350,
-                                  height: 250,
+                                  height: 220,
                                   fit: BoxFit.cover,
                                 ),
                               )
@@ -166,7 +166,7 @@ class _PostPageState extends State<PostPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(

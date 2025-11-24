@@ -51,9 +51,24 @@ class AuthService {
     );
 
     if (userCredential.user != null) {
-      await _authApiService.syncUser();
-      await _authApiService.updateUser(userData);
-      await _onLoginSuccess(context);
+      try {
+        await _authApiService.syncUser();
+        await _authApiService.updateUser(userData);
+        await _onLoginSuccess(context);
+      } catch (e) {
+        print("Iniciando Rollback devido à falha na atualização de dados: $e");
+        _authApiService.deleteUser().catchError((dbDeleteError) {
+          print(
+              "Erro (ignorável) ao tentar deletar o usuário do DB: $dbDeleteError");
+        });
+        userCredential.user!.delete().catchError((fbDeleteError) {
+          print(
+              "Erro ao tentar deletar o usuário do Firebase Auth: $fbDeleteError");
+        });
+        await firebaseAuth.signOut();
+
+        rethrow;
+      }
     }
 
     return userCredential;

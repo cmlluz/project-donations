@@ -1,4 +1,6 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/edit_profile_controller.dart';
@@ -33,12 +35,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
     if (value == null || value.isEmpty) return 'Email é obrigatório';
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(value) ? null : 'Email inválido';
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return null;
-    final phoneRegex = RegExp(r'^\d{2}\s\d{4,5}-\d{4}$');
-    return phoneRegex.hasMatch(value) ? null : 'Formato: 11 99999-9999';
   }
 
   String? _validatePix(String? value) {
@@ -171,8 +167,16 @@ class _EditProfileViewState extends State<_EditProfileView> {
           label: 'Telefone',
           controller: controller.phoneController,
           keyboardType: TextInputType.phone,
-          validator: _validatePhone,
-          hintText: '11 99999-9999',
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            TelefoneInputFormatter(),
+          ],
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Campo obrigatório';
+            if (value.length < 14) return 'Telefone inválido';
+            return null;
+          },
+          hintText: '(71) 99999-9999',
         ),
         const SizedBox(height: 20),
         CustomTextFields(
