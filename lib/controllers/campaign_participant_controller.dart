@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/services/api_services/campaign_participant_service.dart';
+import 'package:appdonationsgestor/services/api_services/campaign_participant_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/models/campaign_participant_model.dart';
 
 class CampaignParticipantController extends ChangeNotifier {
-  final CampaignParticipantService _participantService;
+  final CampaignParticipantApiService _participantService;
 
   // Estado para cada campanha
   final Map<String, bool> _userInterests = {};
@@ -22,7 +22,7 @@ class CampaignParticipantController extends ChangeNotifier {
   // Factory constructor para criar instância com ApiClient
   factory CampaignParticipantController.withApiClient() {
     final apiClient = ApiClient();
-    final participantService = CampaignParticipantService(apiClient);
+    final participantService = CampaignParticipantApiService(apiClient);
     return CampaignParticipantController(participantService);
   }
 
@@ -86,9 +86,15 @@ class CampaignParticipantController extends ChangeNotifier {
       final currentInterest = _userInterests[campaignId] ?? false;
 
       if (currentInterest) {
-        // Remover interesse (não implementado no serviço ainda)
-        // await _participantService.removeInterest(campaignId);
-        throw Exception('Remoção de interesse não implementada');
+        // Remover interesse
+        final success = await _participantService.removeInterest(campaignId);
+        if (success) {
+          _userInterests[campaignId] = false;
+          // Atualizar contagem
+          _participantCounts[campaignId] =
+              (_participantCounts[campaignId] ?? 1) - 1;
+          return true;
+        }
       } else {
         // Registrar interesse
         final participant =
