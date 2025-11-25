@@ -60,7 +60,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
         "phone": phoneController.text.trim(),
         "address": addressController.text.trim(),
         "cpfOrCnpj": cpfCnpjController.text.trim(),
-        "role": "ROLE_ADMIN",
+        "role": "ROLE_GESTOR",
       };
 
       await authService.value.createAccount(
@@ -83,7 +83,7 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-         errorMessage = e.toString().replaceAll('Exception: ', ''); 
+        errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } finally {
       if (mounted) {
