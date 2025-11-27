@@ -36,7 +36,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   Future<Map<String, dynamic>>? _historyFuture;
 
-  // Cache local para otimização
   List<Donation>? _cachedDonations;
   List<Need>? _cachedNeeds;
   String? _cachedUserId;
@@ -60,7 +59,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     _campaignController =
         Provider.of<CampaignController>(context, listen: false);
 
-    // Listener para atualizar o histórico quando campanhas mudarem
     _campaignController.addListener(_refreshHistory);
 
     _loadHistory();
@@ -73,30 +71,22 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   void _refreshHistory() {
     if (mounted) {
-      // Limpa cache para forçar atualização completa
       _clearCache();
       _loadHistory();
     }
   }
 
-  // Verifica se o cache de campanhas é válido (contém apenas campanhas do usuário atual)
   bool _isCampaignCacheValid() {
     final userProvider = context.read<UserProvider>();
     final currentUserId = userProvider.currentUser?.firebaseUid;
 
-    // Se não há usuário logado ou não há campanhas, cache não é válido
     if (currentUserId == null || _campaignController.campaigns.isEmpty) {
       return false;
     }
 
-    // Verifica se todas as campanhas em cache são do usuário atual
-    // (assumindo que getMyCampaigns só retorna campanhas do usuário)
-    // Como não temos o campo do autor diretamente no modelo Campaign,
-    // vamos confiar que se loadMyCampaigns foi chamado por último, o cache é válido
     return _cachedUserId == currentUserId;
   }
 
-  // Limpa o cache quando necessário (ex: mudança de usuário)
   void _clearCache() {
     _cachedDonations = null;
     _cachedNeeds = null;
@@ -112,7 +102,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       List<Need> needs = [];
       List<Campaign> campaigns = [];
 
-      // Cache inteligente para doações
       if (_cachedDonations != null && _cachedUserId == currentUserId) {
         donations = _cachedDonations!;
       } else {
@@ -126,7 +115,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         }
       }
 
-      // Cache inteligente para necessidades
       if (_cachedNeeds != null && _cachedUserId == currentUserId) {
         needs = _cachedNeeds!;
       } else {
@@ -140,7 +128,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         }
       }
 
-      // Cache inteligente para campanhas
       if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
         campaigns = _campaignController.campaigns;
       } else {
@@ -156,7 +143,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       return {'donations': donations, 'needs': needs, 'campaigns': campaigns};
     } catch (e) {
       print("Erro geral ao carregar histórico: $e");
-      // Retornar listas vazias em caso de erro geral
       return {
         'donations': <Donation>[],
         'needs': <Need>[],
@@ -170,8 +156,9 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     final userProvider = context.watch<UserProvider>();
     final user = userProvider.currentUser;
 
-    final bool isManager =
-        user?.role == 'ROLE_ADMIN' || user?.role == 'ROLE_INSTITUTION';
+    final bool isManager = user?.role == 'ROLE_ADMIN' ||
+        user?.role == 'ROLE_INSTITUTION' ||
+        user?.role == 'ROLE_GESTOR';
 
     ImageProvider? profileImage;
     if (user?.profilePictureUrl != null &&
@@ -663,7 +650,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
 
   @override
   void dispose() {
-    // Remove o listener antes de fazer dispose
     _campaignController.removeListener(_refreshHistory);
     super.dispose();
   }

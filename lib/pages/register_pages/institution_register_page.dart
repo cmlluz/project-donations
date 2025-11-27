@@ -7,6 +7,8 @@ import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/services.dart';
 
 class InstitutionRegisterPage extends StatefulWidget {
   const InstitutionRegisterPage({super.key});
@@ -76,6 +78,11 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
         errorMessage = translatedMessage.isEmpty
             ? (e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.')
             : translatedMessage;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -182,9 +189,16 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                       secret: false,
                       controller: phoneController,
                       keyboardType: TextInputType.number,
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Campo obrigatório'
-                          : null,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        TelefoneInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Campo obrigatório';
+                        if (value.length < 14) return 'Telefone inválido';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -193,6 +207,19 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                       secret: false,
                       controller: cpfCnpjController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CnpjInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Campo obrigatório';
+                        }
+                        if (!CNPJValidator.isValid(value)) {
+                          return 'CNPJ inválido';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -232,6 +259,7 @@ class _InstitutionRegisterPage extends State<InstitutionRegisterPage> {
                       Text(
                         errorMessage,
                         style: const TextStyle(color: Colors.redAccent),
+                        textAlign: TextAlign.center,
                       ),
                     CustomButton(
                       text: 'Confirmar',

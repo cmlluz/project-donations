@@ -15,6 +15,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -42,18 +44,25 @@ class _RootPageState extends State<RootPage> {
   }
 
   void _handleNavigation(String type, Map<String, dynamic> data) {
+    final currentUserRole =
+        authService.value.currentUser != null && context.mounted
+            ? context.read<UserProvider>().currentUser?.role
+            : null;
+
     if (type == 'NEW_REQUEST') {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
     } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     } else if (type == 'POST_VALIDATION_PENDING') {
-      final String? itemId = data['itemId'];
-      final String? itemType = data['itemType'];
-      if (itemId != null && itemType != null) {
-        GoRouter.of(context).pushNamed(
-          RouteNames.allowPostPage,
-          extra: {'itemId': itemId, 'itemType': itemType},
-        );
+      if (currentUserRole == 'ROLE_ADMIN') {
+        final String? itemId = data['itemId'];
+        final String? itemType = data['itemType'];
+        if (itemId != null && itemType != null) {
+          GoRouter.of(context).pushNamed(
+            RouteNames.allowPostPage,
+            extra: {'itemId': itemId, 'itemType': itemType},
+          );
+        }
       }
     } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);

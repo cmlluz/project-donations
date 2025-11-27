@@ -51,8 +51,21 @@ class AuthApiService {
         print(
             "Falha ao atualizar utilizador no backend: ${response.statusCode}");
         print("Corpo da resposta: ${response.body}");
-        throw Exception(
-            "Falha ao atualizar utilizador no backend: ${response.statusCode}");
+        String rawBody = utf8.decode(response.bodyBytes);
+        String errorMessage =
+            "Falha ao atualizar utilizador no backend. Tente novamente.";
+        if (rawBody.isNotEmpty) {
+          try {
+            final errorJson = jsonDecode(rawBody);
+            errorMessage =
+                errorJson['message'] ?? errorJson['error'] ?? rawBody;
+          } catch (_) {
+            errorMessage = rawBody;
+          }
+          errorMessage = errorMessage.replaceAll('"', '').trim();
+        }
+
+        throw Exception(errorMessage);
       }
     } catch (e) {
       print("Erro ao atualizar utilizador no backend: $e");

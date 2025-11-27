@@ -172,7 +172,7 @@ class _PostPageState extends State<PostPage> {
                   child: Container(
                     alignment: Alignment.center,
                     width: double.infinity,
-                    height: 250,
+                    height: 220,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(1, 91, 124, 0.05),
                       borderRadius: BorderRadius.circular(25.0),
@@ -186,7 +186,7 @@ class _PostPageState extends State<PostPage> {
                                 child: Image.file(
                                   _selectedImg!,
                                   width: 350,
-                                  height: 250,
+                                  height: 220,
                                   fit: BoxFit.cover,
                                 ),
                               )
@@ -236,7 +236,7 @@ class _PostPageState extends State<PostPage> {
                   controller: _descController,
                   maxLines: 3,
                   maxLength: 150,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     counterText: '',
                     labelStyle: TextStyle(color: ConstantsColors.whiteShade700),
                     hintText: 'Escreva uma descrição para o post',
