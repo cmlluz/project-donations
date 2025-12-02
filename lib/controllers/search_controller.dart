@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
@@ -8,6 +8,8 @@ import 'package:appdonationsgestor/services/api_services/favorites_api_service.d
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:appdonationsgestor/models/public_user_model.dart';
+import 'dart:convert';
 
 class AppSearchController with ChangeNotifier {
   final ApiClient _apiClient = ApiClient();
@@ -37,13 +39,11 @@ class AppSearchController with ChangeNotifier {
     _favoriteApiService = FavoriteApiService(_apiClient);
   }
 
-  // Método para atualizar campanhas externas
   void updateCampaigns(List<Campaign> campaigns) {
     _externalCampaigns = campaigns;
     _refreshItems();
   }
 
-  // Método para recarregar apenas os itens com as campanhas atualizadas
   void _refreshItems() async {
     if (_isLoading) return;
 
@@ -54,9 +54,18 @@ class AppSearchController with ChangeNotifier {
       final favNeedIdsFuture = _favoriteApiService.getFavoriteNeedIds();
       final favCampaignIdsFuture = _favoriteApiService.getFavoriteCampaignIds();
 
+      final usersFuture = _apiClient.get('users').then((response) {
+        if (response.statusCode == 200) {
+          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+          return body.map((item) => PublicUser.fromJson(item)).toList();
+        }
+        return <PublicUser>[];
+      });
+
       final List<dynamic> results = await Future.wait([
         needsFuture,
         donationsFuture,
+        usersFuture,
         favDonationIdsFuture,
         favNeedIdsFuture,
         favCampaignIdsFuture,
@@ -64,11 +73,11 @@ class AppSearchController with ChangeNotifier {
 
       final List<Need> needs = results[0] as List<Need>;
       final List<Donation> donations = results[1] as List<Donation>;
-      final Set<int> favDonationIds = results[2] as Set<int>;
-      final Set<int> favNeedIds = results[3] as Set<int>;
-      final Set<int> favCampaignIds = results[4] as Set<int>;
+      final List<PublicUser> users = results[2] as List<PublicUser>;
+      final Set<int> favDonationIds = results[3] as Set<int>;
+      final Set<int> favNeedIds = results[4] as Set<int>;
+      final Set<int> favCampaignIds = results[5] as Set<int>;
 
-      // Usar campanhas externas se disponíveis
       final List<Campaign> campaigns = _externalCampaigns.isNotEmpty
           ? _externalCampaigns
           : await _campaignApiService.getCampaigns();
@@ -83,7 +92,7 @@ class AppSearchController with ChangeNotifier {
         c.isFavorite = favCampaignIds.contains(c.id);
       }
 
-      _buildSearchItems(needs, donations, campaigns);
+      _buildSearchItems(needs, donations, campaigns, users);
       notifyListeners();
     } catch (e) {
       print('Erro ao atualizar itens de busca: $e');
@@ -91,7 +100,7 @@ class AppSearchController with ChangeNotifier {
   }
 
   void _buildSearchItems(
-      List<Need> needs, List<Donation> donations, List<Campaign> campaigns) {
+      List<Need> needs, List<Donation> donations, List<Campaign> campaigns, List<PublicUser> users) {
     _allItems = [
       ...needs.map((n) => SearchItem(
             id: n.id,
@@ -123,11 +132,25 @@ class AppSearchController with ChangeNotifier {
                 c.urlImagem.isNotEmpty ? c.urlImagem : 'assets/donations.png',
             category: SearchCategory.campanha,
             institution:
-                'Carregando...', // TODO: Buscar nome via UID c.authorUid
+                'Carregando...', 
             date: c.dataInicial ?? DateTime.now(),
-            postStatus: 'ATIVO', // Campanhas sempre ativas por padrão
-            quantity: 0, // Campanhas não têm quantidade
+            postStatus: 'ATIVO', 
+            quantity: 0, 
           )),
+      ...users
+          .where((u) => u.role == 'ROLE_INSTITUTION' || u.role == 'ROLE_GESTOR')
+          .map((u) => SearchItem(
+                id: u.firebaseUid.hashCode, 
+                title: u.name,
+                description: u.bio ?? u.email,
+                imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
+                category: SearchCategory.instituicao,
+                institution: u.name,
+                date: DateTime.now(),
+                postStatus: 'ATIVO',
+                quantity: 0,
+                firebaseUid: u.firebaseUid, // <<-- PASSANDO O UID
+              )),
     ];
   }
 
@@ -140,6 +163,15 @@ class AppSearchController with ChangeNotifier {
       final needsFuture = _needsApiService.getNeeds();
       final donationsFuture = _donationApiService.getDonations();
       final campaignsFuture = _campaignApiService.getCampaigns();
+      
+      final usersFuture = _apiClient.get('users').then((response) {
+        if (response.statusCode == 200) {
+          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+          return body.map((item) => PublicUser.fromJson(item)).toList();
+        }
+        return <PublicUser>[];
+      });
+      
       final favDonationIdsFuture = _favoriteApiService.getFavoriteDonationIds();
       final favNeedIdsFuture = _favoriteApiService.getFavoriteNeedIds();
       final favCampaignIdsFuture = _favoriteApiService.getFavoriteCampaignIds();
@@ -148,6 +180,7 @@ class AppSearchController with ChangeNotifier {
         needsFuture,
         donationsFuture,
         campaignsFuture,
+        usersFuture,
         favDonationIdsFuture,
         favNeedIdsFuture,
         favCampaignIdsFuture,
@@ -156,9 +189,10 @@ class AppSearchController with ChangeNotifier {
       final List<Need> needs = results[0] as List<Need>;
       final List<Donation> donations = results[1] as List<Donation>;
       final List<Campaign> campaigns = results[2] as List<Campaign>;
-      final Set<int> favDonationIds = results[3] as Set<int>;
-      final Set<int> favNeedIds = results[4] as Set<int>;
-      final Set<int> favCampaignIds = results[5] as Set<int>;
+      final List<PublicUser> users = results[3] as List<PublicUser>;
+      final Set<int> favDonationIds = results[4] as Set<int>;
+      final Set<int> favNeedIds = results[5] as Set<int>;
+      final Set<int> favCampaignIds = results[6] as Set<int>;
 
       for (var n in needs) {
         n.isFavorite = favNeedIds.contains(n.id);
@@ -170,7 +204,7 @@ class AppSearchController with ChangeNotifier {
         c.isFavorite = favCampaignIds.contains(c.id);
       }
 
-      _buildSearchItems(needs, donations, campaigns);
+      _buildSearchItems(needs, donations, campaigns, users);
     } catch (e) {
       print('Erro ao carregar itens no AppSearchController: $e');
       _allItems = [];

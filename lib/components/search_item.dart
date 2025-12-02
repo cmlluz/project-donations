@@ -10,6 +10,7 @@ class SearchItem {
   final DateTime date;
   final int quantity;
   final String postStatus;
+  final String? firebaseUid;
 
   const SearchItem({
     required this.id,
@@ -23,6 +24,7 @@ class SearchItem {
     required this.date,
     required this.quantity,
     required this.postStatus,
+    this.firebaseUid,
   });
 }
 
