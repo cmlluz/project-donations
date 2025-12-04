@@ -54,11 +54,12 @@ dependencies:
   cloud_firestore: ^5.6.9
   flutter_facebook_auth: ^7.1.2
   firebase_storage: ^12.1.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
   flutter_native_splash: ^2.4.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -83,6 +84,7 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - assets/term/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
@@ -125,7 +127,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-  
+
 flutter_launcher_icons:
   android: true
   ios: true
@@ -134,6 +136,6 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#FDFCFA"
   image: assets/splash_image.png
-  android_12: 
+  android_12:
     image: assets/splash_image.png
     color: "#FDFCFA"

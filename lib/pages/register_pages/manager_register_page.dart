@@ -9,6 +9,7 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/services.dart';
+import 'package:appdonationsgestor/components/terms_checkbox.dart';
 
 class ManagerRegisterPage extends StatefulWidget {
   const ManagerRegisterPage({super.key});
@@ -30,6 +31,8 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
   final formKey = GlobalKey<FormState>();
   String errorMessage = '';
   bool _isLoading = false;
+  bool _acceptedTerms = false;
+  String? _termsError;
 
   @override
   void dispose() {
@@ -51,7 +54,17 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    if (!_acceptedTerms) {
+      setState(() {
+        _termsError = 'Os termos precisam ser aceitos para prosseguir';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _termsError = null;
+    });
 
     try {
       final userData = {
@@ -248,6 +261,19 @@ class _ManagerRegisterPage extends State<ManagerRegisterPage> {
                       validator: (value) => value == null || value.isEmpty
                           ? 'Campo obrigatório'
                           : null,
+                    ),
+                    const SizedBox(height: 15),
+                    TermsCheckbox(
+                      value: _acceptedTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          _acceptedTerms = value ?? false;
+                          if (_acceptedTerms) {
+                            _termsError = null;
+                          }
+                        });
+                      },
+                      errorText: _termsError,
                     ),
                     const SizedBox(height: 15),
                     if (errorMessage.isNotEmpty)
