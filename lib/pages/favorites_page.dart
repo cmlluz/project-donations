@@ -57,7 +57,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       } else if (item is Campaign) {
         await controller.removeFavoriteCampaign(item);
       } else if (item is Map) {
-        await controller.removeFavoriteUser(item['firebaseUid']);
+        await controller.removeFavoriteUser(item as Map<String, dynamic>);
       }
     } catch (e) {
       if (mounted) {
@@ -287,24 +287,31 @@ class _FavoritesPageState extends State<FavoritesPage> {
       };
     } else if (item is Map) {
       name = item['name'] ?? name;
-      description = item['email'] ?? description;
+      description = item['role'] == 'ROLE_INSTITUTION'
+          ? 'Instituição'
+          : (item['role'] == 'ROLE_GESTOR'
+              ? 'Gestor'
+              : item['email'] ?? description);
+
       imageUrl = item['profilePictureUrl'] ?? imageUrl;
       isNetwork = item['profilePictureUrl'] != null &&
           item['profilePictureUrl'].isNotEmpty;
 
       onTap = () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InstitutionProfilePage(
-              userId: item['firebaseUid'] ?? '',
-              userName: item['name'] ?? 'Usuário',
-              userEmail: item['email'] ?? 'Email não disponível',
-              userImageUrl: item['profilePictureUrl'] ?? '',
-              isInitiallyFavorite: true,
+        if (item['firebaseUid'] != null && item['firebaseUid'].isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InstitutionProfilePage(
+                userId: item['firebaseUid'] ?? '',
+                userName: item['name'] ?? 'Usuário',
+                userEmail: item['email'] ?? 'Email não disponível',
+                userImageUrl: item['profilePictureUrl'] ?? '',
+                isInitiallyFavorite: true,
+              ),
             ),
-          ),
-        );
+          );
+        }
       };
     }
 

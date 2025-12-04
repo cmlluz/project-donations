@@ -6,6 +6,7 @@ import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart'; // NOVO IMPORT
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -174,13 +175,32 @@ class GenericFilterPage extends StatelessWidget {
       );
     } else if (item.category == SearchCategory.campanha) {
       GoRouter.of(context).push('/campaignDetails/${item.id}');
+    } else if (item.category == SearchCategory.instituicao) {
+      if (item.firebaseUid != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InstitutionProfilePage(
+              userId: item.firebaseUid!,
+              userName: item.title,
+              userEmail: item.description.contains('@') ? item.description : '',
+              userImageUrl: item.imageUrl,
+              isInitiallyFavorite: false,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Não foi possível carregar dados da instituição.')),
+        );
+      }
     }
   }
 
   String _getCardTitle(SearchItem item) {
     switch (item.category) {
       case SearchCategory.campanha:
-        // Para campanhas, mostra o título truncado se for muito longo
         if (item.title.length > 15) {
           return '${item.title.substring(0, 15)}...';
         }
