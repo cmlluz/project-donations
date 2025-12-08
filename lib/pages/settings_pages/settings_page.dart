@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -36,15 +38,14 @@ class _SettingsPage extends State<SettingsPage> {
     } catch (e) {
       print("Erro ao alterar notificações: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Falha ao atualizar status de notificação."))
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Falha ao atualizar status de notificação.")));
       }
       setState(() {
         isNotificationOn = !value;
       });
     } finally {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
@@ -89,7 +90,6 @@ class _SettingsPage extends State<SettingsPage> {
                 GoRouter.of(context).pushNamed('linkManagerPage');
               },
             ),
-            
             Container(
               decoration: const BoxDecoration(
                 border: Border(
@@ -99,7 +99,8 @@ class _SettingsPage extends State<SettingsPage> {
                   ),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -110,21 +111,19 @@ class _SettingsPage extends State<SettingsPage> {
                       fontSize: 16,
                     ).merge(TextStylesConstants.kpoppinsLight),
                   ),
-                  _isLoading 
-                    ? const SizedBox(
-                        height: 24, 
-                        width: 24, 
-                        child: CircularProgressIndicator(strokeWidth: 2)
-                      )
-                    : Switch(
-                        value: isNotificationOn,
-                        onChanged: _toggleNotifications,
-                        activeColor: ConstantsColors.blueShade900,
-                      ),
+                  _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : Switch(
+                          value: isNotificationOn,
+                          onChanged: _toggleNotifications,
+                          activeColor: ConstantsColors.blueShade900,
+                        ),
                 ],
               ),
             ),
-            
             _buildSettingOption(
               title: 'Deletar conta',
               textColor: ConstantsColors.redShade800,
@@ -132,6 +131,102 @@ class _SettingsPage extends State<SettingsPage> {
                 GoRouter.of(context).pushNamed('deleteAccountPage');
               },
             ),
+            const SizedBox(height: 40),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: ConstantsColors.blackShade900,
+                    fontFamily: 'Poppins',
+                    height: 1.5,
+                  ),
+                  children: [
+                    const TextSpan(
+                      text: 'Ajude-nos a melhorar! ',
+                    ),
+                    const TextSpan(
+                      text: 'Compartilhe sua experiência respondendo ',
+                    ),
+                    TextSpan(
+                      text: 'nossa breve pesquisa',
+                      style: const TextStyle(
+                        color: ConstantsColors.blueShade900,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          const String urlString =
+                              'https://forms.gle/snivNUUfxobCHHSz9';
+                          final Uri url = Uri.parse(urlString);
+
+                          try {
+                            bool canLaunch = await canLaunchUrl(url);
+
+                            if (canLaunch) {
+                              bool launched = await launchUrl(
+                                url,
+                                mode: LaunchMode.externalApplication,
+                              );
+
+                              if (!launched) {
+                                launched = await launchUrl(
+                                  url,
+                                  mode: LaunchMode.platformDefault,
+                                );
+                              }
+
+                              if (!launched && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Não foi possível abrir o formulário'),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
+                              }
+                            } else {
+                              try {
+                                await launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Erro ao abrir link: $e'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Erro: $e'),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                    ),
+                    const TextSpan(
+                      text: '. Sua opinião é muito importante! 💙',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
