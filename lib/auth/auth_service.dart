@@ -33,6 +33,14 @@ class AuthService {
         .signInWithEmailAndPassword(email: email, password: password);
 
     if (userCredential.user != null) {
+      // --- ADIÇÃO: IMPRIMIR TOKEN ---
+      String? token = await userCredential.user!.getIdToken();
+      print("==================================================");
+      print("🔑 BEARER TOKEN (Copie para o Postman):");
+      print(token);
+      print("==================================================");
+      // ------------------------------
+
       await _onLoginSuccess(context);
     }
     return userCredential;
