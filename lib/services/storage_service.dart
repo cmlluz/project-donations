@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final String _baseUrl = 'http://10.0.2.2:8080/api/storage';
 
   Future<String?> uploadImage(File imageFile, String folder) async {
     User? user = _auth.currentUser;
@@ -12,16 +16,37 @@ class StorageService {
       throw Exception('Utilizador não autenticado.');
     }
 
-    String fileName = '${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageRef = _storage.ref().child('$folder/$fileName');
-
     try {
-      UploadTask uploadTask = storageRef.putFile(imageFile);
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      return downloadUrl;
+      final token = await user.getIdToken();
+      final uri = Uri.parse('$_baseUrl/upload');
+
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields['folder'] = folder;
+
+      final mimeTypeData = lookupMimeType(imageFile.path)!.split('/');
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        contentType: MediaType(mimeTypeData[0], mimeTypeData[1]),
+      ));
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("Upload com sucesso: ${data['url']}");
+        return data['url'];
+      } else {
+        print('Falha no upload: ${response.body}');
+        return null;
+      }
     } catch (e) {
-      print('Erro ao fazer upload da imagem: $e');
+      print('Erro ao fazer upload da imagem para o backend: $e');
       return null;
     }
   }
