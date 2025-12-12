@@ -1,183 +1,148 @@
 import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/resources/constant_colors.dart';
 
-class CardItem extends StatefulWidget {
-  const CardItem({
-    super.key,
-    this.onTap,
-    required this.title,
-    this.subtitle,
-    required this.avatarUrl,
-    required this.location,
-    required this.date,
-    required this.imageAsset,
-  });
-
-  final VoidCallback? onTap;
+class CardItem extends StatelessWidget {
   final String title;
   final String? subtitle;
   final String avatarUrl;
   final String location;
   final String date;
   final String imageAsset;
+  final VoidCallback? onTap;
 
-  @override
-  State<CardItem> createState() => _CardItemState();
-}
-
-class _CardItemState extends State<CardItem> {
-  bool _isExpanded = false;
-  bool _isOverflowing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkOverflow());
-  }
-
-  void _checkOverflow() {
-    if (widget.subtitle == null) return;
-
-    final textSpan = TextSpan(
-      text: widget.subtitle,
-      style: const TextStyle(
-        color: ConstantsColors.blueShade900,
-        fontSize: 14,
-      ).merge(TextStylesConstants.kpoppinsMedium),
-    );
-
-    final tp = TextPainter(
-      text: textSpan,
-      maxLines: 2,
-      textDirection: TextDirection.ltr,
-    );
-
-    tp.layout(maxWidth: MediaQuery.of(context).size.width - 60);
-
-    if (mounted) {
-      setState(() {
-        _isOverflowing = tp.didExceedMaxLines;
-      });
-    }
-  }
+  const CardItem({
+    Key? key,
+    required this.title,
+    this.subtitle,
+    required this.avatarUrl,
+    required this.location,
+    required this.date,
+    required this.imageAsset,
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            offset: const Offset(0, 4),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(25.0),
-        child: Material(
-          color: ConstantsColors.whiteShade900,
-          child: InkWell(
-            onTap: widget.onTap,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    Widget displayImage;
+    if (imageAsset.startsWith('http')) {
+      displayImage = Image.network(
+        imageAsset,
+        height: 200.0,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            height: 200.0,
+            color: Colors.grey[200],
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: ConstantsColors.blueShade900,
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => Container(
+          height: 200.0,
+          color: Colors.grey[300],
+          child: const Center(
+              child: Icon(Icons.broken_image, color: Colors.grey, size: 40)),
+        ),
+      );
+    } else {
+      displayImage = Image.asset(
+        imageAsset,
+        height: 200.0,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          height: 200.0,
+          color: Colors.grey[300],
+          child: const Icon(Icons.image, color: Colors.grey, size: 40),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              spreadRadius: 0,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: NetworkImage(widget.avatarUrl),
-                          ),
-                          const SizedBox(width: 9),
-                          Text(
-                            widget.title,
-                            style: const TextStyle(
-                              color: ConstantsColors.blueShade900,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ).merge(TextStylesConstants.kinterRegular),
-                          ),
-                        ],
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: NetworkImage(avatarUrl),
+                  onBackgroundImageError: (_, __) {},
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStylesConstants.kpoppinsSemiBold.merge(
+                      const TextStyle(
+                        fontSize: 15,
+                        color: ConstantsColors.blueShade900,
                       ),
-                      Row(
-                        children: [
-                          Image.asset("assets/icons/location_icon.png"),
-                          const SizedBox(width: 4),
-                          Text(
-                            "${widget.location}, ${widget.date}",
-                            style: const TextStyle(
-                              color: ConstantsColors.greyShade500,
-                              fontSize: 10,
-                            ).merge(TextStylesConstants.kinterRegular),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-
-                if (widget.subtitle != null)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 27.0, top: 15.0, bottom: 15.0, right: 13.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.subtitle!,
-                          style: const TextStyle(
-                            color: ConstantsColors.blueShade900,
-                            fontSize: 14,
-                          ).merge(TextStylesConstants.kpoppinsMedium),
-                          maxLines: _isExpanded ? null : 2,
-                          overflow: _isExpanded
-                              ? TextOverflow.visible
-                              : TextOverflow.ellipsis,
-                        ),
-                        if (_isOverflowing) ...[
-                          const SizedBox(height: 4),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isExpanded = !_isExpanded;
-                              });
-                            },
-                            child: Text(
-                              _isExpanded ? "Ver menos" : "Ver mais",
-                              style: const TextStyle(
-                                color: ConstantsColors.blueShade900,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ]
-                      ],
+                Row(
+                  children: [
+                    Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
+                    const SizedBox(width: 4),
+                    Text(
+                      location.length > 15 ? date : "$location, $date",
+                      style: TextStylesConstants.kinterRegular.merge(
+                        TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
                     ),
-                  ),
-
-                Container(
-                  height: 230.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    image: DecorationImage(
-                      image: AssetImage(widget.imageAsset),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 12),
+            if (subtitle != null && subtitle!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0, left: 4, right: 4),
+                child: Text(
+                  subtitle!,
+                  style: TextStylesConstants.kpoppinsMedium.merge(
+                    const TextStyle(
+                      fontSize: 14,
+                      color: ConstantsColors.blueShade900,
+                      height: 1.4,
+                    ),
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: displayImage,
+            ),
+          ],
         ),
       ),
     );

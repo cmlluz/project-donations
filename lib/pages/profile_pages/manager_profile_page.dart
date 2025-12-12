@@ -3,16 +3,18 @@ import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:appdonationsgestor/components/profile_components/campaign_history_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
@@ -32,30 +34,22 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   final ApiClient _apiClient = ApiClient();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
+  late final PostApiService _postApiService;
   late final CampaignController _campaignController;
 
   Future<Map<String, dynamic>>? _historyFuture;
 
   List<Donation>? _cachedDonations;
   List<Need>? _cachedNeeds;
+  List<PostModel>? _cachedPosts;
   String? _cachedUserId;
-
-  final List<String> posts = [
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-    "assets/donations2.jpg",
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-    "assets/donations2.jpg",
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-  ];
 
   @override
   void initState() {
     super.initState();
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
+    _postApiService = PostApiService(_apiClient);
     _campaignController =
         Provider.of<CampaignController>(context, listen: false);
 
@@ -90,6 +84,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   void _clearCache() {
     _cachedDonations = null;
     _cachedNeeds = null;
+    _cachedPosts = null;
     _cachedUserId = null;
   }
 
@@ -98,9 +93,19 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       final userProvider = context.read<UserProvider>();
       final currentUserId = userProvider.currentUser?.firebaseUid;
 
+      if (currentUserId == null) {
+        return {
+          'donations': <Donation>[],
+          'needs': <Need>[],
+          'campaigns': <Campaign>[],
+          'posts': <PostModel>[]
+        };
+      }
+
       List<Donation> donations = [];
       List<Need> needs = [];
       List<Campaign> campaigns = [];
+      List<PostModel> posts = [];
 
       if (_cachedDonations != null && _cachedUserId == currentUserId) {
         donations = _cachedDonations!;
@@ -108,10 +113,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         try {
           donations = await _donationApiService.getMyDonations();
           _cachedDonations = donations;
-          _cachedUserId = currentUserId;
         } catch (e) {
           print("Erro ao carregar doações: $e");
-          donations = [];
         }
       }
 
@@ -121,10 +124,19 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         try {
           needs = await _needApiService.getMyNeeds();
           _cachedNeeds = needs;
-          _cachedUserId = currentUserId;
         } catch (e) {
           print("Erro ao carregar necessidades: $e");
-          needs = [];
+        }
+      }
+
+      if (_cachedPosts != null && _cachedUserId == currentUserId) {
+        posts = _cachedPosts!;
+      } else {
+        try {
+          posts = await _postApiService.getPostsByAuthor(currentUserId);
+          _cachedPosts = posts;
+        } catch (e) {
+          print("Erro ao carregar posts: $e");
         }
       }
 
@@ -136,17 +148,24 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           campaigns = _campaignController.campaigns;
         } catch (e) {
           print("Erro ao carregar campanhas: $e");
-          campaigns = [];
         }
       }
 
-      return {'donations': donations, 'needs': needs, 'campaigns': campaigns};
+      _cachedUserId = currentUserId;
+
+      return {
+        'donations': donations,
+        'needs': needs,
+        'campaigns': campaigns,
+        'posts': posts
+      };
     } catch (e) {
       print("Erro geral ao carregar histórico: $e");
       return {
         'donations': <Donation>[],
         'needs': <Need>[],
-        'campaigns': <Campaign>[]
+        'campaigns': <Campaign>[],
+        'posts': <PostModel>[]
       };
     }
   }
@@ -290,7 +309,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 child: Text(
                   (user?.bio != null && user!.bio!.isNotEmpty)
                       ? user.bio!
-                      : "Esta instituição ainda não adicionou uma descrição.",
+                      : "Este usuário ainda não adicionou uma descrição.",
                   style: TextStylesConstants.kpoppinsMedium.merge(
                     const TextStyle(
                       fontSize: 14,
@@ -375,38 +394,54 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
-              if (!showDonations)
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 1.0,
-                  ),
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PublicationsPage(),
-                          ),
-                        );
-                      },
-                      child: ExpandableCard(imageUrl: posts[index]),
-                    );
-                  },
-                )
-              else
-                _buildHistory(),
+              if (!showDonations) _buildPosts() else _buildHistory(),
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPosts() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _historyFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final List<PostModel> posts = snapshot.data!['posts'] ?? [];
+
+        if (posts.isEmpty) {
+          return const Center(child: Text("Nenhuma publicação encontrada."));
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostDetailPage(post: posts[index]),
+                  ),
+                );
+              },
+              child: ExpandableCard(imageUrl: posts[index].imageUrl),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -417,72 +452,15 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           future: _historyFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: CircularProgressIndicator(
-                    color: ConstantsColors.blueShade900,
-                  ),
-                ),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: ConstantsColors.redShade800,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Erro ao carregar histórico: ${snapshot.error}",
-                        textAlign: TextAlign.center,
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                            color: ConstantsColors.redShade800,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadHistory,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.blueShade900,
-                        ),
-                        child: const Text(
-                          "Tentar novamente",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return Center(child: Text("Erro: ${snapshot.error}"));
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    "Esse usuário não registrou nenhuma doação, necessidade ou campanha.",
-                    textAlign: TextAlign.center,
-                    style: TextStylesConstants.kpoppinsMedium.merge(
-                      const TextStyle(
-                        color: ConstantsColors.greyShade600,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              );
+              return const Center(child: Text("Nenhum histórico encontrado."));
             }
 
             final List<Donation> donations = snapshot.data!['donations'] ?? [];
@@ -491,32 +469,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
             final allItems = [...donations, ...needs, ...campaigns];
 
             if (allItems.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.history,
-                        size: 48,
-                        color: ConstantsColors.greyShade500,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Esse usuário não registrou nenhuma doação, necessidade ou campanha.",
-                        textAlign: TextAlign.center,
-                        style: TextStylesConstants.kpoppinsMedium.merge(
-                          const TextStyle(
-                            color: ConstantsColors.greyShade600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return const Center(child: Text("Nenhum histórico encontrado."));
             }
 
             return GridView.builder(
@@ -530,116 +483,58 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               ),
               itemCount: allItems.length,
               itemBuilder: (context, index) {
-                try {
-                  if (index >= allItems.length) {
-                    return const SizedBox.shrink();
-                  }
+                final item = allItems[index];
 
-                  final item = allItems[index];
-
-                  if (item is Donation) {
-                    return HistoryCard(
-                      titulo: item.title,
-                      local: "Local não informado",
-                      quantidade: item.quantity,
-                      imagem: null,
-                      onTap: () {
-                        try {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DonationDetailPage(
-                                donation: item,
-                                isOwnerView: true,
-                              ),
-                            ),
-                          );
-                        } catch (e) {
-                          print("Erro ao navegar para detalhes da doação: $e");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Erro ao abrir detalhes da doação"),
-                              backgroundColor: ConstantsColors.redShade800,
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  } else if (item is Need) {
-                    return HistoryCard(
-                      titulo: item.title,
-                      local: "Local não informado",
-                      quantidade: item.quantity,
-                      imagem: null,
-                      onTap: () {
-                        try {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NeedDetailPage(
-                                need: item,
-                                isOwnerView: true,
-                              ),
-                            ),
-                          );
-                        } catch (e) {
-                          print(
-                              "Erro ao navegar para detalhes da necessidade: $e");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text("Erro ao abrir detalhes da necessidade"),
-                              backgroundColor: ConstantsColors.redShade800,
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  } else if (item is Campaign) {
-                    return CampaignHistoryCard(
-                      titulo: item.titulo,
-                      descricao: item.descricao,
-                      local: item.localizacao.isNotEmpty
-                          ? item.localizacao
-                          : "Local não informado",
-                      imagem: item.urlImagem,
-                      dataInicial: item.dataInicial,
-                      dataFinal: item.dataFinal,
-                      onTap: () {
-                        try {
-                          GoRouter.of(context)
-                              .push('/campaignDetails/${item.id}');
-                        } catch (e) {
-                          print(
-                              "Erro ao navegar para detalhes da campanha: $e");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text("Erro ao abrir detalhes da campanha"),
-                              backgroundColor: ConstantsColors.redShade800,
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  }
-                  return const SizedBox.shrink();
-                } catch (e) {
-                  print(
-                      "Erro ao construir item do histórico no índice $index: $e");
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: ConstantsColors.greyShade200,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        color: ConstantsColors.greyShade500,
-                      ),
-                    ),
+                if (item is Donation) {
+                  return HistoryCard(
+                    titulo: item.title,
+                    local: "Local não informado",
+                    quantidade: item.quantity,
+                    imagem: null,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DonationDetailPage(
+                            donation: item,
+                            isOwnerView: true,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (item is Need) {
+                  return HistoryCard(
+                    titulo: item.title,
+                    local: "Local não informado",
+                    quantidade: item.quantity,
+                    imagem: null,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NeedDetailPage(
+                            need: item,
+                            isOwnerView: true,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (item is Campaign) {
+                  return CampaignHistoryCard(
+                    titulo: item.titulo,
+                    descricao: item.descricao,
+                    local: item.localizacao,
+                    imagem: item.urlImagem,
+                    dataInicial: item.dataInicial,
+                    dataFinal: item.dataFinal,
+                    onTap: () {
+                      GoRouter.of(context).push('/campaignDetails/${item.id}');
+                    },
                   );
                 }
+                return const SizedBox.shrink();
               },
             );
           },

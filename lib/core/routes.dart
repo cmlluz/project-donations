@@ -288,17 +288,18 @@ class AppRountersConfiguration {
           name: RouteNames.postDetailPage,
           pageBuilder: (context, state) {
             final postData = state.extra as PostModel?;
+            
+            // Fallback atualizado para o novo PostModel
             final post = postData ??
                 PostModel(
-                  id: '0',
-                  title: 'Post não encontrado',
-                  description: 'Não foi possível carregar os dados do post.',
-                  imageUrl: 'assets/instituicao.png',
-                  location: 'Salvador, Bahia',
-                  institution: 'Sistema',
-                  institutionImageUrl: 'assets/instituicao.png',
+                  id: 0, // Agora é int
+                  caption: 'Não foi possível carregar os dados do post.', // Antiga description
+                  imageUrl: 'assets/donations.jpg',
+                  authorUid: '',
+                  authorName: 'Sistema', 
+                  authorPhoto: 'assets/profile_default.png', 
                   createdAt: DateTime.now(),
-                  category: 'outros',
+                  postStatus: 'DISPONIVEL',
                 );
 
             return MaterialPage(
