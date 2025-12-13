@@ -1,8 +1,10 @@
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
-import 'package:appdonationsgestor/models/donation_model.dart'; // Import necessário
-import 'package:appdonationsgestor/models/need_model.dart'; // Import necessário
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/nota_fiscal_model.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -10,13 +12,15 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
-import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/services/profile_services.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/nota_fiscal_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 
 class InstitutionProfilePage extends StatefulWidget {
   final String userId;
@@ -44,13 +48,16 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   bool _isLoading = false;
   late final CampaignController _campaignController;
 
-  // Serviços e Dados
   final ProfileService _profileService = ProfileService();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
+  late final NotaFiscalApiService _notaFiscalApiService;
+  late final PostApiService _postApiService;
 
   List<Campaign> _institutionCampaigns = [];
   List<dynamic> _institutionHistory = [];
+  List<NotaFiscal> _notasFiscais = [];
+  List<PostModel> _posts = [];
   Map<String, dynamic>? _fullUserProfile;
   bool _isLoadingData = true;
 
@@ -63,6 +70,8 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
     final apiClient = ApiClient();
     _donationApiService = DonationApiService(apiClient);
     _needApiService = NeedApiService(apiClient);
+    _notaFiscalApiService = NotaFiscalApiService(apiClient);
+    _postApiService = PostApiService(apiClient);
     _campaignController = CampaignController();
 
     _loadAllData();
@@ -80,8 +89,12 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
       final donations =
           await _donationApiService.getDonationsByAuthor(widget.userId);
       final needs = await _needApiService.getNeedsByAuthor(widget.userId);
+      final notas = await _notaFiscalApiService.getNotasByAuthor(widget.userId);
+      final posts = await _postApiService.getPostsByAuthor(widget.userId);
 
       _institutionHistory = [...donations, ...needs];
+      _notasFiscais = notas;
+      _posts = posts;
     } catch (e) {
       print("Erro ao carregar dados da instituição: $e");
     } finally {
@@ -146,16 +159,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
     }
   }
 
-  final List<String> posts = [
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-    "assets/donations2.jpg",
-  ];
-
-  final List<Map<String, String>> notasFiscais = [
-    {"titulo": "Exemplo de Nota Fiscal", "dataEmissao": "12/08/2025"},
-  ];
-
   @override
   Widget build(BuildContext context) {
     final name = _fullUserProfile?['name'] ?? widget.userName;
@@ -196,64 +199,83 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Column(
                   children: [
-                    Row(
+                    Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundImage: profileImage,
-                          onBackgroundImageError: (_, __) {},
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 40.0, top: 10), 
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                name,
-                                style: TextStylesConstants.kpoppinsMedium.merge(
-                                  const TextStyle(
-                                    fontSize: 16,
-                                    color: ConstantsColors.blueShade900,
-                                  ),
-                                ),
+                              CircleAvatar(
+                                radius: 40,
+                                backgroundImage: profileImage,
+                                onBackgroundImageError: (_, __) {},
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Contato",
-                                style: TextStylesConstants.kinterBold.merge(
-                                  const TextStyle(
-                                    fontSize: 13,
-                                    color: ConstantsColors.blueShade900,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Row(
-                                children: [
-                                  const Icon(Icons.email,
-                                      size: 16,
-                                      color: ConstantsColors.blueShade900),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      email,
-                                      style: TextStylesConstants.kinterRegular
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      name,
+                                      style: TextStylesConstants.kpoppinsMedium
                                           .merge(
                                         const TextStyle(
-                                          fontSize: 13,
-                                          color: ConstantsColors.greyShade800,
+                                          fontSize: 18, 
+                                          color: ConstantsColors.blueShade900,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
+                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Contato",
+                                      style:
+                                          TextStylesConstants.kinterBold.merge(
+                                        const TextStyle(
+                                          fontSize: 13,
+                                          color: ConstantsColors.blueShade900,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.email,
+                                            size: 16,
+                                            color:
+                                                ConstantsColors.blueShade900),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            email,
+                                            style: TextStylesConstants
+                                                .kinterRegular
+                                                .merge(
+                                              const TextStyle(
+                                                fontSize: 13,
+                                                color: ConstantsColors
+                                                    .greyShade800,
+                                              ),
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        Transform.translate(
-                          offset: const Offset(5, -25),
+                        Positioned(
+                          top: 0,
+                          right: 0,
                           child: IconButton(
                             icon: Icon(
                               _isFavorite
@@ -262,14 +284,15 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                               color: _isFavorite
                                   ? ConstantsColors.blueShade900
                                   : Colors.grey,
-                              size: 30,
+                              size: 32,
                             ),
                             onPressed: _isLoading ? null : _toggleFavorite,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+
+                    const SizedBox(height: 30),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -316,6 +339,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
                     if (selectedTab == 1) _buildHistory(),
                     if (selectedTab == 2) _buildInstitutionCampaigns(),
                     if (selectedTab == 3) _buildNotes(),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -343,7 +367,7 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
               style: TextStyle(
                 color: isSelected ? Colors.white : ConstantsColors.blueShade900,
                 fontWeight: FontWeight.w600,
-                fontSize: 12,
+                fontSize: 11,
               ),
               textAlign: TextAlign.center,
             ),
@@ -354,6 +378,10 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
   }
 
   Widget _buildPosts() {
+    if (_posts.isEmpty) {
+      return const Center(child: Text("Nenhuma publicação encontrada."));
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -363,18 +391,19 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
         crossAxisSpacing: 8,
         childAspectRatio: 1.0,
       ),
-      itemCount: posts.length,
+      itemCount: _posts.length,
       itemBuilder: (context, index) {
+        final post = _posts[index];
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const PublicationsPage(),
+                builder: (context) => PostDetailPage(post: post),
               ),
             );
           },
-          child: ExpandableCard(imageUrl: posts[index]),
+          child: ExpandableCard(imageUrl: post.imageUrl),
         );
       },
     );
@@ -407,7 +436,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
         if (item is Donation) {
           title = item.title;
           quantity = item.quantity;
-          // imageUrl = item.imageUrl; // Adicione se Donation tiver imagem
         } else if (item is Need) {
           title = item.title;
           quantity = item.quantity;
@@ -418,36 +446,32 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
           local: location,
           quantidade: quantity,
           imagem: imageUrl,
-          onTap: () {
-            // Navegação para detalhes (necessário adaptar DonationDetailPage/NeedDetailPage para aceitar o objeto)
-            /* Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostDetailPage(post: post),
-              ),
-            ); */
-          },
+          onTap: () {},
         );
       },
     );
   }
 
-  // ... _buildNotes e _buildInstitutionCampaigns (já estava correto) ...
   Widget _buildNotes() {
+    if (_notasFiscais.isEmpty) {
+      return const Center(child: Text("Nenhuma nota fiscal encontrada."));
+    }
+
     return Column(
-      children: notasFiscais.map((nota) {
+      children: _notasFiscais.map((nota) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: NotaFiscalCard(
-            titulo: nota["titulo"]!,
-            dataEmissao: nota["dataEmissao"]!,
+            titulo: nota.titulo,
+            dataEmissao:
+                "${nota.dataEmissao.day}/${nota.dataEmissao.month}/${nota.dataEmissao.year}",
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => NotaFiscalDetailPage(
-                    titulo: nota["titulo"]!,
-                    imagePath: "assets/nota_fiscal.png",
+                    titulo: nota.titulo,
+                    imageUrls: nota.imageUrls, 
                   ),
                 ),
               );

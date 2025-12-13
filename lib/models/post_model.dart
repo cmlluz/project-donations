@@ -1,49 +1,39 @@
 class PostModel {
-  final String id;
-  final String title;
-  final String description;
-  final int? quantity;
+  final int id;
+  final String caption;
   final String imageUrl;
-  final String location;
-  final String institution;
-  final String institutionImageUrl;
+  final String authorUid;
+  final String authorName;
+  final String? authorPhoto;
   final DateTime createdAt;
-  final String category;
-  final String postStatus; // ADICIONADO
+  final String postStatus;
+  final bool favorited;
 
   const PostModel({
     required this.id,
-    required this.title,
-    required this.description,
-    this.quantity,
+    required this.caption,
     required this.imageUrl,
-    required this.location,
-    required this.institution,
-    required this.institutionImageUrl,
+    required this.authorUid,
+    required this.authorName,
+    this.authorPhoto,
     required this.createdAt,
-    required this.category,
-    this.postStatus = 'DISPONIVEL',
+    required this.postStatus,
+    this.favorited = false,
   });
 
-  factory PostModel.fromSearchItem(
-    String id,
-    String title,
-    String description,
-    String imageUrl,
-    String category,
-  ) {
+  factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
-      id: id,
-      title: title,
-      description: description,
-      quantity: null,
-      imageUrl: imageUrl,
-      location: 'Salvador, Bahia',
-      institution: 'Instituição Exemplo',
-      institutionImageUrl: 'assets/instituicao.png',
-      createdAt: DateTime.now(),
-      category: category,
-      postStatus: 'DISPONIVEL',
+      id: json['id'] ?? 0,
+      caption: json['caption'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      authorUid: json['authorUid'] ?? '',
+      authorName: json['authorName'] ?? 'Usuário',
+      authorPhoto: json['authorProfilePictureUrl'],
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      postStatus: json['postStatus'] ?? 'PENDENTE_APROVACAO',
+      favorited: json['favorited'] ?? false,
     );
   }
 }
