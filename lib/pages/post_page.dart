@@ -32,15 +32,15 @@ class _PostPageState extends State<PostPage> {
         Text(
           text,
           style: const TextStyle(
-            fontSize: 15,
-            color: ConstantsColors.greyShade600,
+            fontSize: 14,
+            color: ConstantsColors.blueShade900,
             fontWeight: FontWeight.w500,
           ),
         ),
         const Text(
           ' *',
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 14,
             color: Colors.red,
             fontWeight: FontWeight.bold,
           ),
@@ -120,7 +120,6 @@ class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ConstantsColors.blueShade900,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -131,120 +130,117 @@ class _PostPageState extends State<PostPage> {
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade700,
+        foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
+      backgroundColor: ConstantsColors.blueShade900,
       body: Container(
-        width: double.infinity,
         decoration: const BoxDecoration(
           color: ConstantsColors.whiteShade700,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(35.0),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 30),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: _buildRequiredLabel('Imagem do Post'),
-                ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: _showImagePickerOptions,
-                  child: DottedBorder(
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(25.0),
-                    color: ConstantsColors.blueShade900,
-                    dashPattern: const [5, 5],
-                    strokeWidth: 2,
-                    child: Container(
-                      alignment: Alignment.center,
-                      width: double.infinity,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(1, 91, 124, 0.05),
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                      child: _selectedImg != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(25.0),
-                              child: Image.file(
-                                _selectedImg!,
-                                width: double.infinity,
-                                height: 220,
-                                fit: BoxFit.cover,
+        padding: const EdgeInsets.all(30.0),
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Imagem do Post'),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: _showImagePickerOptions,
+                child: DottedBorder(
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(25.0),
+                  color: ConstantsColors.blueShade900,
+                  dashPattern: const [5, 5],
+                  strokeWidth: 2,
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(1, 91, 124, 0.05),
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    child: _selectedImg != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Image.file(
+                              _selectedImg!,
+                              width: double.infinity,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_search_outlined,
+                                size: 80,
+                                color: ConstantsColors.blueShade900,
                               ),
-                            )
-                          : const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.image_search_outlined,
-                                  size: 80,
+                              SizedBox(height: 10),
+                              Text('Envie a foto aqui'),
+                              Text(
+                                'Procurar',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
                                   color: ConstantsColors.blueShade900,
+                                  decoration: TextDecoration.underline,
                                 ),
-                                SizedBox(height: 10),
-                                Text('Envie a foto aqui'),
-                                Text(
-                                  'Procurar',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: ConstantsColors.blueShade900,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
-                const SizedBox(height: 40),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: _buildRequiredLabel('Descrição'),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _descController,
-                  maxLines: 3,
-                  maxLength: 150,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+              ),
+              const SizedBox(height: 40),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Descrição'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _descController,
+                maxLines: 3,
+                maxLength: 150,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                const SizedBox(height: 40),
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : Column(
-                        children: [
-                          CustomButton(
-                            height: 40,
-                            width: 220,
-                            text: 'Publicar',
-                            color: ConstantsColors.blueShade900,
-                            textColor: ConstantsColors.whiteShade700,
-                            onPressed: _submitPost,
+              ),
+              const SizedBox(height: 40),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
+                      children: [
+                        CustomButton(
+                          height: 40,
+                          width: 220,
+                          text: 'Publicar',
+                          color: ConstantsColors.blueShade900,
+                          textColor: ConstantsColors.whiteShade700,
+                          onPressed: _submitPost,
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Cancelar',
+                            style: TextStylesConstants.kpoppinsSemiBold
+                                .copyWith(color: Colors.grey),
                           ),
-                          const SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'Cancelar',
-                              style: TextStylesConstants.kpoppinsSemiBold
-                                  .copyWith(color: Colors.grey),
-                            ),
-                          ),
-                        ],
-                      ),
-              ],
-            ),
+                        ),
+                      ],
+                    ),
+            ],
           ),
         ),
       ),
