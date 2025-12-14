@@ -325,7 +325,6 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                 secret: false,
                 icon: Icons.title_outlined,
                 keyboardType: TextInputType.text,
-                hintText: 'Digite o título da campanha',
               ),
               const SizedBox(height: 15),
               Align(
@@ -339,7 +338,6 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                 secret: false,
                 icon: Icons.description_outlined,
                 keyboardType: TextInputType.multiline,
-                hintText: 'Descreva os detalhes da campanha',
               ),
               const SizedBox(height: 15),
               Align(
@@ -353,7 +351,6 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                 secret: false,
                 icon: Icons.location_on_outlined,
                 keyboardType: TextInputType.text,
-                hintText: 'Informe o local da campanha',
               ),
               const SizedBox(height: 15),
               Row(
@@ -373,7 +370,6 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                               secret: false,
                               icon: Icons.calendar_today,
                               keyboardType: TextInputType.datetime,
-                              hintText: 'Selecione a data inicial',
                             ),
                           ),
                         ),
@@ -396,7 +392,6 @@ class _PublishCampaignPageState extends State<PublishCampaignPage> {
                               secret: false,
                               icon: Icons.calendar_month,
                               keyboardType: TextInputType.datetime,
-                              hintText: 'Selecione a data final',
                             ),
                           ),
                         ),

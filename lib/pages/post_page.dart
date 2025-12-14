@@ -214,7 +214,6 @@ class _PostPageState extends State<PostPage> {
                   maxLines: 3,
                   maxLength: 150,
                   decoration: InputDecoration(
-                    hintText: 'Escreva uma descrição para o post',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
