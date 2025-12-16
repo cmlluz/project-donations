@@ -224,8 +224,46 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ? const Center(child: CircularProgressIndicator())
                       : controller.errorMessage.isNotEmpty
                           ? Center(
-                              child: Text(controller.errorMessage,
-                                  style: const TextStyle(color: Colors.red)))
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.error_outline,
+                                      size: 64,
+                                      color: Colors.orange,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      controller.errorMessage,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: ConstantsColors.blackShade700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        controller.loadFavorites();
+                                      },
+                                      icon: const Icon(Icons.refresh),
+                                      label: const Text('Tentar novamente'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            ConstantsColors.blueShade900,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
                           : itensFiltrados.isEmpty
                               ? const Center(
                                   child: Text('Nenhum favorito encontrado.'))

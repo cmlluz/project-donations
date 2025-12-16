@@ -63,9 +63,23 @@ class FavoriteController with ChangeNotifier {
       _favoriteUsers =
           (results[3] as PaginatedResponse<Map<String, dynamic>>).content;
     } catch (e) {
-      if (!e.toString().contains("não autenticado")) {
-        _errorMessage = "Erro ao carregar favoritos: $e";
-        print(_errorMessage);
+      print("Erro ao carregar favoritos: $e");
+
+      // Mensagem amigável ao usuário
+      if (e.toString().contains("SocketException") ||
+          e.toString().contains("No route to host") ||
+          e.toString().contains("Network is unreachable")) {
+        _errorMessage =
+            "Não foi possível conectar ao servidor.\nVerifique sua conexão com a internet.";
+      } else if (e.toString().contains("não autenticado") ||
+          e.toString().contains("401")) {
+        _errorMessage = ""; // Não mostrar erro de autenticação
+      } else if (e.toString().contains("TimeoutException") ||
+          e.toString().contains("timed out")) {
+        _errorMessage = "A conexão demorou muito.\nTente novamente mais tarde.";
+      } else {
+        _errorMessage =
+            "Erro ao carregar favoritos.\nTente novamente mais tarde.";
       }
     } finally {
       _isLoading = false;
