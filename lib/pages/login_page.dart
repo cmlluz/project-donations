@@ -23,6 +23,7 @@ class _LoginPage extends State<LoginPage> {
 
   String errorMessage = '';
   bool isLoading = false;
+  bool showSlowMessage = false;
 
   @override
   void dispose() {
@@ -35,6 +36,16 @@ class _LoginPage extends State<LoginPage> {
     setState(() {
       isLoading = true;
       errorMessage = '';
+      showSlowMessage = false;
+    });
+
+    // Timer para mostrar mensagem se demorar mais de 5 segundos
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && isLoading) {
+        setState(() {
+          showSlowMessage = true;
+        });
+      }
     });
 
     try {
@@ -60,6 +71,7 @@ class _LoginPage extends State<LoginPage> {
     } finally {
       setState(() {
         isLoading = false;
+        showSlowMessage = false;
       });
     }
   }
@@ -154,6 +166,19 @@ class _LoginPage extends State<LoginPage> {
                               ),
                       ),
                     ),
+                    if (showSlowMessage)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Text(
+                          'Isso está demorando mais do que o esperado...',
+                          style: TextStyle(
+                            color: Colors.orange.shade700,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
