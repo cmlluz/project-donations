@@ -168,6 +168,10 @@ class _RootPageState extends State<RootPage> {
   }
 
   void _showBottomMenu(BuildContext context) {
+    // Obtém o role do usuário logado
+    final userRole = context.read<UserProvider>().currentUser?.role;
+    final isManager = userRole == 'ROLE_MANAGER';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -235,14 +239,16 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  MenuButton(
-                    icon: Icons.campaign_outlined,
-                    label: 'Divulgar \n campanha',
-                    onTap: () {
-                      GoRouter.of(context).push("/publishCampaign");
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  // Mostrar botão de campanha apenas para gestores
+                  if (isManager)
+                    MenuButton(
+                      icon: Icons.campaign_outlined,
+                      label: 'Divulgar \n campanha',
+                      onTap: () {
+                        GoRouter.of(context).push("/publishCampaign");
+                        Navigator.of(context).pop();
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 24),
