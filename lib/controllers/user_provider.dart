@@ -33,6 +33,18 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  void updateLocalUserData(
+      {String? name, String? bio, String? profilePictureUrl}) {
+    if (_currentUser != null) {
+      _currentUser = _currentUser!.copyWith(
+        name: name,
+        bio: bio,
+        profilePictureUrl: profilePictureUrl,
+      );
+      notifyListeners();
+    }
+  }
+
   void clearUser() {
     _currentUser = null;
     notifyListeners();

@@ -104,7 +104,7 @@ class EditProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateProfile() async {
+  Future<String?> updateProfile() async {
     _setLoading(true);
     try {
       final user = _profileService.currentUser!;
@@ -146,6 +146,7 @@ class EditProfileController extends ChangeNotifier {
         await _profileService
             .updateAuthPassword(newPasswordController.text.trim());
       }
+      return uploadedImageUrl;
     } catch (e) {
       rethrow;
     } finally {

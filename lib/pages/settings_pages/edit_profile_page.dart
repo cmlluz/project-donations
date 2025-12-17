@@ -8,6 +8,7 @@ import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
@@ -47,9 +48,18 @@ class _EditProfileViewState extends State<_EditProfileView> {
     if (!_formKey.currentState!.validate()) return;
 
     final controller = context.read<EditProfileController>();
+    final userProvider = context.read<UserProvider>();
+
     try {
-      await controller.updateProfile();
+      final newImageUrl = await controller.updateProfile();
+
       if (mounted) {
+        userProvider.updateLocalUserData(
+          name: controller.nameController.text,
+          bio: controller.bioController.text,
+          profilePictureUrl: newImageUrl,
+        );
+
         _showSuccessMessage('Perfil atualizado com sucesso!');
         GoRouter.of(context).go('/root');
       }
