@@ -3,9 +3,11 @@ import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:intl/intl.dart';
 
-class PostDetailPage extends StatelessWidget {
+class PostDetailPage extends StatefulWidget {
   final PostModel post;
 
   const PostDetailPage({
@@ -14,7 +16,61 @@ class PostDetailPage extends StatelessWidget {
   });
 
   @override
+  State<PostDetailPage> createState() => _PostDetailPageState();
+}
+
+class _PostDetailPageState extends State<PostDetailPage> {
+  late final PostApiService _postApiService;
+  final ApiClient _apiClient = ApiClient();
+  int _pendingPostsCount = 0;
+  bool _isLoadingCount = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _postApiService = PostApiService(_apiClient);
+    if (widget.post.postStatus == 'PENDENTE_APROVACAO') {
+      _loadPendingPostsCount();
+    }
+  }
+
+  Future<void> _loadPendingPostsCount() async {
+    setState(() {
+      _isLoadingCount = true;
+    });
+
+    try {
+      final allPosts = await _postApiService.getPosts();
+      final pendingPosts =
+          allPosts.where((p) => p.postStatus == 'PENDENTE_APROVACAO').toList();
+      setState(() {
+        _pendingPostsCount = pendingPosts.length;
+      });
+    } catch (e) {
+      print('Erro ao carregar contagem de posts pendentes: $e');
+    } finally {
+      setState(() {
+        _isLoadingCount = false;
+      });
+    }
+  }
+
+  String _traduzirPostStatus(String status) {
+    switch (status) {
+      case 'DISPONIVEL':
+        return 'Publicado';
+      case 'PENDENTE_APROVACAO':
+        return 'Em Análise';
+      case 'REJEITADO':
+        return 'Rejeitado';
+      default:
+        return status;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final post = widget.post;
     final formattedDate = DateFormat('dd \'de\' MMMM \'de\' yyyy', 'pt_BR')
         .format(post.createdAt);
 
@@ -138,7 +194,19 @@ class PostDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: const CircleAvatar(child: Icon(Icons.business)),
+                    title: Text(
+                      post.authorName,
+                      style: const TextStyle(
+                              fontSize: 18, color: ConstantsColors.blueShade900)
+                          .merge(TextStylesConstants.kinterSemiBold),
+                    ),
+                    subtitle:
+                        Text('Status: ${_traduzirPostStatus(post.postStatus)}'),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     "Descrição",
                     style: TextStylesConstants.kpoppinsSemiBold.merge(
