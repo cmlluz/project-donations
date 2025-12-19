@@ -99,14 +99,17 @@ class AppSearchController with ChangeNotifier {
     }
   }
 
-  void _buildSearchItems(
-      List<Need> needs, List<Donation> donations, List<Campaign> campaigns, List<PublicUser> users) {
+  void _buildSearchItems(List<Need> needs, List<Donation> donations,
+      List<Campaign> campaigns, List<PublicUser> users) {
     _allItems = [
       ...needs.map((n) => SearchItem(
             id: n.id,
             title: n.title,
             description: n.description,
-            imageUrl: 'assets/donations.png',
+            // CORREÇÃO: Usa a imagem da API ou fallback
+            imageUrl: (n.imageUrl != null && n.imageUrl!.isNotEmpty)
+                ? n.imageUrl!
+                : 'assets/donations.png',
             category: SearchCategory.necessidade,
             institution: n.authorName,
             date: n.date ?? DateTime.now(),
@@ -117,7 +120,10 @@ class AppSearchController with ChangeNotifier {
             id: d.id,
             title: d.title,
             description: d.description,
-            imageUrl: 'assets/donations.png',
+            // CORREÇÃO: Usa a imagem da API ou fallback
+            imageUrl: (d.imageUrl != null && d.imageUrl!.isNotEmpty)
+                ? d.imageUrl!
+                : 'assets/donations.png',
             category: SearchCategory.doacao,
             institution: d.donatorName,
             date: d.date ?? DateTime.now(),
@@ -131,16 +137,15 @@ class AppSearchController with ChangeNotifier {
             imageUrl:
                 c.urlImagem.isNotEmpty ? c.urlImagem : 'assets/donations.png',
             category: SearchCategory.campanha,
-            institution:
-                'Carregando...', 
+            institution: 'Carregando...',
             date: c.dataInicial ?? DateTime.now(),
-            postStatus: 'ATIVO', 
-            quantity: 0, 
+            postStatus: 'ATIVO',
+            quantity: 0,
           )),
       ...users
           .where((u) => u.role == 'ROLE_INSTITUTION' || u.role == 'ROLE_GESTOR')
           .map((u) => SearchItem(
-                id: u.firebaseUid.hashCode, 
+                id: u.firebaseUid.hashCode,
                 title: u.name,
                 description: u.bio ?? u.email,
                 imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
@@ -149,7 +154,7 @@ class AppSearchController with ChangeNotifier {
                 date: DateTime.now(),
                 postStatus: 'ATIVO',
                 quantity: 0,
-                firebaseUid: u.firebaseUid, // <<-- PASSANDO O UID
+                firebaseUid: u.firebaseUid,
               )),
     ];
   }
@@ -163,7 +168,7 @@ class AppSearchController with ChangeNotifier {
       final needsFuture = _needsApiService.getNeeds();
       final donationsFuture = _donationApiService.getDonations();
       final campaignsFuture = _campaignApiService.getCampaigns();
-      
+
       final usersFuture = _apiClient.get('users').then((response) {
         if (response.statusCode == 200) {
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -171,7 +176,7 @@ class AppSearchController with ChangeNotifier {
         }
         return <PublicUser>[];
       });
-      
+
       final favDonationIdsFuture = _favoriteApiService.getFavoriteDonationIds();
       final favNeedIdsFuture = _favoriteApiService.getFavoriteNeedIds();
       final favCampaignIdsFuture = _favoriteApiService.getFavoriteCampaignIds();

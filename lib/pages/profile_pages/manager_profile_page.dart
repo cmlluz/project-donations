@@ -490,7 +490,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                     titulo: item.title,
                     local: "Local não informado",
                     quantidade: item.quantity,
-                    imagem: null,
+                    imagem: item.imageUrl, // CORREÇÃO: Passando a URL
                     onTap: () {
                       Navigator.push(
                         context,
@@ -508,7 +508,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                     titulo: item.title,
                     local: "Local não informado",
                     quantidade: item.quantity,
-                    imagem: null,
+                    imagem: item.imageUrl, // CORREÇÃO: Passando a URL
                     onTap: () {
                       Navigator.push(
                         context,

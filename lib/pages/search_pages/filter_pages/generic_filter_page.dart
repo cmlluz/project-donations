@@ -6,7 +6,7 @@ import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:go_router/go_router.dart';
-import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart'; // NOVO IMPORT
+import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -77,6 +77,8 @@ class GenericFilterPage extends StatelessWidget {
   }
 
   Widget _buildItemCard(BuildContext context, SearchItem item) {
+    final isNetwork = item.imageUrl.startsWith('http');
+
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () => _navigateToDetail(context, item),
@@ -96,6 +98,7 @@ class GenericFilterPage extends StatelessWidget {
                 child: AbsorbPointer(
                   child: ImageCard(
                     imageUrl: item.imageUrl,
+                    isNetworkImage: isNetwork, // Importante!
                     title: _getCardTitle(item),
                     location: item.location ?? 'Salvador, Bahia',
                     onTap: null,
@@ -149,7 +152,8 @@ class GenericFilterPage extends StatelessWidget {
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
-          date: item.date);
+          date: item.date,
+          imageUrl: item.imageUrl); // Passando a imagem
 
       Navigator.push(
         context,
@@ -166,7 +170,8 @@ class GenericFilterPage extends StatelessWidget {
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
-          date: item.date);
+          date: item.date,
+          imageUrl: item.imageUrl); // Passando a imagem
       Navigator.push(
         context,
         MaterialPageRoute(

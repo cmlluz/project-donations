@@ -59,18 +59,20 @@ class _AllowPostPageState extends State<AllowPostPage> {
         _title = item.title;
         _description = item.description;
         _authorName = item.donatorName;
+        _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
       } else if (widget.itemType == "NEED") {
         Need item = await _needApiService.getNeedById(widget.itemId);
         _title = item.title;
         _description = item.description;
         _authorName = item.authorName;
+        _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
       } else if (widget.itemType == "POST") {
         int postId = int.parse(widget.itemId);
         final item = await _postApiService.getPostById(postId);
 
         _title = "Nova Publicação";
         _description = item.caption;
-        _authorName = item.authorName ?? "Usuário";
+        _authorName = item.authorName;
         _imageUrl = item.imageUrl;
       } else {
         throw Exception("Tipo de item desconhecido: ${widget.itemType}");

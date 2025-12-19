@@ -165,8 +165,21 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: const Icon(Icons.volunteer_activism,
-                      size: 100, color: Colors.grey),
+                  child: widget.need.imageUrl != null &&
+                          widget.need.imageUrl!.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(25)),
+                          child: Image.network(
+                            widget.need.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image,
+                                    size: 100, color: Colors.grey),
+                          ),
+                        )
+                      : const Icon(Icons.volunteer_activism,
+                          size: 100, color: Colors.grey),
                 ),
                 Positioned(
                   top: 50,

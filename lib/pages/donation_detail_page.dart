@@ -165,8 +165,21 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: const Icon(Icons.volunteer_activism,
-                      size: 100, color: Colors.grey),
+                  child: widget.donation.imageUrl != null &&
+                          widget.donation.imageUrl!.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(25)),
+                          child: Image.network(
+                            widget.donation.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image,
+                                    size: 100, color: Colors.grey),
+                          ),
+                        )
+                      : const Icon(Icons.volunteer_activism,
+                          size: 100, color: Colors.grey),
                 ),
                 Positioned(
                   top: 50,

@@ -42,22 +42,39 @@ class HistoryCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
+    bool isNetwork = imagem != null && imagem!.startsWith('http');
+
     return Positioned.fill(
       child: imagem != null && imagem!.isNotEmpty
-          ? Image.asset(
-              imagem!,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: ConstantsColors.greyShade200,
-                  child: const Icon(
-                    Icons.broken_image,
-                    size: 40,
-                    color: ConstantsColors.greyShade500,
-                  ),
-                );
-              },
-            )
+          ? (isNetwork
+              ? Image.network(
+                  imagem!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: ConstantsColors.greyShade200,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                    );
+                  },
+                )
+              : Image.asset(
+                  imagem!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: ConstantsColors.greyShade200,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                    );
+                  },
+                ))
           : Container(
               color: ConstantsColors.greyShade200,
               child: const Icon(
