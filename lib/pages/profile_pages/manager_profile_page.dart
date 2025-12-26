@@ -4,14 +4,18 @@ import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/nota_fiscal_api_service.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:appdonationsgestor/components/profile_components/campaign_history_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/models/nota_fiscal_model.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
+import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -29,12 +33,13 @@ class ManagerProfilePage extends StatefulWidget {
 }
 
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
-  bool showDonations = false;
+  int selectedTab = 0;
 
   final ApiClient _apiClient = ApiClient();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
   late final PostApiService _postApiService;
+  late final NotaFiscalApiService _notaFiscalApiService;
   late final CampaignController _campaignController;
 
   Future<Map<String, dynamic>>? _historyFuture;
@@ -42,6 +47,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   List<Donation>? _cachedDonations;
   List<Need>? _cachedNeeds;
   List<PostModel>? _cachedPosts;
+  List<NotaFiscal>? _cachedNotasFiscais;
   String? _cachedUserId;
 
   @override
@@ -50,6 +56,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
     _postApiService = PostApiService(_apiClient);
+    _notaFiscalApiService = NotaFiscalApiService(_apiClient);
     _campaignController =
         Provider.of<CampaignController>(context, listen: false);
 
@@ -85,6 +92,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     _cachedDonations = null;
     _cachedNeeds = null;
     _cachedPosts = null;
+    _cachedNotasFiscais = null;
     _cachedUserId = null;
   }
 
@@ -98,7 +106,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           'donations': <Donation>[],
           'needs': <Need>[],
           'campaigns': <Campaign>[],
-          'posts': <PostModel>[]
+          'posts': <PostModel>[],
+          'notasFiscais': <NotaFiscal>[]
         };
       }
 
@@ -106,6 +115,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       List<Need> needs = [];
       List<Campaign> campaigns = [];
       List<PostModel> posts = [];
+      List<NotaFiscal> notasFiscais = [];
 
       if (_cachedDonations != null && _cachedUserId == currentUserId) {
         donations = _cachedDonations!;
@@ -140,6 +150,18 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         }
       }
 
+      if (_cachedNotasFiscais != null && _cachedUserId == currentUserId) {
+        notasFiscais = _cachedNotasFiscais!;
+      } else {
+        try {
+          notasFiscais =
+              await _notaFiscalApiService.getNotasByAuthor(currentUserId);
+          _cachedNotasFiscais = notasFiscais;
+        } catch (e) {
+          print("Erro ao carregar notas fiscais: $e");
+        }
+      }
+
       if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
         campaigns = _campaignController.campaigns;
       } else {
@@ -157,7 +179,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         'donations': donations,
         'needs': needs,
         'campaigns': campaigns,
-        'posts': posts
+        'posts': posts,
+        'notasFiscais': notasFiscais
       };
     } catch (e) {
       print("Erro geral ao carregar histórico: $e");
@@ -165,7 +188,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         'donations': <Donation>[],
         'needs': <Need>[],
         'campaigns': <Campaign>[],
-        'posts': <PostModel>[]
+        'posts': <PostModel>[],
+        'notasFiscais': <NotaFiscal>[]
       };
     }
   }
@@ -324,77 +348,19 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   border: Border.all(color: ConstantsColors.blueShade900),
-                  color: ConstantsColors.blueShade900.withOpacity(0.1),
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showDonations = false;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: !showDonations
-                                ? ConstantsColors.blueShade900
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Publicações",
-                              style: TextStylesConstants.kpoppinsMedium.merge(
-                                TextStyle(
-                                  color: !showDonations
-                                      ? Colors.white
-                                      : ConstantsColors.blueShade900,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showDonations = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: showDonations
-                                ? ConstantsColors.blueShade900
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Histórico",
-                              style: TextStylesConstants.kpoppinsMedium.merge(
-                                TextStyle(
-                                  color: showDonations
-                                      ? Colors.white
-                                      : ConstantsColors.blueShade900,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildTabButton("Publicações", 0),
+                    _buildTabButton("Histórico", 1),
+                    _buildTabButton("Notas Fiscais", 2),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              if (!showDonations) _buildPosts() else _buildHistory(),
+              if (selectedTab == 0) _buildPosts(),
+              if (selectedTab == 1) _buildHistory(),
+              if (selectedTab == 2) _buildNotes(),
               const SizedBox(height: 24),
             ],
           ),
@@ -538,6 +504,86 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
               },
             );
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildTabButton(String title, int index) {
+    final isSelected = selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() => selectedTab = index);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? ConstantsColors.blueShade900 : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : ConstantsColors.blueShade900,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotes() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _historyFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Erro: ${snapshot.error}"));
+        }
+
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: Text("Nenhuma nota fiscal encontrada."));
+        }
+
+        final List<NotaFiscal> notasFiscais =
+            snapshot.data!['notasFiscais'] ?? [];
+
+        if (notasFiscais.isEmpty) {
+          return const Center(child: Text("Nenhuma nota fiscal encontrada."));
+        }
+
+        return Column(
+          children: notasFiscais.map((nota) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: NotaFiscalCard(
+                titulo: nota.titulo,
+                dataEmissao:
+                    "${nota.dataEmissao.day}/${nota.dataEmissao.month}/${nota.dataEmissao.year}",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotaFiscalDetailPage(
+                        titulo: nota.titulo,
+                        imageUrls: nota.imageUrls,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }).toList(),
         );
       },
     );
