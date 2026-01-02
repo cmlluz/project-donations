@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -16,7 +18,37 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPage extends State<SettingsPage> {
   bool isNotificationOn = false;
   final NotificationService _notificationService = NotificationService();
-  bool _isLoading = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationStatus();
+  }
+
+  Future<void> _checkNotificationStatus() async {
+    try {
+      // Verificar permissões reais do Firebase
+      final settings =
+          await FirebaseMessaging.instance.getNotificationSettings();
+      final isAuthorized =
+          settings.authorizationStatus == AuthorizationStatus.authorized;
+
+      // Verificar se há token salvo (indica que usuário já aceitou antes)
+      final prefs = await SharedPreferences.getInstance();
+      final hasSavedToken = prefs.getBool('notifications_enabled') ?? false;
+
+      setState(() {
+        isNotificationOn = isAuthorized && hasSavedToken;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("Erro ao verificar status de notificações: $e");
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void _toggleNotifications(bool value) async {
     setState(() {
@@ -26,21 +58,27 @@ class _SettingsPage extends State<SettingsPage> {
     try {
       if (value) {
         await _notificationService.initNotifications();
+
+        // Salvar estado localmente
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('notifications_enabled', true);
+
         setState(() {
           isNotificationOn = true;
         });
       } else {
         await _notificationService.deleteToken();
+
+        // Remover estado localmente
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('notifications_enabled', false);
+
         setState(() {
           isNotificationOn = false;
         });
       }
     } catch (e) {
       print("Erro ao alterar notificações: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Falha ao atualizar status de notificação.")));
-      }
       setState(() {
         isNotificationOn = !value;
       });
