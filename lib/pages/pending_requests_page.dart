@@ -41,8 +41,9 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
             context: context,
             builder: (context) => AlertDialog(
               title: const Text("Solicitação Aprovada!"),
+              // testar
               content: SelectableText(
-                  "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}"),
+                  "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}\n\nEste código também está disponível na página da sua publicação no seu perfil."),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
