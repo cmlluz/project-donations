@@ -503,13 +503,17 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: ConstantsColors.blueShade900,
+                            backgroundColor: hasInterest
+                                ? Colors.grey
+                                : ConstantsColors.blueShade900,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          onPressed: (isSubmitting || isLoadingInterest)
+                          onPressed: (isSubmitting ||
+                                  isLoadingInterest ||
+                                  hasInterest)
                               ? null
                               : () async {
                                   final success = await _participantController
@@ -544,7 +548,7 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                                 )
                               : Text(
                                   hasInterest
-                                      ? "✅ Participando"
+                                      ? "Interesse Registrado"
                                       : "Quero Participar",
                                   style:
                                       TextStylesConstants.kpoppinsMedium.merge(

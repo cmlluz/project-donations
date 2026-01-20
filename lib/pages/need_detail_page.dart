@@ -33,6 +33,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
+  bool _hasRequestedItem = false;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -99,6 +100,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   }
 
   void _submitRequest() async {
+    if (_hasRequestedItem || _isLoadingRequest) return;
+
     setState(() => _isLoadingRequest = true);
 
     try {
@@ -108,6 +111,9 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
       );
 
       if (mounted) {
+        setState(() {
+          _hasRequestedItem = true;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Solicitação enviada com sucesso!'),
@@ -265,23 +271,29 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                       height: 50,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.blueShade900,
+                          backgroundColor: _hasRequestedItem
+                              ? Colors.grey
+                              : ConstantsColors.blueShade900,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
-                        onPressed: _isLoadingRequest || !isDisponivel
+                        onPressed: _isLoadingRequest ||
+                                !isDisponivel ||
+                                _hasRequestedItem
                             ? null
                             : _submitRequest,
                         child: _isLoadingRequest
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
                             : Text(
-                                isDisponivel
-                                    ? "Quero Doar"
-                                    : _traduzirPostStatus(
-                                        widget.need.postStatus),
+                                _hasRequestedItem
+                                    ? "Interesse Registrado"
+                                    : isDisponivel
+                                        ? "Quero Doar"
+                                        : _traduzirPostStatus(
+                                            widget.need.postStatus),
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),
