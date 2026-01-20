@@ -34,6 +34,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
   bool _hasRequestedItem = false;
+  bool _isCheckingExistingRequest = true;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -48,6 +49,43 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     if (widget.isOwnerView) {
       _requestsFuture =
           _requestApiService.getRequestsForItem(needId: widget.need.id);
+    } else {
+      // Verificar se já existe solicitação PENDENTE ou APROVADO
+      _checkExistingRequest();
+    }
+  }
+
+  Future<void> _checkExistingRequest() async {
+    try {
+      final sentRequests = await _requestApiService.getMySentRequests();
+
+      // Verificar se já existe solicitação para esta necessidade com status PENDENTE ou APROVADO
+      final existingRequest = sentRequests.firstWhere(
+        (request) =>
+            request.need?.id == widget.need.id &&
+            (request.status == 'PENDENTE' || request.status == 'APROVADO'),
+        orElse: () => sentRequests.first, // dummy, vamos verificar se encontrou
+      );
+
+      if (mounted && existingRequest.need?.id == widget.need.id) {
+        setState(() {
+          _hasRequestedItem = true;
+          _isCheckingExistingRequest = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            _isCheckingExistingRequest = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Erro ao verificar solicitações existentes: $e');
+      if (mounted) {
+        setState(() {
+          _isCheckingExistingRequest = false;
+        });
+      }
     }
   }
 
@@ -281,10 +319,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                         ),
                         onPressed: _isLoadingRequest ||
                                 !isDisponivel ||
-                                _hasRequestedItem
+                                _hasRequestedItem ||
+                                _isCheckingExistingRequest
                             ? null
                             : _submitRequest,
-                        child: _isLoadingRequest
+                        child: _isLoadingRequest || _isCheckingExistingRequest
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
                             : Text(
