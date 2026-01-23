@@ -288,13 +288,21 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget _buildFavoriteCard(dynamic item) {
     String name = 'Nome não encontrado';
     String description = 'Descrição não disponível';
-    String imageUrl = 'assets/placeholder.png';
+    String imageUrl = 'assets/placeholder.png'; // Imagem padrão
     bool isNetwork = false;
     VoidCallback? onTap;
 
     if (item is Donation) {
       name = item.title;
       description = item.description;
+
+      // --- CORREÇÃO: Verificação de nulidade adicionada ---
+      if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
+        imageUrl = item.imageUrl!;
+        isNetwork = true;
+      }
+      // ----------------------------------------------------
+
       onTap = () {
         Navigator.push(
           context,
@@ -306,6 +314,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } else if (item is Need) {
       name = item.title;
       description = item.description;
+
+      // --- CORREÇÃO: Verificação de nulidade adicionada ---
+      if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
+        imageUrl = item.imageUrl!;
+        isNetwork = true;
+      }
+      // ----------------------------------------------------
+
       onTap = () {
         Navigator.push(
           context,
@@ -317,9 +333,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } else if (item is Campaign) {
       name = item.titulo;
       description = item.descricao;
-      imageUrl =
-          item.urlImagem.isNotEmpty ? item.urlImagem : 'assets/donations.jpg';
-      isNetwork = item.urlImagem.isNotEmpty;
+
+      // Campanha geralmente tem string vazia em vez de null, mas por segurança:
+      if (item.urlImagem.isNotEmpty) {
+        imageUrl = item.urlImagem;
+        isNetwork = true;
+      } else {
+        imageUrl = 'assets/donations.jpg';
+        isNetwork = false;
+      }
+
       onTap = () {
         GoRouter.of(context).push('/campaignDetails/${item.id}');
       };
@@ -331,9 +354,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
               ? 'Gestor'
               : item['email'] ?? description);
 
-      imageUrl = item['profilePictureUrl'] ?? imageUrl;
-      isNetwork = item['profilePictureUrl'] != null &&
-          item['profilePictureUrl'].isNotEmpty;
+      if (item['profilePictureUrl'] != null &&
+          item['profilePictureUrl'].toString().isNotEmpty) {
+        imageUrl = item['profilePictureUrl'];
+        isNetwork = true;
+      } else {
+        imageUrl = 'assets/instituicao.png';
+        isNetwork = false;
+      }
 
       onTap = () {
         if (item['firebaseUid'] != null && item['firebaseUid'].isNotEmpty) {
@@ -356,7 +384,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return FavoriteCard(
       name: name,
       description: description,
-      imageUrl: isNetwork ? imageUrl : 'assets/instituicao.png',
+      imageUrl: imageUrl,
       isNetwork: isNetwork,
       onDelete: () => _removeItem(context, item),
       onTap: onTap,
