@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/notification_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +18,7 @@ class PendingRequestsPage extends StatefulWidget {
 
 class _PendingRequestsPageState extends State<PendingRequestsPage> {
   late final RequestApiService _requestApiService;
+  late final NotificationApiService _notificationApiService;
   final ApiClient _apiClient = ApiClient();
   late Future<List<Request>> _pendingRequestsFuture;
 
@@ -22,6 +26,7 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
   void initState() {
     super.initState();
     _requestApiService = RequestApiService(_apiClient);
+    _notificationApiService = NotificationApiService(_apiClient);
     _loadRequests();
   }
 
@@ -30,11 +35,51 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
     setState(() {});
   }
 
+  Future<void> _clearRelatedNewRequestNotifications(
+      {required int requestId}) async {
+    try {
+      final notifs = await _notificationApiService.getMyNotifications();
+
+      for (final n in notifs) {
+        if (n.dataPayload == null) continue;
+
+        try {
+          final data = jsonDecode(n.dataPayload!) as Map<String, dynamic>;
+          final type = data['type'];
+          if (type != 'NEW_REQUEST') continue;
+
+          final payloadRequestId = data['requestId'];
+          final int? parsedRequestId = payloadRequestId is int
+              ? payloadRequestId
+              : int.tryParse(payloadRequestId?.toString() ?? '');
+
+          if (parsedRequestId != requestId) continue;
+
+          final payloadNotificationId = data['notificationId'];
+          final int notificationIdToClear = payloadNotificationId is int
+              ? payloadNotificationId
+              : int.tryParse(payloadNotificationId?.toString() ?? '') ?? n.id;
+
+
+          await _notificationApiService.markAsRead(notificationIdToClear);
+
+          // Pra deletar: await _notificationApiService.deleteNotification(notificationIdToClear);
+        } catch (_) {
+          // ignora payload inválido
+        }
+      }
+    } catch (e) {
+      print('Falha ao limpar notificação relacionada: $e');
+    }
+  }
+
   Future<void> _handleRequest(Request request, bool approve) async {
     try {
       if (approve) {
         final approvedRequest =
             await _requestApiService.approveRequest(request.id);
+
+        await _clearRelatedNewRequestNotifications(requestId: request.id);
 
         if (mounted) {
           await showDialog(
@@ -55,6 +100,9 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
         }
       } else {
         await _requestApiService.rejectRequest(request.id);
+
+        await _clearRelatedNewRequestNotifications(requestId: request.id);
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
