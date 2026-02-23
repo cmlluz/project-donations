@@ -288,7 +288,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget _buildFavoriteCard(dynamic item) {
     String name = 'Nome não encontrado';
     String description = 'Descrição não disponível';
-    String imageUrl = 'assets/placeholder.png'; // Imagem padrão
+    String imageUrl = 'assets/placeholder.png';
     bool isNetwork = false;
     VoidCallback? onTap;
 
@@ -296,12 +296,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
       name = item.title;
       description = item.description;
 
-      // --- CORREÇÃO: Verificação de nulidade adicionada ---
       if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
         imageUrl = item.imageUrl!;
         isNetwork = true;
       }
-      // ----------------------------------------------------
 
       onTap = () {
         Navigator.push(
@@ -315,12 +313,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
       name = item.title;
       description = item.description;
 
-      // --- CORREÇÃO: Verificação de nulidade adicionada ---
       if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
         imageUrl = item.imageUrl!;
         isNetwork = true;
       }
-      // ----------------------------------------------------
 
       onTap = () {
         Navigator.push(
@@ -334,7 +330,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
       name = item.titulo;
       description = item.descricao;
 
-      // Campanha geralmente tem string vazia em vez de null, mas por segurança:
       if (item.urlImagem.isNotEmpty) {
         imageUrl = item.urlImagem;
         isNetwork = true;
