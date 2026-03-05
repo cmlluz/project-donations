@@ -120,6 +120,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
                 approve ? "Postagem permitida!" : "Postagem não permitida."),
             backgroundColor: ConstantsColors.blueShade900,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
           ),
         );
         context.go('/root');
@@ -131,6 +132,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
             content: Text("Erro ao processar: $e"),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
           ),
         );
       }

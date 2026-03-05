@@ -60,7 +60,6 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
               ? payloadNotificationId
               : int.tryParse(payloadNotificationId?.toString() ?? '') ?? n.id;
 
-
           await _notificationApiService.markAsRead(notificationIdToClear);
 
           // Pra deletar: await _notificationApiService.deleteNotification(notificationIdToClear);
@@ -108,6 +107,7 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
             const SnackBar(
               content: Text('Solicitação Rejeitada.'),
               backgroundColor: Colors.orange,
+              duration: Duration(seconds: 2),
             ),
           );
         }
@@ -118,6 +118,7 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
           SnackBar(
             content: Text('Erro ao processar solicitação: $e'),
             backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
           ),
         );
       }
