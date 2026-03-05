@@ -33,13 +33,11 @@ class AuthService {
         .signInWithEmailAndPassword(email: email, password: password);
 
     if (userCredential.user != null) {
-      // --- ADIÇÃO: IMPRIMIR TOKEN ---
       String? token = await userCredential.user!.getIdToken();
       print("==================================================");
       print("🔑 BEARER TOKEN (Copie para o Postman):");
       print(token);
       print("==================================================");
-      // ------------------------------
 
       await _onLoginSuccess(context);
     }
@@ -98,7 +96,6 @@ class AuthService {
     await firebaseAuth.signOut();
 
     if (context.mounted) {
-      // Limpa dados do usuário e favoritos ao sair
       Provider.of<UserProvider>(context, listen: false).clearUser();
       Provider.of<FavoriteController>(context, listen: false).clearFavorites();
     }
@@ -140,23 +137,31 @@ class AuthService {
     await currentUser!.updatePassword(newPassword);
   }
 
-  Future<UserCredential?> loginWithGoogle(BuildContext context) async {
+  Future<Map<String, dynamic>?> loginWithGoogle(BuildContext context) async {
     try {
       final googleUser = await GoogleSignIn().signIn();
-      final googleAuth = await googleUser?.authentication;
+      if (googleUser == null) return null;
+
+      final googleAuth = await googleUser.authentication;
       final cred = GoogleAuthProvider.credential(
-          idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
+          idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
 
       final userCredential = await firebaseAuth.signInWithCredential(cred);
 
       if (userCredential.user != null) {
+        bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+
+        await _authApiService.syncUser();
+
         await _onLoginSuccess(context);
+
+        return {'userCredential': userCredential, 'isNewUser': isNewUser};
       }
 
-      return userCredential;
+      return null;
     } catch (e) {
       print(e.toString());
-      return null;
+      rethrow;
     }
   }
 
