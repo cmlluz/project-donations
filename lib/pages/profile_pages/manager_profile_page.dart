@@ -200,7 +200,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     final user = userProvider.currentUser;
 
     final bool isManager = user?.role == 'ROLE_ADMIN' ||
-        user?.role == 'ROLE_INSTITUTION' ||
         user?.role == 'ROLE_GESTOR';
 
     ImageProvider? profileImage;
