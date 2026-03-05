@@ -457,23 +457,6 @@ class _CampaignDetailsPageState extends State<CampaignDetailsPage> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined,
-                        color: ConstantsColors.blueShade900, size: 18),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        campaign.localizacao,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: ConstantsColors.greyShade600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
                     const Icon(Icons.calendar_month_outlined,
                         color: ConstantsColors.blueShade900, size: 18),
                     const SizedBox(width: 6),

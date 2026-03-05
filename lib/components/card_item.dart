@@ -6,7 +6,6 @@ class CardItem extends StatelessWidget {
   final String title;
   final String? subtitle;
   final String avatarUrl;
-  final String location;
   final String date;
   final String imageAsset;
   final VoidCallback? onTap;
@@ -16,7 +15,6 @@ class CardItem extends StatelessWidget {
     required this.title,
     this.subtitle,
     required this.avatarUrl,
-    required this.location,
     required this.date,
     required this.imageAsset,
     this.onTap,
@@ -106,18 +104,6 @@ class CardItem extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
-                    const SizedBox(width: 4),
-                    Text(
-                      location.length > 15 ? date : "$location, $date",
-                      style: TextStylesConstants.kinterRegular.merge(
-                        TextStyle(fontSize: 11, color: Colors.grey[500]),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),

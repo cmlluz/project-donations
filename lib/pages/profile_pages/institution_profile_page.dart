@@ -429,7 +429,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
         final item = _institutionHistory[index];
 
         String title = '';
-        String location = 'Local não informado';
         int quantity = 0;
         String? imageUrl;
 
@@ -443,7 +442,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
 
         return HistoryCard(
           titulo: title,
-          local: location,
           quantidade: quantity,
           imagem: imageUrl,
           onTap: () {},
@@ -514,7 +512,6 @@ class _InstitutionProfilePageState extends State<InstitutionProfilePage> {
 
         return HistoryCard(
           titulo: campaign.titulo,
-          local: campaign.localizacao,
           quantidade: 0,
           imagem: campaign.urlImagem.isNotEmpty
               ? campaign.urlImagem

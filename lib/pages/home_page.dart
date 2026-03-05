@@ -141,7 +141,6 @@ class _HomePageState extends State<HomePage> {
                         subtitle: post.caption,
                         avatarUrl: post.authorPhoto ??
                             "https://via.placeholder.com/150",
-                        location: "Salvador, Bahia",
                         date: DateFormat('dd MMM, yyyy').format(post.createdAt),
                         imageAsset: post.imageUrl,
                         onTap: () {

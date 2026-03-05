@@ -5,7 +5,6 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class HistoryCard extends StatelessWidget {
   final String titulo;
-  final String local;
   final int? quantidade;
   final String? imagem;
   final VoidCallback? onTap;
@@ -13,7 +12,6 @@ class HistoryCard extends StatelessWidget {
   const HistoryCard({
     super.key,
     required this.titulo,
-    required this.local,
     required this.quantidade,
     this.imagem,
     this.onTap,
@@ -130,14 +128,14 @@ class HistoryCard extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.location_pin,
+                      Icons.numbers,
                       color: Colors.white,
                       size: 14,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        "Qtd: $quantidade | $local",
+                        "Qtd: $quantidade",
                         style: TextStylesConstants.kpoppinsRegular.merge(
                           const TextStyle(
                             fontSize: 11.0,

@@ -275,7 +275,6 @@ class _PublicationsPageState extends State<PublicationsPage> {
                           ? null
                           : "${_traduzirStatus(pub.postStatus)} - ${pub.caption}",
                       avatarUrl: userPhoto,
-                      location: "Salvador, Bahia",
                       date: formattedDate,
                       imageAsset: pub.imageUrl,
                     ),

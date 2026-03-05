@@ -100,7 +100,6 @@ class GenericFilterPage extends StatelessWidget {
                     imageUrl: item.imageUrl,
                     isNetworkImage: isNetwork, // Importante!
                     title: _getCardTitle(item),
-                    location: item.location ?? 'Salvador, Bahia',
                     onTap: null,
                   ),
                 ),

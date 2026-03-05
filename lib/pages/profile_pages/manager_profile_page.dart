@@ -454,7 +454,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 if (item is Donation) {
                   return HistoryCard(
                     titulo: item.title,
-                    local: "Local não informado",
                     quantidade: item.quantity,
                     imagem: item.imageUrl, // CORREÇÃO: Passando a URL
                     onTap: () {
@@ -472,7 +471,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 } else if (item is Need) {
                   return HistoryCard(
                     titulo: item.title,
-                    local: "Local não informado",
                     quantidade: item.quantity,
                     imagem: item.imageUrl, // CORREÇÃO: Passando a URL
                     onTap: () {
@@ -491,7 +489,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                   return CampaignHistoryCard(
                     titulo: item.titulo,
                     descricao: item.descricao,
-                    local: item.localizacao,
                     imagem: item.urlImagem,
                     dataInicial: item.dataInicial,
                     dataFinal: item.dataFinal,

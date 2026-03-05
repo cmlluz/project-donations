@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 class CampaignHistoryCard extends StatelessWidget {
   final String titulo;
   final String descricao;
-  final String local;
   final String? imagem;
   final DateTime? dataInicial;
   final DateTime? dataFinal;
@@ -17,7 +16,6 @@ class CampaignHistoryCard extends StatelessWidget {
     super.key,
     required this.titulo,
     required this.descricao,
-    required this.local,
     this.imagem,
     this.dataInicial,
     this.dataFinal,
@@ -108,29 +106,6 @@ class CampaignHistoryCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: ConstantsColors.whiteShade900,
-                        size: 12,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          local,
-                          style: TextStylesConstants.kpoppinsRegular.merge(
-                            const TextStyle(
-                              color: ConstantsColors.whiteShade900,
-                              fontSize: 10,
-                            ),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
                   if (dataInicial != null) ...[
                     const SizedBox(height: 2),
                     Row(

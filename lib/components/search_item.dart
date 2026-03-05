@@ -4,7 +4,6 @@ class SearchItem {
   final String description;
   final String imageUrl;
   final SearchCategory category;
-  final String? location;
   final String institution;
   final String? institutionImageUrl;
   final DateTime date;
@@ -18,7 +17,6 @@ class SearchItem {
     required this.description,
     required this.imageUrl,
     required this.category,
-    this.location,
     required this.institution,
     this.institutionImageUrl,
     required this.date,
