@@ -10,6 +10,7 @@ class Request {
   final Need? need;
   final String status;
   final DateTime createdAt;
+  final String? confirmationCode;
 
   Request({
     required this.id,
@@ -19,6 +20,7 @@ class Request {
     this.need,
     required this.status,
     required this.createdAt,
+    this.confirmationCode,
   });
 
   factory Request.fromJson(Map<String, dynamic> json) {
@@ -26,10 +28,12 @@ class Request {
       id: json['id'],
       solicitante: PublicUser.fromJson(json['solicitante']),
       dono: PublicUser.fromJson(json['dono']),
-      donation: json['donation'] != null ? Donation.fromJson(json['donation']) : null,
+      donation:
+          json['donation'] != null ? Donation.fromJson(json['donation']) : null,
       need: json['need'] != null ? Need.fromJson(json['need']) : null,
       status: json['status'],
       createdAt: DateTime.parse(json['createdAt']),
+      confirmationCode: json['confirmationCode'],
     );
   }
 }

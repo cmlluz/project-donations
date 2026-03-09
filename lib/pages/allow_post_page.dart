@@ -5,6 +5,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,6 +27,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
   final ApiClient _apiClient = ApiClient();
   late final DonationApiService _donationApiService;
   late final NeedApiService _needApiService;
+  late final PostApiService _postApiService;
 
   bool _isLoading = true;
   bool _isProcessing = false;
@@ -41,6 +43,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
     super.initState();
     _donationApiService = DonationApiService(_apiClient);
     _needApiService = NeedApiService(_apiClient);
+    _postApiService = PostApiService(_apiClient);
     _loadItemData();
   }
 
@@ -56,13 +59,23 @@ class _AllowPostPageState extends State<AllowPostPage> {
         _title = item.title;
         _description = item.description;
         _authorName = item.donatorName;
+        _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
       } else if (widget.itemType == "NEED") {
         Need item = await _needApiService.getNeedById(widget.itemId);
         _title = item.title;
         _description = item.description;
         _authorName = item.authorName;
+        _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
+      } else if (widget.itemType == "POST") {
+        int postId = int.parse(widget.itemId);
+        final item = await _postApiService.getPostById(postId);
+
+        _title = "Nova Publicação";
+        _description = item.caption;
+        _authorName = item.authorName;
+        _imageUrl = item.imageUrl;
       } else {
-        throw Exception("Tipo de item desconhecido");
+        throw Exception("Tipo de item desconhecido: ${widget.itemType}");
       }
     } catch (e) {
       _error = "Erro ao carregar item: $e";
@@ -91,6 +104,13 @@ class _AllowPostPageState extends State<AllowPostPage> {
         } else {
           await _needApiService.rejectNeed(widget.itemId);
         }
+      } else if (widget.itemType == "POST") {
+        int postId = int.parse(widget.itemId);
+        if (approve) {
+          await _postApiService.approvePost(postId);
+        } else {
+          await _postApiService.rejectPost(postId);
+        }
       }
 
       if (mounted) {
@@ -100,6 +120,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
                 approve ? "Postagem permitida!" : "Postagem não permitida."),
             backgroundColor: ConstantsColors.blueShade900,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
           ),
         );
         context.go('/root');
@@ -111,6 +132,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
             content: Text("Erro ao processar: $e"),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -144,24 +166,17 @@ class _AllowPostPageState extends State<AllowPostPage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
-                child: Image.asset(
+                child: Image.network(
                   _imageUrl,
                   width: double.infinity,
                   height: 400,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return Container(
+                    return Image.asset(
+                      'assets/donations.jpg',
                       width: double.infinity,
                       height: 400,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: const Icon(
-                        Icons.image,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
+                      fit: BoxFit.cover,
                     );
                   },
                 ),

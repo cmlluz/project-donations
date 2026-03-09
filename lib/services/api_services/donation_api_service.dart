@@ -19,6 +19,18 @@ class DonationApiService {
     }
   }
 
+  Future<List<Donation>> getMyDonations() async {
+    final response = await _apiClient.get('donations/me');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Donation.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar minhas doações.');
+    }
+  }
+
   Future<Donation> getDonationById(String id) async {
     final response = await _apiClient.get('donations/$id');
 
@@ -83,6 +95,18 @@ class DonationApiService {
     } else {
       print("Erro ${response.statusCode}: ${response.body}");
       throw Exception('Falha ao rejeitar a doação.');
+    }
+  }
+
+  Future<List<Donation>> getDonationsByAuthor(String authorUid) async {
+    final response = await _apiClient.get('donations/author/$authorUid');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Donation.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar doações do autor.');
     }
   }
 }

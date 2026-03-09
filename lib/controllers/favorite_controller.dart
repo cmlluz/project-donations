@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 
@@ -10,10 +11,12 @@ class FavoriteController with ChangeNotifier {
 
   List<Donation> _favoriteDonations = [];
   List<Need> _favoriteNeeds = [];
+  List<Campaign> _favoriteCampaigns = [];
   List<Map<String, dynamic>> _favoriteUsers = [];
 
   List<Donation> get favoriteDonations => _favoriteDonations;
   List<Need> get favoriteNeeds => _favoriteNeeds;
+  List<Campaign> get favoriteCampaigns => _favoriteCampaigns;
   List<Map<String, dynamic>> get favoriteUsers => _favoriteUsers;
 
   bool _isLoading = false;
@@ -24,7 +27,16 @@ class FavoriteController with ChangeNotifier {
 
   FavoriteController() {
     _favoriteApiService = FavoriteApiService(_apiClient);
-    loadFavorites(); // Carrega os favoritos quando o app inicia
+    loadFavorites(notify: false);
+  }
+
+  void clearFavorites() {
+    _favoriteDonations = [];
+    _favoriteNeeds = [];
+    _favoriteCampaigns = [];
+    _favoriteUsers = [];
+    _errorMessage = '';
+    notifyListeners();
   }
 
   Future<void> loadFavorites({bool notify = true}) async {
@@ -37,28 +49,48 @@ class FavoriteController with ChangeNotifier {
           _favoriteApiService.getFavoriteDonations(page: 0, size: 200);
       final needsFuture =
           _favoriteApiService.getFavoriteNeeds(page: 0, size: 200);
+      final campaignsFuture =
+          _favoriteApiService.getFavoriteCampaigns(page: 0, size: 200);
       final usersFuture =
           _favoriteApiService.getFavoriteUsers(page: 0, size: 200);
 
-      final results =
-          await Future.wait([donationsFuture, needsFuture, usersFuture]);
+      final results = await Future.wait(
+          [donationsFuture, needsFuture, campaignsFuture, usersFuture]);
 
       _favoriteDonations = (results[0] as PaginatedResponse<Donation>).content;
       _favoriteNeeds = (results[1] as PaginatedResponse<Need>).content;
+      _favoriteCampaigns = (results[2] as PaginatedResponse<Campaign>).content;
       _favoriteUsers =
-          (results[2] as PaginatedResponse<Map<String, dynamic>>).content;
+          (results[3] as PaginatedResponse<Map<String, dynamic>>).content;
     } catch (e) {
-      _errorMessage = "Erro ao carregar favoritos: $e";
+      print("Erro ao carregar favoritos: $e");
+
+      // Mensagem amigável ao usuário
+      if (e.toString().contains("SocketException") ||
+          e.toString().contains("No route to host") ||
+          e.toString().contains("Network is unreachable")) {
+        _errorMessage =
+            "Não foi possível conectar ao servidor.\nVerifique sua conexão com a internet.";
+      } else if (e.toString().contains("não autenticado") ||
+          e.toString().contains("401")) {
+        _errorMessage = ""; // Não mostrar erro de autenticação
+      } else if (e.toString().contains("TimeoutException") ||
+          e.toString().contains("timed out")) {
+        _errorMessage = "A conexão demorou muito.\nTente novamente mais tarde.";
+      } else {
+        _errorMessage =
+            "Erro ao carregar favoritos.\nTente novamente mais tarde.";
+      }
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (notify) notifyListeners();
     }
   }
 
   Future<void> addFavoriteDonation(Donation donation) async {
     try {
       await _favoriteApiService.addFavoriteDonation(donation.id);
-      _favoriteDonations.add(donation); // Atualização otimista
+      _favoriteDonations.add(donation);
       notifyListeners();
     } catch (e) {
       print("Erro ao adicionar favorito: $e");
@@ -122,7 +154,28 @@ class FavoriteController with ChangeNotifier {
     }
   }
 
-  // Verifica se um item já está favoritado (para as páginas de detalhe)
+  Future<void> addFavoriteCampaign(Campaign campaign) async {
+    try {
+      await _favoriteApiService.addFavoriteCampaign(campaign.id);
+      _favoriteCampaigns.add(campaign);
+      notifyListeners();
+    } catch (e) {
+      print("Erro ao adicionar favorito: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> removeFavoriteCampaign(Campaign campaign) async {
+    try {
+      await _favoriteApiService.removeFavoriteCampaign(campaign.id);
+      _favoriteCampaigns.removeWhere((c) => c.id == campaign.id);
+      notifyListeners();
+    } catch (e) {
+      print("Erro ao remover favorito: $e");
+      rethrow;
+    }
+  }
+
   bool isDonationFavorite(int id) {
     return _favoriteDonations.any((d) => d.id == id);
   }
@@ -133,5 +186,9 @@ class FavoriteController with ChangeNotifier {
 
   bool isUserFavorite(String uid) {
     return _favoriteUsers.any((u) => u['firebaseUid'] == uid);
+  }
+
+  bool isCampaignFavorite(int id) {
+    return _favoriteCampaigns.any((c) => c.id == id);
   }
 }

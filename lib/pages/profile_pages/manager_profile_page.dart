@@ -1,14 +1,29 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/nota_fiscal_api_service.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:appdonationsgestor/components/profile_components/campaign_history_card.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/models/nota_fiscal_model.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/pages/profile_pages/nota_fiscal_detail_page.dart';
+import 'package:appdonationsgestor/components/profile_components/nota_fiscal_card.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/pages/profile_pages/publications_page.dart';
 import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/components/profile_components/expandable_card.dart';
 import 'package:appdonationsgestor/pages/settings_pages/settings_page.dart';
-import 'package:appdonationsgestor/pages/post_detail_page.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ManagerProfilePage extends StatefulWidget {
   const ManagerProfilePage({super.key});
@@ -18,97 +33,174 @@ class ManagerProfilePage extends StatefulWidget {
 }
 
 class _ManagerProfilePageState extends State<ManagerProfilePage> {
-  bool showDonations = false;
+  int selectedTab = 0;
 
-  final List<String> posts = [
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-    "assets/donations2.jpg",
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-    "assets/donations2.jpg",
-    "assets/donations.jpg",
-    "assets/instituicao.png",
-  ];
+  final ApiClient _apiClient = ApiClient();
+  late final DonationApiService _donationApiService;
+  late final NeedApiService _needApiService;
+  late final PostApiService _postApiService;
+  late final NotaFiscalApiService _notaFiscalApiService;
+  late final CampaignController _campaignController;
 
-  final List<PostModel> donations = [
-    PostModel(
-      id: "1",
-      title: "Agasalhos - Doação",
-      description:
-          "Doação de agasalhos para famílias em situação de vulnerabilidade.",
-      quantity: 35,
-      imageUrl: "assets/instituicao.png",
-      location: "Barbalho, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 12),
-      category: "doacao",
-      postStatus: "DISPONIVEL",
-    ),
-    PostModel(
-      id: "2",
-      title: "Vestuário - Doação",
-      description: "Doação de roupas variadas para pessoas em situação de rua.",
-      quantity: 50,
-      imageUrl: "assets/donations.jpg",
-      location: "Rio Vermelho, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 20),
-      category: "doacao",
-      postStatus: "DISPONIVEL",
-    ),
-    PostModel(
-      id: "3",
-      title: "Sapatos - Doação",
-      description: "Distribuição de sapatos para comunidades carentes.",
-      quantity: 20,
-      imageUrl: "assets/donations2.jpg",
-      location: "Pituba, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 25),
-      category: "doacao",
-      postStatus: "CONCLUIDO",
-    ),
-    PostModel(
-      id: "4",
-      title: "Cobertores - Doação",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "doacao",
-      postStatus: "CONCLUIDO",
-    ),
-    PostModel(
-      id: "5",
-      title: "Cobertores - Necessidade",
-      description:
-          "Cobertores arrecadados para distribuição durante o inverno.",
-      quantity: 15,
-      imageUrl: "assets/instituicao.png",
-      location: "Liberdade, Salvador",
-      institution: "Lar dos Idosos",
-      institutionImageUrl: "assets/profile.jpg",
-      createdAt: DateTime(2025, 8, 30),
-      category: "necessidade",
-      postStatus: "DISPONIVEL",
-    ),
-  ];
+  Future<Map<String, dynamic>>? _historyFuture;
+
+  List<Donation>? _cachedDonations;
+  List<Need>? _cachedNeeds;
+  List<PostModel>? _cachedPosts;
+  List<NotaFiscal>? _cachedNotasFiscais;
+  String? _cachedUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    _donationApiService = DonationApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
+    _postApiService = PostApiService(_apiClient);
+    _notaFiscalApiService = NotaFiscalApiService(_apiClient);
+    _campaignController =
+        Provider.of<CampaignController>(context, listen: false);
+
+    _campaignController.addListener(_refreshHistory);
+
+    _loadHistory();
+  }
+
+  void _loadHistory() {
+    _historyFuture = _fetchHistoryItems();
+    setState(() {});
+  }
+
+  void _refreshHistory() {
+    if (mounted) {
+      _clearCache();
+      _loadHistory();
+    }
+  }
+
+  bool _isCampaignCacheValid() {
+    final userProvider = context.read<UserProvider>();
+    final currentUserId = userProvider.currentUser?.firebaseUid;
+
+    if (currentUserId == null || _campaignController.campaigns.isEmpty) {
+      return false;
+    }
+
+    return _cachedUserId == currentUserId;
+  }
+
+  void _clearCache() {
+    _cachedDonations = null;
+    _cachedNeeds = null;
+    _cachedPosts = null;
+    _cachedNotasFiscais = null;
+    _cachedUserId = null;
+  }
+
+  Future<Map<String, dynamic>> _fetchHistoryItems() async {
+    try {
+      final userProvider = context.read<UserProvider>();
+      final currentUserId = userProvider.currentUser?.firebaseUid;
+
+      if (currentUserId == null) {
+        return {
+          'donations': <Donation>[],
+          'needs': <Need>[],
+          'campaigns': <Campaign>[],
+          'posts': <PostModel>[],
+          'notasFiscais': <NotaFiscal>[]
+        };
+      }
+
+      List<Donation> donations = [];
+      List<Need> needs = [];
+      List<Campaign> campaigns = [];
+      List<PostModel> posts = [];
+      List<NotaFiscal> notasFiscais = [];
+
+      if (_cachedDonations != null && _cachedUserId == currentUserId) {
+        donations = _cachedDonations!;
+      } else {
+        try {
+          donations = await _donationApiService.getMyDonations();
+          _cachedDonations = donations;
+        } catch (e) {
+          print("Erro ao carregar doações: $e");
+        }
+      }
+
+      if (_cachedNeeds != null && _cachedUserId == currentUserId) {
+        needs = _cachedNeeds!;
+      } else {
+        try {
+          needs = await _needApiService.getMyNeeds();
+          _cachedNeeds = needs;
+        } catch (e) {
+          print("Erro ao carregar necessidades: $e");
+        }
+      }
+
+      if (_cachedPosts != null && _cachedUserId == currentUserId) {
+        posts = _cachedPosts!;
+      } else {
+        try {
+          posts = await _postApiService.getPostsByAuthor(currentUserId);
+          _cachedPosts = posts;
+        } catch (e) {
+          print("Erro ao carregar posts: $e");
+        }
+      }
+
+      if (_cachedNotasFiscais != null && _cachedUserId == currentUserId) {
+        notasFiscais = _cachedNotasFiscais!;
+      } else {
+        try {
+          notasFiscais =
+              await _notaFiscalApiService.getNotasByAuthor(currentUserId);
+          _cachedNotasFiscais = notasFiscais;
+        } catch (e) {
+          print("Erro ao carregar notas fiscais: $e");
+        }
+      }
+
+      if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
+        campaigns = _campaignController.campaigns;
+      } else {
+        try {
+          await _campaignController.loadMyCampaigns(notify: false);
+          campaigns = _campaignController.campaigns;
+        } catch (e) {
+          print("Erro ao carregar campanhas: $e");
+        }
+      }
+
+      _cachedUserId = currentUserId;
+
+      return {
+        'donations': donations,
+        'needs': needs,
+        'campaigns': campaigns,
+        'posts': posts,
+        'notasFiscais': notasFiscais
+      };
+    } catch (e) {
+      print("Erro geral ao carregar histórico: $e");
+      return {
+        'donations': <Donation>[],
+        'needs': <Need>[],
+        'campaigns': <Campaign>[],
+        'posts': <PostModel>[],
+        'notasFiscais': <NotaFiscal>[]
+      };
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final user = userProvider.currentUser;
 
-    final bool isManager =
-        user?.role == 'ROLE_ADMIN' || user?.role == 'ROLE_INSTITUTION';
+    final bool isManager = user?.role == 'ROLE_ADMIN' ||
+        user?.role == 'ROLE_GESTOR';
 
     ImageProvider? profileImage;
     if (user?.profilePictureUrl != null &&
@@ -240,7 +332,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 child: Text(
                   (user?.bio != null && user!.bio!.isNotEmpty)
                       ? user.bio!
-                      : "Esta instituição ainda não adicionou uma descrição.",
+                      : "Este usuário ainda não adicionou uma descrição.",
                   style: TextStylesConstants.kpoppinsMedium.merge(
                     const TextStyle(
                       fontSize: 14,
@@ -255,136 +347,247 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   border: Border.all(color: ConstantsColors.blueShade900),
-                  color: ConstantsColors.blueShade900.withOpacity(0.1),
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showDonations = false;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: !showDonations
-                                ? ConstantsColors.blueShade900
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Publicações",
-                              style: TextStylesConstants.kpoppinsMedium.merge(
-                                TextStyle(
-                                  color: !showDonations
-                                      ? Colors.white
-                                      : ConstantsColors.blueShade900,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showDonations = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: showDonations
-                                ? ConstantsColors.blueShade900
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Histórico",
-                              style: TextStylesConstants.kpoppinsMedium.merge(
-                                TextStyle(
-                                  color: showDonations
-                                      ? Colors.white
-                                      : ConstantsColors.blueShade900,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildTabButton("Publicações", 0),
+                    _buildTabButton("Histórico", 1),
+                    _buildTabButton("Notas Fiscais", 2),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              if (!showDonations)
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 1.0,
-                  ),
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PublicationsPage(),
-                          ),
-                        );
-                      },
-                      child: ExpandableCard(imageUrl: posts[index]),
-                    );
-                  },
-                )
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: donations.length,
-                  itemBuilder: (context, index) {
-                    final post = donations[index];
-
-                    return HistoryCard(
-                      titulo: post.title,
-                      local: post.location,
-                      quantidade: post.quantity,
-                      imagem: post.imageUrl,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PostDetailPage(post: post),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+              if (selectedTab == 0) _buildPosts(),
+              if (selectedTab == 1) _buildHistory(),
+              if (selectedTab == 2) _buildNotes(),
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildPosts() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _historyFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final List<PostModel> posts = snapshot.data!['posts'] ?? [];
+
+        if (posts.isEmpty) {
+          return const Center(child: Text("Nenhuma publicação encontrada."));
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostDetailPage(post: posts[index]),
+                  ),
+                );
+              },
+              child: ExpandableCard(imageUrl: posts[index].imageUrl),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildHistory() {
+    return Consumer<CampaignController>(
+      builder: (context, campaignController, child) {
+        return FutureBuilder<Map<String, dynamic>>(
+          future: _historyFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(child: Text("Erro: ${snapshot.error}"));
+            }
+
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Center(child: Text("Nenhum histórico encontrado."));
+            }
+
+            final List<Donation> donations = snapshot.data!['donations'] ?? [];
+            final List<Need> needs = snapshot.data!['needs'] ?? [];
+            final List<Campaign> campaigns = snapshot.data!['campaigns'] ?? [];
+            final allItems = [...donations, ...needs, ...campaigns];
+
+            if (allItems.isEmpty) {
+              return const Center(child: Text("Nenhum histórico encontrado."));
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
+              itemCount: allItems.length,
+              itemBuilder: (context, index) {
+                final item = allItems[index];
+
+                if (item is Donation) {
+                  return HistoryCard(
+                    titulo: item.title,
+                    quantidade: item.quantity,
+                    imagem: item.imageUrl, // CORREÇÃO: Passando a URL
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DonationDetailPage(
+                            donation: item,
+                            isOwnerView: true,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (item is Need) {
+                  return HistoryCard(
+                    titulo: item.title,
+                    quantidade: item.quantity,
+                    imagem: item.imageUrl, // CORREÇÃO: Passando a URL
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NeedDetailPage(
+                            need: item,
+                            isOwnerView: true,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (item is Campaign) {
+                  return CampaignHistoryCard(
+                    titulo: item.titulo,
+                    descricao: item.descricao,
+                    imagem: item.urlImagem,
+                    dataInicial: item.dataInicial,
+                    dataFinal: item.dataFinal,
+                    onTap: () {
+                      GoRouter.of(context).push('/campaignDetails/${item.id}');
+                    },
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTabButton(String title, int index) {
+    final isSelected = selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() => selectedTab = index);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? ConstantsColors.blueShade900 : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : ConstantsColors.blueShade900,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotes() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _historyFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Erro: ${snapshot.error}"));
+        }
+
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: Text("Nenhuma nota fiscal encontrada."));
+        }
+
+        final List<NotaFiscal> notasFiscais =
+            snapshot.data!['notasFiscais'] ?? [];
+
+        if (notasFiscais.isEmpty) {
+          return const Center(child: Text("Nenhuma nota fiscal encontrada."));
+        }
+
+        return Column(
+          children: notasFiscais.map((nota) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: NotaFiscalCard(
+                titulo: nota.titulo,
+                dataEmissao:
+                    "${nota.dataEmissao.day}/${nota.dataEmissao.month}/${nota.dataEmissao.year}",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotaFiscalDetailPage(
+                        titulo: nota.titulo,
+                        imageUrls: nota.imageUrls,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _campaignController.removeListener(_refreshHistory);
+    super.dispose();
   }
 }

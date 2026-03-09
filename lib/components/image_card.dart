@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 class ImageCard extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final String? location;
   final String? route;
   final VoidCallback? onTap;
   final bool isNetworkImage;
@@ -22,7 +21,6 @@ class ImageCard extends StatelessWidget {
     super.key,
     required this.imageUrl,
     required this.title,
-    this.location,
     this.route,
     this.onTap,
     this.isNetworkImage = false,
@@ -45,7 +43,6 @@ class ImageCard extends StatelessWidget {
     return ImageCard(
       imageUrl: imageUrl,
       title: title,
-      location: location,
       route: '/donation/$donationId',
       isNetworkImage: isNetworkImage,
     );
@@ -74,7 +71,6 @@ class ImageCard extends StatelessWidget {
   factory ImageCard.need({
     required String imageUrl,
     required String description,
-    required String location,
     required String publicationDate,
     required String needId,
     bool isNetworkImage = false,
@@ -82,7 +78,6 @@ class ImageCard extends StatelessWidget {
     return ImageCard(
       imageUrl: imageUrl,
       title: description,
-      location: location,
       publicationDate: publicationDate,
       route: '/need/$needId',
       isNetworkImage: isNetworkImage,
@@ -205,31 +200,6 @@ class ImageCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_pin,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: location != null
-                          ? Text(
-                              location!,
-                              style: TextStylesConstants.kpoppinsRegular.merge(
-                                const TextStyle(
-                                  fontSize: 12.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

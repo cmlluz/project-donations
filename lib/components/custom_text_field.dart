@@ -1,6 +1,7 @@
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextFields extends StatefulWidget {
   final IconData icon;
@@ -9,12 +10,13 @@ class CustomTextFields extends StatefulWidget {
   final Color? labelColor;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator; // NOVO
+  final String? Function(String?)? validator;
   final int? maxLines;
-  final int? maxLength; // NOVO
-  final double? height; // NOVO
+  final int? maxLength;
+  final double? height;
   final String? hintText;
-  final InputBorder? border; // NOVO
+  final InputBorder? border;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextFields({
     super.key,
@@ -30,6 +32,7 @@ class CustomTextFields extends StatefulWidget {
     this.height,
     this.hintText,
     this.border,
+    this.inputFormatters,
   });
 
   @override
@@ -50,7 +53,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: SizedBox(
-        height: widget.height, // aplica altura se fornecida
+        height: widget.height,
         child: TextFormField(
           controller: widget.controller,
           keyboardType: widget.keyboardType,
@@ -58,6 +61,7 @@ class _CustomTextFieldState extends State<CustomTextFields> {
           validator: widget.validator,
           maxLines: widget.maxLines ?? 1,
           maxLength: widget.maxLength,
+          inputFormatters: widget.inputFormatters,
           style: TextStylesConstants.kcustomTextField,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(

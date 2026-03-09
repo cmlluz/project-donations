@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
@@ -31,6 +32,7 @@ class _HystoryPage extends State<HystoryPage> {
 
   void _loadMyRequests() {
     _myRequestsFuture = _requestApiService.getMySentRequests();
+    setState(() {});
   }
 
   String _formatStatus(String status) {
@@ -105,6 +107,8 @@ class _HystoryPage extends State<HystoryPage> {
                   item is Donation ? item.category : (item as Need).category;
               final quantity =
                   item is Donation ? item.quantity : (item as Need).quantity;
+              final imageUrl =
+                  item is Donation ? item.imageUrl : (item as Need).imageUrl;
 
               final statusText = _formatStatus(request.status);
               final statusIcon = _getStatusIcon(request.status);
@@ -161,78 +165,86 @@ class _HystoryPage extends State<HystoryPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  title,
-                                  style: TextStylesConstants.kpoppinsSemiBold
-                                      .merge(const TextStyle(fontSize: 16)),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    if (request.status == 'APROVADO') {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => AlertDialog(
-                                          content: Popup(
-                                            title: 'Contato do Doador',
-                                            subtitle:
-                                                'Telefone: ${request.dono.phone}',
-                                            cancelText: 'Fechar',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(0, 0),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+                      child: Column(
+                        children: [
+                          if (imageUrl != null && imageUrl.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(16)),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 150,
+                                child: Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.broken_image),
                                   ),
-                                  child: Text(
-                                    request.status == 'APROVADO'
-                                        ? 'Ver contato'
-                                        : 'Detalhes',
-                                    style:
-                                        TextStylesConstants.kinterRegular.merge(
-                                      const TextStyle(
-                                        fontSize: 13,
-                                        color: ConstantsColors.greyShade900,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Quantidade: $quantity',
-                              style: TextStylesConstants.kinterRegular.merge(
-                                const TextStyle(
-                                  fontSize: 12,
-                                  color: ConstantsColors.greyShade600,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Row(
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.person_pin,
-                                  color: ConstantsColors.greyShade600,
-                                  size: 15,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        title,
+                                        style: TextStylesConstants
+                                            .kpoppinsSemiBold
+                                            .merge(
+                                                const TextStyle(fontSize: 16)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        if (request.status == 'APROVADO') {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                              content: Popup(
+                                                title: 'Contato do Doador',
+                                                subtitle:
+                                                    'Telefone: ${request.dono.phone ?? "Não informado"}',
+                                                cancelText: 'Fechar',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(0, 0),
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      child: Text(
+                                        request.status == 'APROVADO'
+                                            ? 'Ver contato'
+                                            : 'Detalhes',
+                                        style: TextStylesConstants.kinterRegular
+                                            .merge(
+                                          const TextStyle(
+                                            fontSize: 13,
+                                            color: ConstantsColors.greyShade900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 3),
+                                const SizedBox(height: 6),
                                 Text(
-                                  'Dono: ${request.dono.name}',
+                                  'Quantidade: $quantity',
                                   style:
                                       TextStylesConstants.kinterRegular.merge(
                                     const TextStyle(
@@ -241,44 +253,87 @@ class _HystoryPage extends State<HystoryPage> {
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  formattedDate,
-                                  style:
-                                      TextStylesConstants.kinterRegular.merge(
-                                    const TextStyle(
-                                      fontSize: 12,
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.person_pin,
                                       color: ConstantsColors.greyShade600,
+                                      size: 15,
                                     ),
-                                  ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      'Dono: ${request.dono.name}',
+                                      style: TextStylesConstants.kinterRegular
+                                          .merge(
+                                        const TextStyle(
+                                          fontSize: 12,
+                                          color: ConstantsColors.greyShade600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: ConstantsColors.greyShade300,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    category.toString().split('.').last,
-                                    style: TextStylesConstants.kpoppinsMedium
-                                        .merge(
-                                      const TextStyle(
-                                        fontSize: 12,
-                                        color: ConstantsColors.blackShade900,
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      formattedDate,
+                                      style: TextStylesConstants.kinterRegular
+                                          .merge(
+                                        const TextStyle(
+                                          fontSize: 12,
+                                          color: ConstantsColors.greyShade600,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: ConstantsColors.greyShade300,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        category.toString().split('.').last,
+                                        style: TextStylesConstants
+                                            .kpoppinsMedium
+                                            .merge(
+                                          const TextStyle(
+                                            fontSize: 12,
+                                            color:
+                                                ConstantsColors.blackShade900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (request.status == 'APROVADO')
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Center(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          GoRouter.of(context).pushNamed(
+                                            RouteNames.confirmDonationPage,
+                                            extra: request.id,
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: const Text('Confirmar Entrega'),
                                       ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

@@ -42,20 +42,22 @@ class _CustomButtonState extends State<CustomButton> {
         onPressed: () {
           if (widget.onPressed != null) {
             widget.onPressed!();
-          } else if (widget.route.isNotEmpty && widget.hasMensage == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: ConstantsColors.blueShade900,
-                behavior: SnackBarBehavior.floating,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          } else if (widget.route.isNotEmpty) {
+            if (widget.hasMensage == true) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: ConstantsColors.blueShade900,
+                  behavior: SnackBarBehavior.floating,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  content: Text(widget.mensage ?? ''),
                 ),
-                content: Text(widget.mensage ?? ''),
-              ),
-            );
-            GoRouter.of(context).go(widget.route);
-          } else if (widget.route.isNotEmpty && widget.hasMensage == false) {
-            GoRouter.of(context).go(widget.route);
+              );
+              GoRouter.of(context).go(widget.route);
+            } else {
+              GoRouter.of(context).go(widget.route);
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('No route provided')),

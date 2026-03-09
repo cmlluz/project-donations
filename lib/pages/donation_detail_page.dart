@@ -1,3 +1,4 @@
+import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -8,12 +9,17 @@ import 'package:appdonationsgestor/services/api_services/request_api_service.dar
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:flutter/services.dart';
 
 class DonationDetailPage extends StatefulWidget {
   final Donation donation;
+  final bool isOwnerView;
 
-  const DonationDetailPage({Key? key, required this.donation})
-      : super(key: key);
+  const DonationDetailPage({
+    Key? key,
+    required this.donation,
+    this.isOwnerView = false,
+  }) : super(key: key);
 
   @override
   State<DonationDetailPage> createState() => _DonationDetailPageState();
@@ -27,6 +33,10 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
+  bool _hasRequestedItem = false;
+  bool _isCheckingExistingRequest = true;
+
+  Future<List<Request>>? _requestsFuture;
 
   @override
   void initState() {
@@ -35,6 +45,48 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     _requestApiService = RequestApiService(_apiClient);
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isDonationFavorite(widget.donation.id);
+
+    if (widget.isOwnerView) {
+      _requestsFuture =
+          _requestApiService.getRequestsForItem(donationId: widget.donation.id);
+    } else {
+      // Verificar se já existe solicitação PENDENTE ou APROVADO
+      _checkExistingRequest();
+    }
+  }
+
+  Future<void> _checkExistingRequest() async {
+    try {
+      final sentRequests = await _requestApiService.getMySentRequests();
+
+      // Verificar se já existe solicitação para esta doação com status PENDENTE ou APROVADO
+      final existingRequest = sentRequests.firstWhere(
+        (request) =>
+            request.donation?.id == widget.donation.id &&
+            (request.status == 'PENDENTE' || request.status == 'APROVADO'),
+        orElse: () => sentRequests.first, // vamos verificar se encontrou
+      );
+
+      if (mounted && existingRequest.donation?.id == widget.donation.id) {
+        setState(() {
+          _hasRequestedItem = true;
+          _isCheckingExistingRequest = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            _isCheckingExistingRequest = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Erro ao verificar solicitações existentes: $e');
+      if (mounted) {
+        setState(() {
+          _isCheckingExistingRequest = false;
+        });
+      }
+    }
   }
 
   void _toggleFavorite() async {
@@ -86,6 +138,8 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
   }
 
   void _submitRequest() async {
+    if (_hasRequestedItem || _isLoadingRequest) return;
+
     setState(() => _isLoadingRequest = true);
 
     try {
@@ -95,6 +149,9 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
       );
 
       if (mounted) {
+        setState(() {
+          _hasRequestedItem = true;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Solicitação enviada com sucesso!'),
@@ -152,8 +209,21 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: const Icon(Icons.volunteer_activism,
-                      size: 100, color: Colors.grey),
+                  child: widget.donation.imageUrl != null &&
+                          widget.donation.imageUrl!.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(25)),
+                          child: Image.network(
+                            widget.donation.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image,
+                                    size: 100, color: Colors.grey),
+                          ),
+                        )
+                      : const Icon(Icons.volunteer_activism,
+                          size: 100, color: Colors.grey),
                 ),
                 Positioned(
                   top: 50,
@@ -166,21 +236,24 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 50,
-                  right: 16,
-                  child: CircleAvatar(
-                    backgroundColor: _isFavorite
-                        ? ConstantsColors.blueShade900
-                        : Colors.grey.withOpacity(0.5),
-                    child: IconButton(
-                      icon: Icon(
-                          _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.white),
-                      onPressed: _isLoadingFavorite ? null : _toggleFavorite,
+                if (!widget.isOwnerView)
+                  Positioned(
+                    top: 50,
+                    right: 16,
+                    child: CircleAvatar(
+                      backgroundColor: _isFavorite
+                          ? ConstantsColors.blueShade900
+                          : Colors.grey.withOpacity(0.5),
+                      child: IconButton(
+                        icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.white),
+                        onPressed: _isLoadingFavorite ? null : _toggleFavorite,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             Padding(
@@ -228,38 +301,116 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ConstantsColors.blueShade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  if (widget.isOwnerView)
+                    _buildOwnerView()
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _hasRequestedItem
+                              ? Colors.grey
+                              : ConstantsColors.blueShade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        onPressed: _isLoadingRequest ||
+                                !isDisponivel ||
+                                _hasRequestedItem ||
+                                _isCheckingExistingRequest
+                            ? null
+                            : _submitRequest,
+                        child: _isLoadingRequest || _isCheckingExistingRequest
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : Text(
+                                _hasRequestedItem
+                                    ? "Interesse Registrado"
+                                    : isDisponivel
+                                        ? "Quero Receber"
+                                        : _traduzirPostStatus(
+                                            widget.donation.postStatus),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
                       ),
-                      onPressed: _isLoadingRequest || !isDisponivel
-                          ? null
-                          : _submitRequest,
-                      child: _isLoadingRequest
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                              isDisponivel
-                                  ? "Quero Receber"
-                                  : _traduzirPostStatus(
-                                      widget.donation.postStatus),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                            ),
                     ),
-                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildOwnerView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Solicitações Recebidas",
+          style:
+              const TextStyle(fontSize: 22, color: ConstantsColors.blueShade900)
+                  .merge(TextStylesConstants.kpoppinsMedium),
+        ),
+        const SizedBox(height: 10),
+        FutureBuilder<List<Request>>(
+          future: _requestsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                  child:
+                      Text("Erro ao carregar solicitações: ${snapshot.error}"));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                  child: Text("Nenhuma solicitação para este item."));
+            }
+
+            final requests = snapshot.data!;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: requests.length,
+              itemBuilder: (context, index) {
+                final request = requests[index];
+                return Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: request.solicitante.profilePictureUrl !=
+                              null
+                          ? NetworkImage(request.solicitante.profilePictureUrl!)
+                          : null,
+                      child: request.solicitante.profilePictureUrl == null
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+                    title: Text(request.solicitante.name,
+                        style: TextStylesConstants.kpoppinsMedium),
+                    subtitle: Text("Status: ${request.status}"),
+                    trailing: request.status == 'APROVADO'
+                        ? SelectableText(
+                            request.confirmationCode ?? "SEM COD",
+                            style: TextStylesConstants.kpoppinsBold
+                                .copyWith(color: ConstantsColors.blueShade900),
+                          )
+                        : null,
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 }

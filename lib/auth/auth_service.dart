@@ -1,10 +1,11 @@
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/auth_api_service.dart';
-import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
@@ -31,18 +32,16 @@ class AuthService {
     final UserCredential userCredential = await firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password);
 
-    User? user = userCredential.user;
-    if (user != null) {
-      String? token = await user.getIdToken();
-      print('--- FIREBASE TOKEN PARA POSTMAN ---');
-      print(token);
-      print('------------------------------------');
-    }
-
     if (userCredential.user != null) {
-      await _authApiService.syncUser();
-      await Provider.of<UserProvider>(context, listen: false)
-          .fetchCurrentUser();
+      // --- ADIÇÃO: IMPRIMIR TOKEN ---
+      String? token = await userCredential.user!.getIdToken();
+      print("==================================================");
+      print("🔑 BEARER TOKEN (Copie para o Postman):");
+      print(token);
+      print("==================================================");
+      // ------------------------------
+
+      await _onLoginSuccess(context);
     }
     return userCredential;
   }
@@ -60,20 +59,49 @@ class AuthService {
     );
 
     if (userCredential.user != null) {
-      await _authApiService.syncUser();
-      await _authApiService.updateUser(userData);
-      await Provider.of<UserProvider>(context, listen: false)
-          .fetchCurrentUser();
+      try {
+        await _authApiService.syncUser();
+        await _authApiService.updateUser(userData);
+        await _onLoginSuccess(context);
+      } catch (e) {
+        print("Iniciando Rollback devido à falha na atualização de dados: $e");
+        _authApiService.deleteUser().catchError((dbDeleteError) {
+          print(
+              "Erro (ignorável) ao tentar deletar o usuário do DB: $dbDeleteError");
+        });
+        userCredential.user!.delete().catchError((fbDeleteError) {
+          print(
+              "Erro ao tentar deletar o usuário do Firebase Auth: $fbDeleteError");
+        });
+        await firebaseAuth.signOut();
+
+        rethrow;
+      }
     }
 
     return userCredential;
+  }
+
+  Future<void> _onLoginSuccess(BuildContext context) async {
+    await _authApiService.syncUser();
+    if (context.mounted) {
+      await Provider.of<UserProvider>(context, listen: false)
+          .fetchCurrentUser();
+      await Provider.of<FavoriteController>(context, listen: false)
+          .loadFavorites();
+    }
   }
 
   Future<void> signOut(BuildContext context) async {
     await GoogleSignIn().signOut();
     await FacebookAuth.instance.logOut();
     await firebaseAuth.signOut();
-    Provider.of<UserProvider>(context, listen: false).clearUser();
+
+    if (context.mounted) {
+      // Limpa dados do usuário e favoritos ao sair
+      Provider.of<UserProvider>(context, listen: false).clearUser();
+      Provider.of<FavoriteController>(context, listen: false).clearFavorites();
+    }
   }
 
   Future<void> resetPassword({
@@ -122,9 +150,7 @@ class AuthService {
       final userCredential = await firebaseAuth.signInWithCredential(cred);
 
       if (userCredential.user != null) {
-        await _authApiService.syncUser();
-        await Provider.of<UserProvider>(context, listen: false)
-            .fetchCurrentUser();
+        await _onLoginSuccess(context);
       }
 
       return userCredential;
@@ -146,9 +172,7 @@ class AuthService {
           .signInWithCredential(facebookAuthCredential);
 
       if (userCredential.user != null) {
-        await _authApiService.syncUser();
-        await Provider.of<UserProvider>(context, listen: false)
-            .fetchCurrentUser();
+        await _onLoginSuccess(context);
       }
 
       return userCredential;

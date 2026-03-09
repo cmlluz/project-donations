@@ -1,10 +1,15 @@
 import 'package:appdonationsgestor/components/card_item.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/models/post_model.dart';
+import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,36 +19,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Map<String, String>> cardsData = [
-    {
-      "title": "Lar dos Idosos",
-      "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing...",
-      "avatarUrl":
-          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
-      "location": "Salvador, Bahia",
-      "date": "15 Jun, 2025",
-      "imageAsset": "assets/donations.jpg",
-    },
-    {
-      "title": "Centro Comunitário",
-      "subtitle": "Ajudando crianças carentes com educação e saúde",
-      "avatarUrl":
-          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
-      "location": "Recife, PE",
-      "date": "10 Jun, 2025",
-      "imageAsset": "assets/donations2.jpg",
-    },
-    {
-      "title": "ONG Teste",
-      "subtitle":
-          "Este é um subtítulo muito longo para testar a limitação de duas linhas no CardItem. Ele deve mostrar reticências quando ultrapassar o limite.",
-      "avatarUrl":
-          "https://imgs.search.brave.com/EH557LzfsHTfIMbszf0VhVSjTAxp2YIL1olc8zaL-ic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWM2LmRlcG9zaXRw/aG90b3MuY29tLzEw/MzExNzQvNTk0L2kv/NDUwL2RlcG9zaXRw/aG90b3NfNTk0MjE0/MS1zdG9jay1waG90/by1ncm91cC1vZi1w/YXBlcmNoYWluLWhv/bGRpbmctaGFuZHMu/anBn",
-      "location": "São Paulo, SP",
-      "date": "20 Jun, 2025",
-      "imageAsset": "assets/donations.jpg",
-    },
-  ];
+  late final PostApiService _postApiService;
+  late Future<List<PostModel>> _postsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _postApiService = PostApiService(ApiClient());
+    _postsFuture = _postApiService.getPosts();
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      _postsFuture = _postApiService.getPosts();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,23 +109,54 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Container(
           color: ConstantsColors.whiteShade900,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(left: 5.0, right: 5.0, top: 29.0),
-            itemCount: cardsData.length,
-            itemBuilder: (context, index) {
-              final card = cardsData[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 29.0),
-                child: CardItem(
-                  title: card['title']!,
-                  subtitle: card['subtitle'],
-                  avatarUrl: card['avatarUrl']!,
-                  location: card['location']!,
-                  date: card['date']!,
-                  imageAsset: card['imageAsset']!,
-                ),
-              );
-            },
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            child: FutureBuilder<List<PostModel>>(
+              future: _postsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                      child: Text("Erro ao carregar: ${snapshot.error}"));
+                }
+
+                final posts = snapshot.data ?? [];
+                if (posts.isEmpty) {
+                  return const Center(
+                      child: Text("Nenhuma publicação encontrada."));
+                }
+
+                return ListView.builder(
+                  padding:
+                      const EdgeInsets.only(left: 5.0, right: 5.0, top: 29.0),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    final post = posts[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 29.0),
+                      child: CardItem(
+                        title: post.authorName,
+                        subtitle: post.caption,
+                        avatarUrl: post.authorPhoto ??
+                            "https://via.placeholder.com/150",
+                        date: DateFormat('dd MMM, yyyy').format(post.createdAt),
+                        imageAsset: post.imageUrl,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(post: post),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),

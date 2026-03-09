@@ -4,6 +4,8 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/favorite_card.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
@@ -52,8 +54,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
         await controller.removeFavoriteDonation(item);
       } else if (item is Need) {
         await controller.removeFavoriteNeed(item);
+      } else if (item is Campaign) {
+        await controller.removeFavoriteCampaign(item);
       } else if (item is Map) {
-        await controller.removeFavoriteUser(item['firebaseUid']);
+        await controller.removeFavoriteUser(item as Map<String, dynamic>);
       }
     } catch (e) {
       if (mounted) {
@@ -109,6 +113,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
         List<dynamic> tempItens = [];
 
         switch (categoriaSelecionada) {
+          case 'Campanhas':
+            tempItens = controller.favoriteCampaigns;
+            break;
           case 'Instituições':
             tempItens = controller.favoriteUsers;
             break;
@@ -123,7 +130,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
             tempItens = [
               ...controller.favoriteUsers,
               ...controller.favoriteNeeds,
-              ...controller.favoriteDonations
+              ...controller.favoriteDonations,
+              ...controller.favoriteCampaigns
             ];
         }
 
@@ -134,6 +142,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
               name = item.title;
             } else if (item is Need) {
               name = item.title;
+            } else if (item is Campaign) {
+              name = item.titulo;
             } else if (item is Map) {
               name = item['name'] ?? '';
             }
@@ -214,8 +224,46 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ? const Center(child: CircularProgressIndicator())
                       : controller.errorMessage.isNotEmpty
                           ? Center(
-                              child: Text(controller.errorMessage,
-                                  style: const TextStyle(color: Colors.red)))
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.error_outline,
+                                      size: 64,
+                                      color: Colors.orange,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      controller.errorMessage,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: ConstantsColors.blackShade700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        controller.loadFavorites();
+                                      },
+                                      icon: const Icon(Icons.refresh),
+                                      label: const Text('Tentar novamente'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            ConstantsColors.blueShade900,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
                           : itensFiltrados.isEmpty
                               ? const Center(
                                   child: Text('Nenhum favorito encontrado.'))
@@ -247,6 +295,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
     if (item is Donation) {
       name = item.title;
       description = item.description;
+
+      if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
+        imageUrl = item.imageUrl!;
+        isNetwork = true;
+      }
+
       onTap = () {
         Navigator.push(
           context,
@@ -258,6 +312,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } else if (item is Need) {
       name = item.title;
       description = item.description;
+
+      if (item.imageUrl != null && item.imageUrl!.isNotEmpty) {
+        imageUrl = item.imageUrl!;
+        isNetwork = true;
+      }
+
       onTap = () {
         Navigator.push(
           context,
@@ -266,33 +326,60 @@ class _FavoritesPageState extends State<FavoritesPage> {
           ),
         );
       };
-    } else if (item is Map) {
-      name = item['name'] ?? name;
-      description = item['email'] ?? description;
-      imageUrl = item['profilePictureUrl'] ?? imageUrl;
-      isNetwork = item['profilePictureUrl'] != null &&
-          item['profilePictureUrl'].isNotEmpty;
+    } else if (item is Campaign) {
+      name = item.titulo;
+      description = item.descricao;
+
+      if (item.urlImagem.isNotEmpty) {
+        imageUrl = item.urlImagem;
+        isNetwork = true;
+      } else {
+        imageUrl = 'assets/donations.jpg';
+        isNetwork = false;
+      }
 
       onTap = () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InstitutionProfilePage(
-              userId: item['firebaseUid'] ?? '',
-              userName: item['name'] ?? 'Usuário',
-              userEmail: item['email'] ?? 'Email não disponível',
-              userImageUrl: item['profilePictureUrl'] ?? '',
-              isInitiallyFavorite: true,
+        GoRouter.of(context).push('/campaignDetails/${item.id}');
+      };
+    } else if (item is Map) {
+      name = item['name'] ?? name;
+      description = item['role'] == 'ROLE_INSTITUTION'
+          ? 'Instituição'
+          : (item['role'] == 'ROLE_GESTOR'
+              ? 'Gestor'
+              : item['email'] ?? description);
+
+      if (item['profilePictureUrl'] != null &&
+          item['profilePictureUrl'].toString().isNotEmpty) {
+        imageUrl = item['profilePictureUrl'];
+        isNetwork = true;
+      } else {
+        imageUrl = 'assets/instituicao.png';
+        isNetwork = false;
+      }
+
+      onTap = () {
+        if (item['firebaseUid'] != null && item['firebaseUid'].isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InstitutionProfilePage(
+                userId: item['firebaseUid'] ?? '',
+                userName: item['name'] ?? 'Usuário',
+                userEmail: item['email'] ?? 'Email não disponível',
+                userImageUrl: item['profilePictureUrl'] ?? '',
+                isInitiallyFavorite: true,
+              ),
             ),
-          ),
-        );
+          );
+        }
       };
     }
 
     return FavoriteCard(
       name: name,
       description: description,
-      imageUrl: isNetwork ? imageUrl : 'assets/instituicao.png',
+      imageUrl: imageUrl,
       isNetwork: isNetwork,
       onDelete: () => _removeItem(context, item),
       onTap: onTap,

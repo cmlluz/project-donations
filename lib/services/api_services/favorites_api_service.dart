@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/models/campaign_model.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 
 class FavoriteApiService {
@@ -106,6 +107,39 @@ class FavoriteApiService {
     }
   }
 
+  Future<void> addFavoriteCampaign(int campaignId) async {
+    final response = await _apiClient.post('favorites/campaigns/$campaignId');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao adicionar campanha favorita');
+    }
+    print("Campanha $campaignId favoritada com sucesso.");
+  }
+
+  Future<void> removeFavoriteCampaign(int campaignId) async {
+    final response = await _apiClient.delete('favorites/campaigns/$campaignId');
+    if (response.statusCode != 204) {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao remover campanha favorita');
+    }
+    print("Campanha $campaignId desfavoritada com sucesso.");
+  }
+
+  Future<PaginatedResponse<Campaign>> getFavoriteCampaigns(
+      {int page = 0, int size = 10}) async {
+    final response =
+        await _apiClient.get('favorites/campaigns?page=$page&size=$size');
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      return PaginatedResponse.fromJson(
+          body, (item) => Campaign.fromJson(item));
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao buscar campanhas favoritas.');
+    }
+  }
+
   Future<Set<int>> getFavoriteDonationIds() async {
     try {
       final response = await getFavoriteDonations(page: 0, size: 200);
@@ -132,6 +166,16 @@ class FavoriteApiService {
       return response.content.map((u) => u['firebaseUid'] as String).toSet();
     } catch (e) {
       print("Erro ao buscar IDs de usuários favoritos: $e");
+      return {};
+    }
+  }
+
+  Future<Set<int>> getFavoriteCampaignIds() async {
+    try {
+      final response = await getFavoriteCampaigns(page: 0, size: 200);
+      return response.content.map((c) => c.id).toSet();
+    } catch (e) {
+      print("Erro ao buscar IDs de campanhas favoritas: $e");
       return {};
     }
   }

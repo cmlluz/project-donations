@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/models/notification_model.dart';
-import 'package:appdonationsgestor/pages/allow_post_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -9,6 +8,7 @@ import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/notification_api_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -28,7 +28,20 @@ class _NotificationsPage extends State<NotificationsPage> {
   void initState() {
     super.initState();
     _notificationApiService = NotificationApiService(_apiClient);
+    _checkNotificationSettings();
     _loadApiNotifications();
+  }
+
+  Future<void> _checkNotificationSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final enabled = prefs.getBool('notifications_enabled') ?? true;
+      setState(() {
+        notificationsEnabled = enabled;
+      });
+    } catch (e) {
+      print("Erro ao verificar configurações de notificação: $e");
+    }
   }
 
   void _loadApiNotifications() {
@@ -158,7 +171,7 @@ class _NotificationsPage extends State<NotificationsPage> {
         if (notifications == null || notifications.isEmpty) {
           return buildEmptyNotifications();
         }
-        
+
         final newNotifications = notifications.where((n) => !n.isRead).toList();
         final oldNotifications = notifications.where((n) => n.isRead).toList();
 
@@ -318,26 +331,31 @@ class _NotificationsPage extends State<NotificationsPage> {
           ),
           const SizedBox(height: 40),
           Text(
-            'Suas notificações são exibidas aqui',
+            'Notificações Desativadas',
             style: const TextStyle(
               color: ConstantsColors.blueShade900,
               fontSize: 20,
             ).merge(TextStylesConstants.kpoppinsBold),
           ),
           const SizedBox(height: 10),
-          Text(
-            'Não deixe passar nenhuma oportunidade de fazer o bem.',
-            style: const TextStyle(
-              color: ConstantsColors.blueShade900,
-              fontSize: 17,
-            ).merge(TextStylesConstants.kpoppinsRegular),
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Text(
+              'Você desativou as notificações. Para receber novidades sobre doações e necessidades, ative as notificações nas configurações.',
+              style: const TextStyle(
+                color: ConstantsColors.blueShade900,
+                fontSize: 15,
+              ).merge(TextStylesConstants.kpoppinsRegular),
+              textAlign: TextAlign.center,
+            ),
           ),
           const SizedBox(height: 40),
           TextButton(
             onPressed: () {
-              setState(() {
-                notificationsEnabled = true;
+              // Navegar para página de configurações
+              GoRouter.of(context).pushNamed(RouteNames.root);
+              Future.delayed(const Duration(milliseconds: 100), () {
+                Navigator.of(context).pushNamed('/settings');
               });
             },
             style: TextButton.styleFrom(
@@ -351,7 +369,7 @@ class _NotificationsPage extends State<NotificationsPage> {
               ),
             ),
             child: Text(
-              'Ativar Notificações',
+              'Ir para Configurações',
               style: const TextStyle(
                 color: ConstantsColors.whiteShade900,
                 fontSize: 16,

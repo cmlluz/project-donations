@@ -1,11 +1,15 @@
 import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/services.dart';
+import 'package:appdonationsgestor/components/terms_checkbox.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -27,6 +31,8 @@ class _UserRegisterPage extends State<UserRegisterPage> {
   final formKey = GlobalKey<FormState>();
   String errorMessage = '';
   bool _isLoading = false;
+  bool _acceptedTerms = false;
+  String? _termsError;
 
   @override
   void dispose() {
@@ -48,7 +54,17 @@ class _UserRegisterPage extends State<UserRegisterPage> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    if (!_acceptedTerms) {
+      setState(() {
+        _termsError = 'Os termos precisam ser aceitos para prosseguir';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _termsError = null;
+    });
 
     try {
       final userData = {
@@ -73,17 +89,15 @@ class _UserRegisterPage extends State<UserRegisterPage> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       setState(() {
-        if (e.code == 'weak-password') {
-          errorMessage = 'A senha deve ter pelo menos 8 caracteres.';
-        } else if (e.code == 'email-already-in-use') {
-          errorMessage =
-              'Este e-mail já está em uso. Tente outro ou faça login.';
-        } else if (e.code == 'invalid-email') {
-          errorMessage = 'O formato do e-mail é inválido.';
-        } else {
-          errorMessage =
-              e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.';
-        }
+        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+        errorMessage = translatedMessage.isEmpty
+            ? (e.message ?? 'Ocorreu um erro ao registrar. Tente novamente.')
+            : translatedMessage;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } finally {
       if (mounted) {
@@ -190,9 +204,16 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       secret: false,
                       controller: phoneController,
                       keyboardType: TextInputType.number,
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Campo obrigatório'
-                          : null,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        TelefoneInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Campo obrigatório';
+                        if (value.length < 14) return 'Telefone inválido';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -201,6 +222,16 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                       secret: false,
                       controller: cpfCnpjController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CpfInputFormatter(),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Campo obrigatório';
+                        if (!CPFValidator.isValid(value)) return 'CPF inválido';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
                     CustomTextFields(
@@ -233,10 +264,24 @@ class _UserRegisterPage extends State<UserRegisterPage> {
                           : null,
                     ),
                     const SizedBox(height: 15),
+                    TermsCheckbox(
+                      value: _acceptedTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          _acceptedTerms = value ?? false;
+                          if (_acceptedTerms) {
+                            _termsError = null;
+                          }
+                        });
+                      },
+                      errorText: _termsError,
+                    ),
+                    const SizedBox(height: 15),
                     if (errorMessage.isNotEmpty)
                       Text(
                         errorMessage,
                         style: const TextStyle(color: Colors.redAccent),
+                        textAlign: TextAlign.center,
                       ),
                     CustomButton(
                       text: 'Confirmar',

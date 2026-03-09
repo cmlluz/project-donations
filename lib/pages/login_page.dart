@@ -2,6 +2,7 @@ import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _LoginPage extends State<LoginPage> {
 
   String errorMessage = '';
   bool isLoading = false;
+  bool showSlowMessage = false;
 
   @override
   void dispose() {
@@ -34,6 +36,16 @@ class _LoginPage extends State<LoginPage> {
     setState(() {
       isLoading = true;
       errorMessage = '';
+      showSlowMessage = false;
+    });
+
+    // Timer para mostrar mensagem se demorar mais de 5 segundos
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && isLoading) {
+        setState(() {
+          showSlowMessage = true;
+        });
+      }
     });
 
     try {
@@ -47,11 +59,19 @@ class _LoginPage extends State<LoginPage> {
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage = e.message ?? 'Erro ao tentar fazer login';
+        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+        errorMessage = translatedMessage.isEmpty
+            ? (e.message ?? 'Erro desconhecido ao fazer login')
+            : translatedMessage;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = FirebaseErrorTranslator.translateException(e);
       });
     } finally {
       setState(() {
         isLoading = false;
+        showSlowMessage = false;
       });
     }
   }
@@ -146,6 +166,19 @@ class _LoginPage extends State<LoginPage> {
                               ),
                       ),
                     ),
+                    if (showSlowMessage)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Text(
+                          'Isso está demorando mais do que o esperado...',
+                          style: TextStyle(
+                            color: Colors.orange.shade700,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
@@ -203,10 +236,17 @@ class _LoginPage extends State<LoginPage> {
                                 if (mounted) {
                                   GoRouter.of(context).push('/root');
                                 }
+                              } on FirebaseAuthException catch (e) {
+                                setState(() {
+                                  final translatedMessage =
+                                      FirebaseErrorTranslator.translate(e.code);
+                                  errorMessage =
+                                      'Erro ao entrar com Google: ${translatedMessage.isEmpty ? (e.message ?? 'Erro desconhecido') : translatedMessage}';
+                                });
                               } catch (e) {
                                 setState(() {
                                   errorMessage =
-                                      'Erro ao entrar com Google: ${e.toString()}';
+                                      'Erro ao entrar com Google: ${FirebaseErrorTranslator.translateException(e)}';
                                 });
                               }
                             },
@@ -226,8 +266,7 @@ class _LoginPage extends State<LoginPage> {
                                 }
                               } catch (e) {
                                 setState(() {
-                                  errorMessage =
-                                      'Erro ao entrar com Facebook: ${e.toString()}';
+                                  errorMessage = 'Erro ao entrar com Facebook: ${FirebaseErrorTranslator.translateException(e)}';
                                 });
                               }
                             },

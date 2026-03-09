@@ -30,4 +30,14 @@ class NotificationApiService {
       throw Exception('Falha ao marcar notificação como lida');
     }
   }
+
+  Future<void> deleteNotification(int notificationId) async {
+    final response = await _apiClient.delete('notifications/$notificationId');
+
+    // Alguns backends retornam 200, outros 204
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao deletar notificação');
+    }
+  }
 }

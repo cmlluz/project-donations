@@ -31,4 +31,26 @@ class PublicUser {
       pixKey: json['pixKey'],
     );
   }
+
+  PublicUser copyWith({
+    String? firebaseUid,
+    String? name,
+    String? role,
+    String? email,
+    String? profilePictureUrl,
+    String? phone,
+    String? bio,
+    String? pixKey,
+  }) {
+    return PublicUser(
+      firebaseUid: firebaseUid ?? this.firebaseUid,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      email: email ?? this.email,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      phone: phone ?? this.phone,
+      bio: bio ?? this.bio,
+      pixKey: pixKey ?? this.pixKey,
+    );
+  }
 }

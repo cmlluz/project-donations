@@ -4,12 +4,12 @@ class SearchItem {
   final String description;
   final String imageUrl;
   final SearchCategory category;
-  final String? location;
   final String institution;
   final String? institutionImageUrl;
   final DateTime date;
   final int quantity;
   final String postStatus;
+  final String? firebaseUid;
 
   const SearchItem({
     required this.id,
@@ -17,12 +17,12 @@ class SearchItem {
     required this.description,
     required this.imageUrl,
     required this.category,
-    this.location,
     required this.institution,
     this.institutionImageUrl,
     required this.date,
     required this.quantity,
     required this.postStatus,
+    this.firebaseUid,
   });
 }
 

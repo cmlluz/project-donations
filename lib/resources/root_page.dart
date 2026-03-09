@@ -13,7 +13,10 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -41,18 +44,25 @@ class _RootPageState extends State<RootPage> {
   }
 
   void _handleNavigation(String type, Map<String, dynamic> data) {
+    final currentUserRole =
+        authService.value.currentUser != null && context.mounted
+            ? context.read<UserProvider>().currentUser?.role
+            : null;
+
     if (type == 'NEW_REQUEST') {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
     } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     } else if (type == 'POST_VALIDATION_PENDING') {
-      final String? itemId = data['itemId'];
-      final String? itemType = data['itemType'];
-      if (itemId != null && itemType != null) {
-        GoRouter.of(context).pushNamed(
-          RouteNames.allowPostPage,
-          extra: {'itemId': itemId, 'itemType': itemType},
-        );
+      if (currentUserRole == 'ROLE_ADMIN') {
+        final String? itemId = data['itemId'];
+        final String? itemType = data['itemType'];
+        if (itemId != null && itemType != null) {
+          GoRouter.of(context).pushNamed(
+            RouteNames.allowPostPage,
+            extra: {'itemId': itemId, 'itemType': itemType},
+          );
+        }
       }
     } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
@@ -101,7 +111,20 @@ class _RootPageState extends State<RootPage> {
         context.go('/');
       }
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+      final errorMsg = translatedMessage.isEmpty
+          ? (e.message ?? 'Erro desconhecido ao fazer logout')
+          : translatedMessage;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -145,6 +168,10 @@ class _RootPageState extends State<RootPage> {
   }
 
   void _showBottomMenu(BuildContext context) {
+    // Obtém o role do usuário logado
+    final userRole = context.read<UserProvider>().currentUser?.role;
+    final isManager = userRole == 'ROLE_MANAGER';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -212,14 +239,16 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  MenuButton(
-                    icon: Icons.campaign_outlined,
-                    label: 'Divulgar \n campanha',
-                    onTap: () {
-                      GoRouter.of(context).push("/publishCampaign");
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  // Mostrar botão de campanha apenas para gestores
+                  if (isManager)
+                    MenuButton(
+                      icon: Icons.campaign_outlined,
+                      label: 'Divulgar \n campanha',
+                      onTap: () {
+                        GoRouter.of(context).push("/publishCampaign");
+                        Navigator.of(context).pop();
+                      },
+                    ),
                 ],
               ),
               const SizedBox(height: 24),

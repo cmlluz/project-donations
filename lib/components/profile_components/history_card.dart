@@ -5,17 +5,15 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 
 class HistoryCard extends StatelessWidget {
   final String titulo;
-  final String local;
   final int? quantidade;
-  final String imagem;
+  final String? imagem;
   final VoidCallback? onTap;
 
   const HistoryCard({
     super.key,
     required this.titulo,
-    required this.local,
     required this.quantidade,
-    required this.imagem,
+    this.imagem,
     this.onTap,
   });
 
@@ -42,34 +40,47 @@ class HistoryCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
+    bool isNetwork = imagem != null && imagem!.startsWith('http');
+
     return Positioned.fill(
-      child: Image.asset(
-        imagem,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey[300],
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.broken_image,
-                  size: 50,
-                  color: Colors.grey,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Imagem não encontrada',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+      child: imagem != null && imagem!.isNotEmpty
+          ? (isNetwork
+              ? Image.network(
+                  imagem!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: ConstantsColors.greyShade200,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                    );
+                  },
+                )
+              : Image.asset(
+                  imagem!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: ConstantsColors.greyShade200,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: ConstantsColors.greyShade500,
+                      ),
+                    );
+                  },
+                ))
+          : Container(
+              color: ConstantsColors.greyShade200,
+              child: const Icon(
+                Icons.broken_image,
+                size: 40,
+                color: ConstantsColors.greyShade500,
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 
@@ -117,14 +128,14 @@ class HistoryCard extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.location_pin,
+                      Icons.numbers,
                       color: Colors.white,
                       size: 14,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        "Qtd: $quantidade | $local",
+                        "Qtd: $quantidade",
                         style: TextStylesConstants.kpoppinsRegular.merge(
                           const TextStyle(
                             fontSize: 11.0,

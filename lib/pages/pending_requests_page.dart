@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/notification_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +18,7 @@ class PendingRequestsPage extends StatefulWidget {
 
 class _PendingRequestsPageState extends State<PendingRequestsPage> {
   late final RequestApiService _requestApiService;
+  late final NotificationApiService _notificationApiService;
   final ApiClient _apiClient = ApiClient();
   late Future<List<Request>> _pendingRequestsFuture;
 
@@ -22,6 +26,7 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
   void initState() {
     super.initState();
     _requestApiService = RequestApiService(_apiClient);
+    _notificationApiService = NotificationApiService(_apiClient);
     _loadRequests();
   }
 
@@ -30,27 +35,90 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
     setState(() {});
   }
 
+  Future<void> _clearRelatedNewRequestNotifications(
+      {required int requestId}) async {
+    try {
+      final notifs = await _notificationApiService.getMyNotifications();
+
+      for (final n in notifs) {
+        if (n.dataPayload == null) continue;
+
+        try {
+          final data = jsonDecode(n.dataPayload!) as Map<String, dynamic>;
+          final type = data['type'];
+          if (type != 'NEW_REQUEST') continue;
+
+          final payloadRequestId = data['requestId'];
+          final int? parsedRequestId = payloadRequestId is int
+              ? payloadRequestId
+              : int.tryParse(payloadRequestId?.toString() ?? '');
+
+          if (parsedRequestId != requestId) continue;
+
+          final payloadNotificationId = data['notificationId'];
+          final int notificationIdToClear = payloadNotificationId is int
+              ? payloadNotificationId
+              : int.tryParse(payloadNotificationId?.toString() ?? '') ?? n.id;
+
+          await _notificationApiService.markAsRead(notificationIdToClear);
+
+          // Pra deletar: await _notificationApiService.deleteNotification(notificationIdToClear);
+        } catch (_) {
+          // ignora payload inválido
+        }
+      }
+    } catch (e) {
+      print('Falha ao limpar notificação relacionada: $e');
+    }
+  }
+
   Future<void> _handleRequest(Request request, bool approve) async {
     try {
       if (approve) {
-        await _requestApiService.approveRequest(request.id);
+        final approvedRequest =
+            await _requestApiService.approveRequest(request.id);
+
+        await _clearRelatedNewRequestNotifications(requestId: request.id);
+
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Solicitação Aprovada!"),
+              // testar
+              content: SelectableText(
+                  "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}\n\nEste código também está disponível na página da sua publicação no seu perfil."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+        }
       } else {
         await _requestApiService.rejectRequest(request.id);
-      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              approve ? 'Solicitação Aprovada!' : 'Solicitação Rejeitada.'),
-          backgroundColor: approve ? Colors.green : Colors.orange,
-        ),
-      );
+        await _clearRelatedNewRequestNotifications(requestId: request.id);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Solicitação Rejeitada.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao processar solicitação: $e'),
             backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
           ),
         );
       }

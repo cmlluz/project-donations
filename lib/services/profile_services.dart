@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class ProfileService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final String _baseUrl = 'http://192.168.0.21:8080/api';
+  final String _baseUrl = 'http://192.168.1.4:8080/api';
 
   User? get currentUser => _auth.currentUser;
 
@@ -79,5 +79,24 @@ class ProfileService {
   Future<void> updateAuthPassword(String newPassword) async {
     if (currentUser == null) throw Exception('Usuário não autenticado.');
     await currentUser!.updatePassword(newPassword);
+  }
+
+  Future<Map<String, dynamic>> getUserById(String uid) async {
+    if (currentUser == null) throw Exception('Usuário não autenticado.');
+    final token = await currentUser!.getIdToken();
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/users/$uid'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      throw Exception('Falha ao carregar dados do usuário $uid.');
+    }
   }
 }

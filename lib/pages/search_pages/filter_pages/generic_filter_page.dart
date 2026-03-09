@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
-import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
+import 'package:go_router/go_router.dart';
+import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -76,6 +77,8 @@ class GenericFilterPage extends StatelessWidget {
   }
 
   Widget _buildItemCard(BuildContext context, SearchItem item) {
+    final isNetwork = item.imageUrl.startsWith('http');
+
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () => _navigateToDetail(context, item),
@@ -95,8 +98,8 @@ class GenericFilterPage extends StatelessWidget {
                 child: AbsorbPointer(
                   child: ImageCard(
                     imageUrl: item.imageUrl,
-                    title: 'Doação',
-                    location: 'Salvador, Bahia',
+                    isNetworkImage: isNetwork, // Importante!
+                    title: _getCardTitle(item),
                     onTap: null,
                   ),
                 ),
@@ -148,7 +151,8 @@ class GenericFilterPage extends StatelessWidget {
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
-          date: item.date);
+          date: item.date,
+          imageUrl: item.imageUrl); // Passando a imagem
 
       Navigator.push(
         context,
@@ -165,13 +169,54 @@ class GenericFilterPage extends StatelessWidget {
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
-          date: item.date);
+          date: item.date,
+          imageUrl: item.imageUrl); // Passando a imagem
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => DonationDetailPage(donation: donation),
         ),
       );
+    } else if (item.category == SearchCategory.campanha) {
+      GoRouter.of(context).push('/campaignDetails/${item.id}');
+    } else if (item.category == SearchCategory.instituicao) {
+      if (item.firebaseUid != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => InstitutionProfilePage(
+              userId: item.firebaseUid!,
+              userName: item.title,
+              userEmail: item.description.contains('@') ? item.description : '',
+              userImageUrl: item.imageUrl,
+              isInitiallyFavorite: false,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Não foi possível carregar dados da instituição.')),
+        );
+      }
+    }
+  }
+
+  String _getCardTitle(SearchItem item) {
+    switch (item.category) {
+      case SearchCategory.campanha:
+        if (item.title.length > 15) {
+          return '${item.title.substring(0, 15)}...';
+        }
+        return item.title;
+      case SearchCategory.doacao:
+        return 'Doação';
+      case SearchCategory.necessidade:
+        return 'Necessidade';
+      case SearchCategory.instituicao:
+        return 'Instituição';
+      default:
+        return item.category.label;
     }
   }
 }

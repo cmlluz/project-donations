@@ -26,10 +26,13 @@ import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
 import 'package:appdonationsgestor/pages/campaign_pages/publish_campaign.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_edit_page.dart';
+import 'package:appdonationsgestor/pages/campaign_pages/campaign_details.dart';
 import 'package:appdonationsgestor/pages/nota_fiscal_page.dart';
 import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/pending_requests_page.dart';
+import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -63,8 +66,11 @@ class RouteNames {
   static const String notificationsPage = "notificationsPage";
   static const String linkManagerPage = "linkManagerPage";
   static const String publishCampaign = "publishCampaign";
+  static const String campaignEditPage = "campaignEditPage";
+  static const String campaignDetailsPage = "campaignDetailsPage";
   static const String pendingRequests = "pendingRequests";
   static const String allowPostPage = "allowPostPage";
+  static const String confirmDonationPage = "confirmDonationPage";
 }
 
 class AppRountersConfiguration {
@@ -96,6 +102,16 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: PendingRequestsPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/confirmDonationPage',
+          name: RouteNames.confirmDonationPage,
+          pageBuilder: (context, state) {
+            final int requestId = state.extra as int;
+            return MaterialPage(
+              child: ConfirmDonationPage(requestId: requestId),
             );
           },
         ),
@@ -272,17 +288,18 @@ class AppRountersConfiguration {
           name: RouteNames.postDetailPage,
           pageBuilder: (context, state) {
             final postData = state.extra as PostModel?;
+            
+            // Fallback atualizado para o novo PostModel
             final post = postData ??
                 PostModel(
-                  id: '0',
-                  title: 'Post não encontrado',
-                  description: 'Não foi possível carregar os dados do post.',
-                  imageUrl: 'assets/instituicao.png',
-                  location: 'Salvador, Bahia',
-                  institution: 'Sistema',
-                  institutionImageUrl: 'assets/instituicao.png',
+                  id: 0, // Agora é int
+                  caption: 'Não foi possível carregar os dados do post.', // Antiga description
+                  imageUrl: 'assets/donations.jpg',
+                  authorUid: '',
+                  authorName: 'Sistema', 
+                  authorPhoto: 'assets/profile_default.png', 
                   createdAt: DateTime.now(),
-                  category: 'outros',
+                  postStatus: 'DISPONIVEL',
                 );
 
             return MaterialPage(
@@ -323,6 +340,26 @@ class AppRountersConfiguration {
           pageBuilder: (context, state) {
             return const MaterialPage(
               child: PublishCampaignPage(),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/campaignEdit/:campaignId',
+          name: RouteNames.campaignEditPage,
+          pageBuilder: (context, state) {
+            final campaignId = state.pathParameters['campaignId']!;
+            return MaterialPage(
+              child: CampaignEditPage(campaignId: campaignId),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/campaignDetails/:campaignId',
+          name: RouteNames.campaignDetailsPage,
+          pageBuilder: (context, state) {
+            final campaignId = state.pathParameters['campaignId']!;
+            return MaterialPage(
+              child: CampaignDetailsPage(campaignId: campaignId),
             );
           },
         ),

@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:appdonationsgestor/components/custom_button.dart';
-import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
-import 'package:appdonationsgestor/controllers/post_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
+import 'package:appdonationsgestor/services/storage_service.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,17 +20,42 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   File? _selectedImg;
-  final PostController _controller = PostController();
-  String mensagem = '';
+  final TextEditingController _descController = TextEditingController();
+  bool _isLoading = false;
 
-  Future pickImageFromGallery(ImageSource source) async {
+  final PostApiService _postApiService = PostApiService(ApiClient());
+  final StorageService _storageService = StorageService();
+
+  Widget _buildRequiredLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: ConstantsColors.blueShade900,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const Text(
+          ' *',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future pickImage(ImageSource source) async {
     final selectedImage = await ImagePicker().pickImage(source: source);
-
-    setState(() {
-      if (selectedImage != null) {
+    if (selectedImage != null) {
+      setState(() {
         _selectedImg = File(selectedImage.path);
-      }
-    });
+      });
+    }
   }
 
   void _showImagePickerOptions() {
@@ -39,11 +64,11 @@ class _PostPageState extends State<PostPage> {
       builder: (context) {
         return ImagePickerOptionsSheet(
           onCameraTap: () {
-            pickImageFromGallery(ImageSource.camera);
+            pickImage(ImageSource.camera);
             Navigator.of(context).pop();
           },
           onGalleryTap: () {
-            pickImageFromGallery(ImageSource.gallery);
+            pickImage(ImageSource.gallery);
             Navigator.of(context).pop();
           },
         );
@@ -51,62 +76,83 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
-  /*Future<void> publicar() async {
-    String authorUid = authService.value.currentUser?.uid ?? '';
-    String token = await authService.value.currentUser?.getIdToken() ?? '';
-    String imageUrl = _controller.crtlPic.text;
-    String caption = _controller.crtlDesc.text;
-    bool favorited = false;
+  Future<void> _submitPost() async {
+    if (_selectedImg == null || _descController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Selecione uma imagem e escreva uma descrição.')),
+      );
+      return;
+    }
 
-    String resultado = await _controller.publicarPost(
-      authorUid: authorUid,
-      imageUrl: imageUrl,
-      caption: caption,
-      favorited: favorited,
-      token: token,
-    );
-    setState(() {
-      mensagem = resultado;
-    });
-  } */
+    setState(() => _isLoading = true);
+
+    try {
+      final imageUrl =
+          await _storageService.uploadImage(_selectedImg!, 'posts');
+
+      if (imageUrl == null) throw Exception("Falha no upload da imagem");
+
+      final post = await _postApiService.createPost({
+        'caption': _descController.text.trim(),
+        'imageUrl': imageUrl,
+        'favorited': false,
+      });
+
+      if (mounted) {
+        String feedbackText = post.postStatus == 'DISPONIVEL'
+            ? 'Publicação Criada!'
+            : 'Publicação enviada para análise';
+
+        GoRouter.of(context).push('/feedback?text1=$feedbackText');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao publicar: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ConstantsColors.blueShade900,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            GoRouter.of(context).go('/root');
-          },
+          onPressed: () => GoRouter.of(context).go('/root'),
         ),
         title: Text(
           'Criar Publicação',
           style: TextStylesConstants.kformularyTitle,
         ),
         backgroundColor: ConstantsColors.blueShade900,
-        foregroundColor: ConstantsColors.whiteShade700,
+        foregroundColor: ConstantsColors.whiteShade900,
         elevation: 0,
         centerTitle: true,
       ),
+      backgroundColor: ConstantsColors.blueShade900,
       body: Container(
-        width: double.infinity,
         decoration: const BoxDecoration(
           color: ConstantsColors.whiteShade700,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(35.0),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(30),
+        padding: const EdgeInsets.all(30.0),
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 30),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _buildRequiredLabel('Imagem do Post'),
+              ),
+              const SizedBox(height: 10),
               GestureDetector(
-                onTap: () {
-                  _showImagePickerOptions();
-                },
+                onTap: _showImagePickerOptions,
                 child: DottedBorder(
                   borderType: BorderType.RRect,
                   radius: const Radius.circular(25.0),
@@ -116,134 +162,84 @@ class _PostPageState extends State<PostPage> {
                   child: Container(
                     alignment: Alignment.center,
                     width: double.infinity,
-                    height: 250,
+                    height: 220,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(1, 91, 124, 0.05),
                       borderRadius: BorderRadius.circular(25.0),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _selectedImg != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(25.0),
-                                child: Image.file(
-                                  _selectedImg!,
-                                  width: 350,
-                                  height: 250,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  const Icon(
-                                    Icons.image_search_outlined,
-                                    size: 80,
-                                    color: ConstantsColors.blueShade900,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Envie a foto aqui',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: ConstantsColors.greyShade600
-                                          .withOpacity(0.8),
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Procurar',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: ConstantsColors.blueShade900,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ],
+                    child: _selectedImg != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Image.file(
+                              _selectedImg!,
+                              width: double.infinity,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_search_outlined,
+                                size: 80,
+                                color: ConstantsColors.blueShade900,
                               ),
-                      ],
-                    ),
+                              SizedBox(height: 10),
+                              Text('Envie a foto aqui'),
+                              Text(
+                                'Procurar',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: ConstantsColors.blueShade900,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "Descrição",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: ConstantsColors.greyShade600,
-                  ),
-                ),
+                child: _buildRequiredLabel('Descrição'),
               ),
               const SizedBox(height: 10),
-              const Material(
-                elevation: 2,
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                color: ConstantsColors.whiteShade700,
-                child: TextField(
-                  maxLines: 3,
-                  maxLength: 150,
-                  decoration: InputDecoration(
-                    counterText: '',
-                    labelStyle: TextStyle(color: ConstantsColors.whiteShade700),
-                    hintText: 'Escreva uma descrição para o post',
-                    hintStyle: TextStyle(
-                      color: ConstantsColors.greyShade600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        width: 1,
-                        color:
-                            ConstantsColors.blueShade900, // Cor da borda padrão
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        width: 1.5,
-                        // Cor da borda quando o usuário clica no campo
-                        color: ConstantsColors.blueShade900,
-                      ),
-                    ),
+              TextField(
+                controller: _descController,
+                maxLines: 3,
+                maxLength: 150,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomButton(
-                    height: 40,
-                    width: 220,
-                    text: 'Publicar',
-                    color: ConstantsColors.blueShade900,
-                    textColor: ConstantsColors.whiteShade700,
-                    onPressed: () {
-                      // publicar();
-                      // if (mensagem.isNotEmpty) {
-                      GoRouter.of(context).push('/feedback?text1=Publicação');
-                      // }
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        'Cancelar',
-                        style: const TextStyle(
-                          color: ConstantsColors.greyShade600,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ).merge(TextStylesConstants.kpoppinsSemiBold),
-                      ),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
+                      children: [
+                        CustomButton(
+                          height: 40,
+                          width: 220,
+                          text: 'Publicar',
+                          color: ConstantsColors.blueShade900,
+                          textColor: ConstantsColors.whiteShade700,
+                          onPressed: _submitPost,
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Cancelar',
+                            style: TextStylesConstants.kpoppinsSemiBold
+                                .copyWith(color: Colors.grey),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
