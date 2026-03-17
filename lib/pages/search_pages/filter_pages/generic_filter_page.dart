@@ -7,6 +7,8 @@ import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -22,7 +24,9 @@ class GenericFilterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredItems = _getFilteredItems();
+    final currentUserUid = Provider.of<UserProvider>(context, listen: false).currentUser?.firebaseUid;
+    
+    final filteredItems = _getFilteredItems(currentUserUid);
 
     if (filteredItems.isEmpty) {
       return const Center(
@@ -56,8 +60,16 @@ class GenericFilterPage extends StatelessWidget {
     );
   }
 
-  List<SearchItem> _getFilteredItems() {
+  List<SearchItem> _getFilteredItems(String? currentUserUid) {
     var filtered = items;
+
+    if (currentUserUid != null) {
+      filtered = filtered.where((item) {
+        if (item.category == SearchCategory.instituicao) return true;
+        
+        return item.authorUid != currentUserUid;
+      }).toList();
+    }
 
     if (category != SearchCategory.todos) {
       filtered = filtered.where((item) => item.category == category).toList();
@@ -98,7 +110,7 @@ class GenericFilterPage extends StatelessWidget {
                 child: AbsorbPointer(
                   child: ImageCard(
                     imageUrl: item.imageUrl,
-                    isNetworkImage: isNetwork, // Importante!
+                    isNetworkImage: isNetwork,
                     title: _getCardTitle(item),
                     onTap: null,
                   ),
@@ -148,11 +160,12 @@ class GenericFilterPage extends StatelessWidget {
           title: item.title,
           description: item.description,
           authorName: item.institution,
+          authorUid: item.authorUid,
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
           date: item.date,
-          imageUrl: item.imageUrl); // Passando a imagem
+          imageUrl: item.imageUrl); 
 
       Navigator.push(
         context,
@@ -166,11 +179,13 @@ class GenericFilterPage extends StatelessWidget {
           title: item.title,
           description: item.description,
           donatorName: item.institution,
+          donatorUid: item.authorUid,
           category: item.category.toString(),
           quantity: item.quantity,
           postStatus: item.postStatus,
           date: item.date,
-          imageUrl: item.imageUrl); // Passando a imagem
+          imageUrl: item.imageUrl); 
+          
       Navigator.push(
         context,
         MaterialPageRoute(

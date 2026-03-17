@@ -7,7 +7,8 @@ class Need {
   final int quantity;
   final String postStatus;
   final String authorName;
-  final String? imageUrl; // Novo campo
+  final String? authorUid;
+  final String? imageUrl;
   bool isFavorite;
 
   Need({
@@ -19,6 +20,7 @@ class Need {
     required this.quantity,
     required this.postStatus,
     required this.authorName,
+    this.authorUid,
     this.imageUrl, 
     this.isFavorite = false,
   });
@@ -33,6 +35,7 @@ class Need {
       quantity: json['quantity'] ?? 0,
       postStatus: json['postStatus'] ?? 'PENDENTE_APROVACAO',
       authorName: json['authorName'] ?? 'Autor anônimo',
+      authorUid: json['authorUid'],
       imageUrl: json['imageUrl'],
     );
   }

@@ -106,12 +106,12 @@ class AppSearchController with ChangeNotifier {
             id: n.id,
             title: n.title,
             description: n.description,
-            // CORREÇÃO: Usa a imagem da API ou fallback
             imageUrl: (n.imageUrl != null && n.imageUrl!.isNotEmpty)
                 ? n.imageUrl!
                 : 'assets/donations.png',
             category: SearchCategory.necessidade,
             institution: n.authorName,
+            authorUid: n.authorUid,
             date: n.date ?? DateTime.now(),
             postStatus: n.postStatus,
             quantity: n.quantity,
@@ -120,12 +120,12 @@ class AppSearchController with ChangeNotifier {
             id: d.id,
             title: d.title,
             description: d.description,
-            // CORREÇÃO: Usa a imagem da API ou fallback
             imageUrl: (d.imageUrl != null && d.imageUrl!.isNotEmpty)
                 ? d.imageUrl!
                 : 'assets/donations.png',
             category: SearchCategory.doacao,
             institution: d.donatorName,
+            authorUid: d.donatorUid,
             date: d.date ?? DateTime.now(),
             postStatus: d.postStatus,
             quantity: d.quantity,
@@ -155,6 +155,7 @@ class AppSearchController with ChangeNotifier {
                 postStatus: 'ATIVO',
                 quantity: 0,
                 firebaseUid: u.firebaseUid,
+                authorUid: u.firebaseUid,
               )),
     ];
   }
