@@ -5,6 +5,8 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/controllers/search_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/pages/search_pages/filter_pages/generic_filter_page.dart';
 import 'package:go_router/go_router.dart';
@@ -28,22 +30,46 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     _searchControllerProvider = AppSearchController();
     _searchControllerProvider.loadItems();
 
-    // Conecta com o CampaignController para receber atualizações
+    // Conecta com os Controllers para receber atualizações em tempo real
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final campaignController =
           Provider.of<CampaignController>(context, listen: false);
-      _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+      final donationController =
+          Provider.of<DonationController>(context, listen: false);
+      final needController =
+          Provider.of<NeedController>(context, listen: false);
 
-      // Adiciona listener para atualizar quando campanhas mudarem
+      // Atualiza com dados iniciais
+      _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+      _searchControllerProvider.updateDonations(donationController.donations);
+      _searchControllerProvider.updateNeeds(needController.needs);
+
+      // Listeners para atualizações em tempo real
       campaignController.addListener(() {
-        _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+        if (mounted) {
+          _searchControllerProvider
+              .updateCampaigns(campaignController.campaigns);
+        }
+      });
+
+      donationController.addListener(() {
+        if (mounted) {
+          _searchControllerProvider
+              .updateDonations(donationController.donations);
+        }
+      });
+
+      needController.addListener(() {
+        if (mounted) {
+          _searchControllerProvider.updateNeeds(needController.needs);
+        }
       });
     });
   }
 
   @override
   void dispose() {
-    // Remove listener do CampaignController se ainda estiver montado
+    // Remove listeners se ainda estiver montado
     if (mounted) {
       try {
         final campaignController =
@@ -51,6 +77,27 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
         campaignController.removeListener(() {
           _searchControllerProvider
               .updateCampaigns(campaignController.campaigns);
+        });
+      } catch (e) {
+        // Ignora erro se o Provider não estiver mais disponível
+      }
+
+      try {
+        final donationController =
+            Provider.of<DonationController>(context, listen: false);
+        donationController.removeListener(() {
+          _searchControllerProvider
+              .updateDonations(donationController.donations);
+        });
+      } catch (e) {
+        // Ignora erro se o Provider não estiver mais disponível
+      }
+
+      try {
+        final needController =
+            Provider.of<NeedController>(context, listen: false);
+        needController.removeListener(() {
+          _searchControllerProvider.updateNeeds(needController.needs);
         });
       } catch (e) {
         // Ignora erro se o Provider não estiver mais disponível
