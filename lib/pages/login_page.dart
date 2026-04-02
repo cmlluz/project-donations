@@ -39,7 +39,6 @@ class _LoginPage extends State<LoginPage> {
       showSlowMessage = false;
     });
 
-    // Timer para mostrar mensagem se demorar mais de 5 segundos
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted && isLoading) {
         setState(() {
@@ -69,10 +68,56 @@ class _LoginPage extends State<LoginPage> {
         errorMessage = FirebaseErrorTranslator.translateException(e);
       });
     } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          showSlowMessage = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      final result = await firebaseAuth.loginWithGoogle(context);
+
+      if (mounted && result != null) {
+        final bool isNewUser = result['isNewUser'] as bool;
+
+        if (isNewUser) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Bem-vindo! Conta criada automaticamente com o Google.'),
+              backgroundColor: ConstantsColors.blueShade900,
+            ),
+          );
+        }
+
+        GoRouter.of(context).push('/root');
+      }
+    } on FirebaseAuthException catch (e) {
       setState(() {
-        isLoading = false;
-        showSlowMessage = false;
+        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+        errorMessage =
+            'Erro ao entrar com Google: ${translatedMessage.isEmpty ? (e.message ?? 'Erro desconhecido') : translatedMessage}';
       });
+    } catch (e) {
+      setState(() {
+        errorMessage =
+            'Erro ao entrar com Google: ${FirebaseErrorTranslator.translateException(e)}';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -230,51 +275,13 @@ class _LoginPage extends State<LoginPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: GoogleAuthButton(
-                            onPressed: () async {
-                              try {
-                                await firebaseAuth.loginWithGoogle(context);
-                                if (mounted) {
-                                  GoRouter.of(context).push('/root');
-                                }
-                              } on FirebaseAuthException catch (e) {
-                                setState(() {
-                                  final translatedMessage =
-                                      FirebaseErrorTranslator.translate(e.code);
-                                  errorMessage =
-                                      'Erro ao entrar com Google: ${translatedMessage.isEmpty ? (e.message ?? 'Erro desconhecido') : translatedMessage}';
-                                });
-                              } catch (e) {
-                                setState(() {
-                                  errorMessage =
-                                      'Erro ao entrar com Google: ${FirebaseErrorTranslator.translateException(e)}';
-                                });
-                              }
-                            },
+                            // --- USA A NOVA FUNÇÃO ---
+                            onPressed: isLoading ? null : _handleGoogleSignIn,
                             style: const AuthButtonStyle(
                               buttonType: AuthButtonType.icon,
                             ),
                           ),
                         ),
-                        /*Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: FacebookAuthButton(
-                            onPressed: () async {
-                              try {
-                                await firebaseAuth.loginWithFacebook(context);
-                                if (mounted) {
-                                  GoRouter.of(context).push('/root');
-                                }
-                              } catch (e) {
-                                setState(() {
-                                  errorMessage = 'Erro ao entrar com Facebook: ${FirebaseErrorTranslator.translateException(e)}';
-                                });
-                              }
-                            },
-                            style: const AuthButtonStyle(
-                              buttonType: AuthButtonType.icon,
-                            ),
-                          ),
-                        ),*/
                       ],
                     ),
                     TextButton(

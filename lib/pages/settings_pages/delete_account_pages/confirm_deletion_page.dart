@@ -28,7 +28,7 @@ class _ConfirmDeletionPageState extends State<ConfirmDeletionPage> {
       await _authApiService.deleteUser();
 
       if (mounted) {
-        GoRouter.of(context).go('/login');
+        context.go('/');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Conta excluída com sucesso.')),
         );

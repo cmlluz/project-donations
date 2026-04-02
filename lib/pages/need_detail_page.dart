@@ -9,6 +9,7 @@ import 'package:appdonationsgestor/services/api_services/favorites_api_service.d
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/services.dart';
 
 class NeedDetailPage extends StatefulWidget {
@@ -35,6 +36,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   bool _isLoadingRequest = false;
   bool _hasRequestedItem = false;
   bool _isCheckingExistingRequest = true;
+  late bool _actualOwnerView;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -46,11 +48,16 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isNeedFavorite(widget.need.id);
 
-    if (widget.isOwnerView) {
+    final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+        .currentUser
+        ?.firebaseUid;
+    _actualOwnerView = widget.isOwnerView ||
+        (currentUserUid != null && widget.need.authorUid == currentUserUid);
+
+    if (_actualOwnerView) {
       _requestsFuture =
           _requestApiService.getRequestsForItem(needId: widget.need.id);
     } else {
-      // Verificar se já existe solicitação PENDENTE ou APROVADO
       _checkExistingRequest();
     }
   }
@@ -59,12 +66,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     try {
       final sentRequests = await _requestApiService.getMySentRequests();
 
-      // Verificar se já existe solicitação para esta necessidade com status PENDENTE ou APROVADO
       final existingRequest = sentRequests.firstWhere(
         (request) =>
             request.need?.id == widget.need.id &&
             (request.status == 'PENDENTE' || request.status == 'APROVADO'),
-        orElse: () => sentRequests.first, // dummy, vamos verificar se encontrou
+        orElse: () => sentRequests.first,
       );
 
       if (mounted && existingRequest.need?.id == widget.need.id) {
@@ -80,7 +86,6 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
         }
       }
     } catch (e) {
-      print('Erro ao verificar solicitações existentes: $e');
       if (mounted) {
         setState(() {
           _isCheckingExistingRequest = false;
@@ -236,7 +241,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                 ),
-                if (!widget.isOwnerView)
+                if (!_actualOwnerView)
                   Positioned(
                     top: 50,
                     right: 16,
@@ -301,7 +306,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (widget.isOwnerView)
+                  if (_actualOwnerView)
                     _buildOwnerView()
                   else
                     SizedBox(
