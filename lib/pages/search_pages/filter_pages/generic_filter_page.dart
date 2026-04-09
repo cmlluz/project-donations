@@ -25,8 +25,10 @@ class GenericFilterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUserUid = Provider.of<UserProvider>(context, listen: false).currentUser?.firebaseUid;
-    
+    final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+        .currentUser
+        ?.firebaseUid;
+
     final filteredItems = _getFilteredItems(currentUserUid);
 
     if (filteredItems.isEmpty) {
@@ -67,7 +69,7 @@ class GenericFilterPage extends StatelessWidget {
     if (currentUserUid != null) {
       filtered = filtered.where((item) {
         if (item.category == SearchCategory.instituicao) return true;
-        
+
         return item.authorUid != currentUserUid;
       }).toList();
     }
@@ -157,16 +159,17 @@ class GenericFilterPage extends StatelessWidget {
   void _navigateToDetail(BuildContext context, SearchItem item) {
     if (item.category == SearchCategory.necessidade) {
       final need = Need(
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          authorName: item.institution,
-          authorUid: item.authorUid,
-          category: item.category.toString(),
-          quantity: item.quantity,
-          postStatus: item.postStatus,
-          date: item.date,
-          imageUrl: item.imageUrl); 
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        authorName: item.institution,
+        authorUid: item.authorUid,
+        category: item.category.toString(),
+        quantity: item.quantity,
+        postStatus: item.postStatus,
+        date: item.date,
+        imageUrl: item.imageUrl,
+      );
 
       Navigator.push(
         context,
@@ -176,18 +179,18 @@ class GenericFilterPage extends StatelessWidget {
       );
     } else if (item.category == SearchCategory.doacao) {
       final donation = Donation(
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          donatorName: item.institution,
-          donatorUid: item.authorUid,
-          category: item.category.toString(),
-          quantity: item.quantity,
-          postStatus: item.postStatus,
-          date: item.date,
-          imageUrl: item.imageUrl
-          ); 
-          
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        donatorName: item.institution,
+        donatorUid: item.authorUid,
+        category: item.category.toString(),
+        quantity: item.quantity,
+        postStatus: item.postStatus,
+        date: item.date,
+        imageUrl: item.imageUrl,
+      );
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -202,7 +205,7 @@ class GenericFilterPage extends StatelessWidget {
             Provider.of<UserProvider>(context, listen: false).currentUser;
         if (currentUser != null &&
             currentUser.firebaseUid == item.firebaseUid) {
-          GoRouter.of(context).goNamed('managerProfilePage');
+          GoRouter.of(context).pushNamed('managerProfilePage');
         } else {
           Navigator.push(
             context,
