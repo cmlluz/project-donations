@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -121,6 +123,8 @@ class _AppInitializationState extends State<AppInitialization> {
             ChangeNotifierProvider(create: (context) => FavoriteController()),
             ChangeNotifierProvider(create: (context) => UserProvider()),
             ChangeNotifierProvider(create: (context) => CampaignController()),
+            ChangeNotifierProvider(create: (context) => DonationController()),
+            ChangeNotifierProvider(create: (context) => NeedController()),
           ],
           child: const MyApp(),
         );

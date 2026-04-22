@@ -44,6 +44,16 @@ class AppSearchController with ChangeNotifier {
     _refreshItems();
   }
 
+  void updateDonations(List<Donation> donations) {
+    // Atualiza a lista interna e reconstrói os itens
+    _refreshItems();
+  }
+
+  void updateNeeds(List<Need> needs) {
+    // Atualiza a lista interna e reconstrói os itens
+    _refreshItems();
+  }
+
   void _refreshItems() async {
     if (_isLoading) return;
 

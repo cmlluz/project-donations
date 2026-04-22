@@ -3,15 +3,15 @@ import 'package:appdonationsgestor/components/donation_item_component.dart';
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
 import 'package:appdonationsgestor/controllers/post_type_controller.dart';
 import 'package:appdonationsgestor/controllers/product_registration_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
-import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
-import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:appdonationsgestor/services/storage_service.dart';
+import 'package:provider/provider.dart';
 
 class ItemPostPage extends StatefulWidget {
   const ItemPostPage({super.key});
@@ -25,9 +25,6 @@ class _ItemPostPageState extends State<ItemPostPage> {
       ProductRegistrationController();
   final PostTypeController _controller1 = PostTypeController();
 
-  final ApiClient _apiClient = ApiClient();
-  late final NeedApiService _needsApiService;
-  late final DonationApiService _donationApiService;
   final StorageService _storageService = StorageService();
 
   File? _selectedImg;
@@ -36,8 +33,6 @@ class _ItemPostPageState extends State<ItemPostPage> {
   @override
   void initState() {
     super.initState();
-    _needsApiService = NeedApiService(_apiClient);
-    _donationApiService = DonationApiService(_apiClient);
   }
 
   Future pickImage(ImageSource source) async {
@@ -107,24 +102,19 @@ class _ItemPostPageState extends State<ItemPostPage> {
       final quantity = int.tryParse(_controller.crtlQtd.text) ?? 0;
       final postType = _controller1.selectedValueCategory.value!;
 
+      final itemData = {
+        'title': itemName,
+        'description': description,
+        'quantity': quantity,
+        'category': category.toUpperCase(),
+        'date': DateTime.now().toIso8601String().split('T').first,
+        'imageUrl': imageUrl,
+      };
+
       if (postType == 'Necessidade') {
-        await _needsApiService.createNeed({
-          'title': itemName,
-          'description': description,
-          'quantity': quantity,
-          'category': category.toUpperCase(),
-          'date': DateTime.now().toIso8601String().split('T').first,
-          'imageUrl': imageUrl,
-        });
+        await context.read<NeedController>().createNeed(itemData);
       } else if (postType == 'Doação') {
-        await _donationApiService.createDonation({
-          'title': itemName,
-          'description': description,
-          'quantity': quantity,
-          'category': category.toUpperCase(),
-          'date': DateTime.now().toIso8601String().split('T').first,
-          'imageUrl': imageUrl,
-        });
+        await context.read<DonationController>().createDonation(itemData);
       }
 
       if (mounted)

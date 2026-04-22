@@ -60,6 +60,8 @@ class _EditProfileViewState extends State<_EditProfileView> {
           profilePictureUrl: newImageUrl,
         );
 
+        await userProvider.fetchCurrentUser();
+
         _showSuccessMessage('Perfil atualizado com sucesso!');
         GoRouter.of(context).go('/root');
       }
