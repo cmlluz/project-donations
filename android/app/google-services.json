@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "933781600794-7u11sva2e0kp2hc129ob5qtssur2uj3k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.appdonationsgestor",
-            "certificate_hash": "5280b74f2d3def3a0edc45dc36a0a8cf6c957b98"
-          }
-        },
-        {
           "client_id": "933781600794-8lmvr2dkot1aqbas01nm89cibod4g78j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -43,6 +35,14 @@
           "android_info": {
             "package_name": "com.example.appdonationsgestor",
             "certificate_hash": "6f7c05d149f3e0714044321b17c00928e4940aa7"
+          }
+        },
+        {
+          "client_id": "933781600794-kcvoc1etbvi7q36gpuinph9lbgh7sedk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "f18b684208fb6a21eb0b1199870481ca9523b499"
           }
         },
         {
