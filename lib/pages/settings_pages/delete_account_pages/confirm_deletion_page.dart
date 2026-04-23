@@ -6,7 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ConfirmDeletionPage extends StatefulWidget {
-  const ConfirmDeletionPage({super.key});
+  final String password;
+
+  const ConfirmDeletionPage({
+    super.key,
+    required this.password,
+  });
 
   @override
   State<ConfirmDeletionPage> createState() => _ConfirmDeletionPageState();
@@ -25,10 +30,10 @@ class _ConfirmDeletionPageState extends State<ConfirmDeletionPage> {
   Future<void> _handleDeleteAccount() async {
     setState(() => _isLoading = true);
     try {
-      await _authApiService.deleteUser();
+      await _authApiService.deleteUser(widget.password);
 
       if (mounted) {
-        context.go('/');
+        context.go('/deleteFeedback');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Conta excluída com sucesso.')),
         );

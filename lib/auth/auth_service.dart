@@ -63,7 +63,7 @@ class AuthService {
         await _onLoginSuccess(context);
       } catch (e) {
         print("Iniciando Rollback devido à falha na atualização de dados: $e");
-        _authApiService.deleteUser().catchError((dbDeleteError) {
+        _authApiService.deleteUser(password).catchError((dbDeleteError) {
           print(
               "Erro (ignorável) ao tentar deletar o usuário do DB: $dbDeleteError");
         });
@@ -121,7 +121,7 @@ class AuthService {
     AuthCredential credential =
         EmailAuthProvider.credential(email: email, password: password);
     await currentUser!.reauthenticateWithCredential(credential);
-    await _authApiService.deleteUser();
+    await _authApiService.deleteUser(password);
     await currentUser!.delete();
     await firebaseAuth.signOut();
   }

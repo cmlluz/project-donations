@@ -256,11 +256,12 @@ class AppRountersConfiguration {
           ),
         ),
         GoRoute(
-          path: '/confirmDeletionPage',
           name: RouteNames.confirmDeletionPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: ConfirmDeletionPage(),
-          ),
+          path: '/confirmDeletion',
+          builder: (context, state) {
+            final pass = state.extra as String;
+            return ConfirmDeletionPage(password: pass);
+          },
         ),
         GoRoute(
           path: '/deleteFeedbackPage',
@@ -288,16 +289,17 @@ class AppRountersConfiguration {
           name: RouteNames.postDetailPage,
           pageBuilder: (context, state) {
             final postData = state.extra as PostModel?;
-            
+
             // Fallback atualizado para o novo PostModel
             final post = postData ??
                 PostModel(
                   id: 0, // Agora é int
-                  caption: 'Não foi possível carregar os dados do post.', // Antiga description
+                  caption:
+                      'Não foi possível carregar os dados do post.', // Antiga description
                   imageUrl: 'assets/donations.jpg',
                   authorUid: '',
-                  authorName: 'Sistema', 
-                  authorPhoto: 'assets/profile_default.png', 
+                  authorName: 'Sistema',
+                  authorPhoto: 'assets/profile_default.png',
                   createdAt: DateTime.now(),
                   postStatus: 'DISPONIVEL',
                 );
