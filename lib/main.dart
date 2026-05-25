@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,26 +17,26 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> _firebaseMessagingBackgroundHandler(
+  RemoteMessage message,                                           
+) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   print("Handling a background message: ${message.messageId}");
 }
 
 void main() {
-  // Garante que a ligação com o nativo exista, mas NÃO espera o Firebase aqui
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp],
   );
 
-  // Executa o app IMEDIATAMENTE com uma tela de carregamento
   runApp(const AppInitialization());
 }
 
-/// Widget responsável por inicializar dependências antes de carregar o app real
 class AppInitialization extends StatefulWidget {
   const AppInitialization({super.key});
 
@@ -44,7 +45,6 @@ class AppInitialization extends StatefulWidget {
 }
 
 class _AppInitializationState extends State<AppInitialization> {
-  // Future que guarda o estado da inicialização
   late Future<void> _initializationFuture;
 
   @override
@@ -53,22 +53,25 @@ class _AppInitializationState extends State<AppInitialization> {
     _initializationFuture = _initApp();
   }
 
-  /// Coloque aqui tudo que estava "travando" o main()
   Future<void> _initApp() async {
-    // 1. Configuração de Data
+    // Configuração de data
     await initializeDateFormatting('pt_BR', null);
     Intl.defaultLocale = 'pt_BR';
 
-    // 2. Inicialização do Firebase (A parte pesada)
+    // Inicialização Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // 3. Configuração de Listeners
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Firebase App Check
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+    );
 
-    // (Opcional) Pequeno delay artificial se quiser ver o loading
-    // await Future.delayed(const Duration(seconds: 1));
+    // Firebase Messaging
+    FirebaseMessaging.onBackgroundMessage(
+      _firebaseMessagingBackgroundHandler,
+    );
   }
 
   @override
@@ -76,18 +79,16 @@ class _AppInitializationState extends State<AppInitialization> {
     return FutureBuilder(
       future: _initializationFuture,
       builder: (context, snapshot) {
-        // Enquanto carrega, mostra tela de loading
+        // Loading
         if (snapshot.connectionState != ConnectionState.done) {
           return const MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
-              backgroundColor: ConstantsColors.whiteShade700, // Cor do seu tema
+              backgroundColor: ConstantsColors.whiteShade700,
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Pode colocar sua Logo aqui
-                    // Image.asset('assets/LogoName.png', width: 150),
                     SizedBox(height: 20),
                     CircularProgressIndicator(
                       color: ConstantsColors.blueShade900,
@@ -99,9 +100,10 @@ class _AppInitializationState extends State<AppInitialization> {
           );
         }
 
-        // Se der erro na inicialização
+        // Erro
         if (snapshot.hasError) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
               body: Center(
                 child: Padding(
@@ -117,14 +119,18 @@ class _AppInitializationState extends State<AppInitialization> {
           );
         }
 
-        // Sucesso: Carrega os Providers e o App Principal
+        // App principal
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => FavoriteController()),
-            ChangeNotifierProvider(create: (context) => UserProvider()),
-            ChangeNotifierProvider(create: (context) => CampaignController()),
-            ChangeNotifierProvider(create: (context) => DonationController()),
-            ChangeNotifierProvider(create: (context) => NeedController()),
+            ChangeNotifierProvider(
+              create: (context) => FavoriteController(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => UserProvider(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => CampaignController(),
+            ),
           ],
           child: const MyApp(),
         );
@@ -143,8 +149,9 @@ class MyApp extends StatelessWidget {
       title: 'Donations Gestor',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: ConstantsColors.blueShade900),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: ConstantsColors.blueShade900,
+        ),
         useMaterial3: true,
       ),
     );

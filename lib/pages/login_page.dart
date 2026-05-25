@@ -3,10 +3,12 @@ import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,21 +19,28 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPage extends State<LoginPage> {
   final AuthService firebaseAuth = AuthService();
+
   final TextEditingController emailController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   String errorMessage = '';
+
   bool isLoading = false;
+
   bool showSlowMessage = false;
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+
     super.dispose();
   }
 
+  // LOGIN EMAIL/SENHA
   Future<void> signIn() async {
     setState(() {
       isLoading = true;
@@ -39,31 +48,69 @@ class _LoginPage extends State<LoginPage> {
       showSlowMessage = false;
     });
 
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted && isLoading) {
-        setState(() {
-          showSlowMessage = true;
-        });
-      }
-    });
+    // MENSAGEM DE DEMORA
+    Future.delayed(
+      const Duration(seconds: 5),
+      () {
+        if (mounted && isLoading) {
+          setState(() {
+            showSlowMessage = true;
+          });
+        }
+      },
+    );
 
     try {
       await firebaseAuth.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-        context: context,
       );
+
+// CARREGA DADOS DO USUÁRIO
+      await context.read<UserProvider>().fetchCurrentUser();
+
       if (mounted) {
-        GoRouter.of(context).push('/root');
+        GoRouter.of(context).go('/root');
       }
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          message = 'Senha incorreta.';
+          break;
+
+        case 'user-not-found':
+          message = 'Usuário não encontrado.';
+          break;
+
+        case 'invalid-email':
+          message = 'Email inválido.';
+          break;
+
+        case 'too-many-requests':
+          message = 'Muitas tentativas. Tente novamente mais tarde.';
+          break;
+
+        default:
+          message = FirebaseErrorTranslator.translate(
+            e.code,
+          );
+
+          if (message.isEmpty) {
+            message = e.message ?? 'Erro ao fazer login.';
+          }
+      }
+
       setState(() {
-        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
-        errorMessage = translatedMessage.isEmpty
-            ? (e.message ?? 'Erro desconhecido ao fazer login')
-            : translatedMessage;
+        errorMessage = message;
       });
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         errorMessage = FirebaseErrorTranslator.translateException(e);
       });
@@ -99,7 +146,11 @@ class _LoginPage extends State<LoginPage> {
           );
         }
 
-        GoRouter.of(context).push('/root');
+        await context.read<UserProvider>().fetchCurrentUser();
+
+        if (mounted) {
+          GoRouter.of(context).push('/root');
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -137,13 +188,22 @@ class _LoginPage extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 40),
+                    const SizedBox(
+                      height: 40,
+                    ),
+
+                    // LOGO
                     Image.asset(
                       'assets/LogoName.png',
                       width: 180,
                       height: 180,
                     ),
-                    const SizedBox(height: 40),
+
+                    const SizedBox(
+                      height: 40,
+                    ),
+
+                    // EMAIL
                     CustomTextFields(
                       icon: Icons.email,
                       label: 'Email',
@@ -152,7 +212,12 @@ class _LoginPage extends State<LoginPage> {
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    const SizedBox(height: 10),
+
+                    const SizedBox(
+                      height: 10,
+                    ),
+
+                    // SENHA
                     CustomTextFields(
                       icon: Icons.lock,
                       label: 'Senha',
@@ -161,16 +226,30 @@ class _LoginPage extends State<LoginPage> {
                       controller: passwordController,
                       keyboardType: TextInputType.visiblePassword,
                     ),
+
+                    // ERRO
                     if (errorMessage.isNotEmpty)
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 10,
+                        ),
+                        child: Text(
+                          errorMessage,
+                          style: const TextStyle(
+                            color: Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
+
+                    // ESQUECI SENHA
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          GoRouter.of(context).push('/forgotPasswordPage');
+                          GoRouter.of(context).push(
+                            '/forgotPasswordPage',
+                          );
                         },
                         child: Text(
                           'Esqueci minha senha',
@@ -182,14 +261,21 @@ class _LoginPage extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+
+                    const SizedBox(
+                      height: 10,
+                    ),
+
+                    // BOTÃO LOGIN
                     SizedBox(
                       width: 250,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ConstantsColors.blueShade900,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(
+                              15,
+                            ),
                           ),
                         ),
                         onPressed: isLoading ? null : signIn,
@@ -211,9 +297,13 @@ class _LoginPage extends State<LoginPage> {
                               ),
                       ),
                     ),
+
+                    // MENSAGEM DEMORA
                     if (showSlowMessage)
                       Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
+                        padding: const EdgeInsets.only(
+                          top: 12.0,
+                        ),
                         child: Text(
                           'Isso está demorando mais do que o esperado...',
                           style: TextStyle(
@@ -224,7 +314,12 @@ class _LoginPage extends State<LoginPage> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                    const SizedBox(height: 20),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    // DIVISOR
                     Row(
                       children: [
                         Expanded(
@@ -233,7 +328,9 @@ class _LoginPage extends State<LoginPage> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  ConstantsColors.blueShade900.withOpacity(0.0),
+                                  ConstantsColors.blueShade900.withOpacity(
+                                    0.0,
+                                  ),
                                   ConstantsColors.blueShade900,
                                 ],
                                 begin: Alignment.centerLeft,
@@ -243,13 +340,17 @@ class _LoginPage extends State<LoginPage> {
                           ),
                         ),
                         const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('ou entrar com',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                                color: ConstantsColors.blackShade700,
-                              )),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
+                          child: Text(
+                            'ou entrar com',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color: ConstantsColors.blackShade700,
+                            ),
+                          ),
                         ),
                         Expanded(
                           child: Container(
@@ -258,7 +359,9 @@ class _LoginPage extends State<LoginPage> {
                               gradient: LinearGradient(
                                 colors: [
                                   ConstantsColors.blueShade900,
-                                  ConstantsColors.blueShade900.withOpacity(0.0),
+                                  ConstantsColors.blueShade900.withOpacity(
+                                    0.0,
+                                  ),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -268,12 +371,19 @@ class _LoginPage extends State<LoginPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    // GOOGLE LOGIN
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
                           child: GoogleAuthButton(
                             // --- USA A NOVA FUNÇÃO ---
                             onPressed: isLoading ? null : _handleGoogleSignIn,
@@ -284,9 +394,17 @@ class _LoginPage extends State<LoginPage> {
                         ),
                       ],
                     ),
+
+                    const SizedBox(
+                      height: 10,
+                    ),
+
+                    // CADASTRO
                     TextButton(
                       onPressed: () {
-                        GoRouter.of(context).push('/userTypePage');
+                        GoRouter.of(context).push(
+                          '/userTypePage',
+                        );
                       },
                       child: const Text(
                         'Não tem conta? Crie uma!',

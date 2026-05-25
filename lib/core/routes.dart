@@ -256,11 +256,17 @@ class AppRountersConfiguration {
           ),
         ),
         GoRoute(
+          path: '/confirmDeletionPage',
           name: RouteNames.confirmDeletionPage,
-          path: '/confirmDeletion',
-          builder: (context, state) {
-            final pass = state.extra as String;
-            return ConfirmDeletionPage(password: pass);
+          pageBuilder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+
+            return MaterialPage(
+              child: ConfirmDeletionPage(
+                email: data['email'],
+                password: data['password'],
+              ),
+            );
           },
         ),
         GoRoute(
