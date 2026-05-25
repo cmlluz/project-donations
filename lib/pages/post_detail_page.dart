@@ -55,19 +55,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  String _traduzirPostStatus(String status) {
-    switch (status) {
-      case 'DISPONIVEL':
-        return 'Publicado';
-      case 'PENDENTE_APROVACAO':
-        return 'Em Análise';
-      case 'REJEITADO':
-        return 'Rejeitado';
-      default:
-        return status;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final post = widget.post;
@@ -203,8 +190,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               fontSize: 18, color: ConstantsColors.blueShade900)
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
-                    subtitle:
-                        Text('Status: ${_traduzirPostStatus(post.postStatus)}'),
                   ),
                   const SizedBox(height: 16),
                   Text(
