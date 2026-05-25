@@ -60,9 +60,8 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
               ? payloadNotificationId
               : int.tryParse(payloadNotificationId?.toString() ?? '') ?? n.id;
 
-          await _notificationApiService.markAsRead(notificationIdToClear);
-
-          // Pra deletar: await _notificationApiService.deleteNotification(notificationIdToClear);
+          await _notificationApiService
+              .deleteNotification(notificationIdToClear);
         } catch (_) {
           // ignora payload inválido
         }
