@@ -69,31 +69,37 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () =>
-                        GoRouter.of(context).pushNamed("managerProfilePage"),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      minimumSize: Size.zero,
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundImage: profileImage,
-                        ),
-                        const SizedBox(width: 11.0),
-                        Text(
-                          'Olá, $userName 👋',
-                          style: const TextStyle(
-                            color: ConstantsColors.blueShade900,
-                            fontSize: 20,
-                          ).merge(TextStylesConstants.kpoppinsRegular),
-                        ),
-                      ],
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () =>
+                          GoRouter.of(context).pushNamed("managerProfilePage"),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: Size.zero,
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundImage: profileImage,
+                          ),
+                          const SizedBox(width: 11.0),
+                          Flexible(
+                            child: Text(
+                              'Olá, $userName 👋',
+                              style: const TextStyle(
+                                color: ConstantsColors.blueShade900,
+                                fontSize: 20,
+                              ).merge(TextStylesConstants.kpoppinsRegular),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 15.0),
                   IconButton(
                     onPressed: () {
                       GoRouter.of(context).pushNamed("notificationsPage");
