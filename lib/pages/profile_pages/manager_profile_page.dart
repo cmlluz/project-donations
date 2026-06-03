@@ -1,8 +1,8 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
-import 'package:appdonationsgestor/controllers/donation_controller.dart';
-import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/nota_fiscal_api_service.dart';
 import 'package:appdonationsgestor/models/campaign_model.dart';
@@ -36,11 +36,11 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   int selectedTab = 0;
 
   final ApiClient _apiClient = ApiClient();
+  late final DonationApiService _donationApiService;
+  late final NeedApiService _needApiService;
   late final PostApiService _postApiService;
   late final NotaFiscalApiService _notaFiscalApiService;
   late final CampaignController _campaignController;
-  late final DonationController _donationController;
-  late final NeedController _needController;
 
   Future<Map<String, dynamic>>? _historyFuture;
 
@@ -53,17 +53,14 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   @override
   void initState() {
     super.initState();
+    _donationApiService = DonationApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
     _postApiService = PostApiService(_apiClient);
     _notaFiscalApiService = NotaFiscalApiService(_apiClient);
     _campaignController =
         Provider.of<CampaignController>(context, listen: false);
-    _donationController =
-        Provider.of<DonationController>(context, listen: false);
-    _needController = Provider.of<NeedController>(context, listen: false);
 
     _campaignController.addListener(_refreshHistory);
-    _donationController.addListener(_refreshHistory);
-    _needController.addListener(_refreshHistory);
 
     _loadHistory();
   }
@@ -120,26 +117,22 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       List<PostModel> posts = [];
       List<NotaFiscal> notasFiscais = [];
 
-      // Carrega doações via controller se não estiver em cache
       if (_cachedDonations != null && _cachedUserId == currentUserId) {
         donations = _cachedDonations!;
       } else {
         try {
-          await _donationController.loadMyDonations(notify: false);
-          donations = _donationController.donations;
+          donations = await _donationApiService.getMyDonations();
           _cachedDonations = donations;
         } catch (e) {
           print("Erro ao carregar doações: $e");
         }
       }
 
-      // Carrega necessidades via controller se não estiver em cache
       if (_cachedNeeds != null && _cachedUserId == currentUserId) {
         needs = _cachedNeeds!;
       } else {
         try {
-          await _needController.loadMyNeeds(notify: false);
-          needs = _needController.needs;
+          needs = await _needApiService.getMyNeeds();
           _cachedNeeds = needs;
         } catch (e) {
           print("Erro ao carregar necessidades: $e");
@@ -169,7 +162,6 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         }
       }
 
-      // Carrega campanhas via controller se não estiver em cache
       if (_campaignController.campaigns.isNotEmpty && _isCampaignCacheValid()) {
         campaigns = _campaignController.campaigns;
       } else {
@@ -226,7 +218,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back,
                 color: ConstantsColors.blueShade900),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => GoRouter.of(context).pop(),
           ),
         ),
       ),

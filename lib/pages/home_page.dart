@@ -69,23 +69,23 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
+                  Flexible(
                     child: TextButton(
                       onPressed: () =>
                           GoRouter.of(context).pushNamed("managerProfilePage"),
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        minimumSize: Size.zero,
                       ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           CircleAvatar(
                             radius: 24,
                             backgroundImage: profileImage,
                           ),
                           const SizedBox(width: 11.0),
-                          Flexible(
+                          Expanded(
                             child: Text(
                               'Olá, $userName 👋',
                               style: const TextStyle(
@@ -101,9 +101,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(width: 15.0),
                   IconButton(
-                    onPressed: () {
-                      GoRouter.of(context).pushNamed("notificationsPage");
-                    },
+                    onPressed: () =>
+                        GoRouter.of(context).pushNamed("notificationsPage"),
                     icon: Image.asset("assets/icons/notification_icon.png"),
                   ),
                 ],

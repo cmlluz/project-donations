@@ -160,7 +160,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                Flexible(
                   child: TextButton(
                     onPressed: () =>
                         GoRouter.of(context).pushNamed("managerProfilePage"),
@@ -169,13 +169,14 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         CircleAvatar(
                           radius: 24,
                           backgroundImage: profileImage,
                         ),
                         const SizedBox(width: 11.0),
-                        Flexible(
+                        Expanded(
                           child: Text(
                             'Olá, $userName 👋',
                             style: const TextStyle(
