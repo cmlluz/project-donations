@@ -66,7 +66,7 @@ class _LoginPage extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
 
-// CARREGA DADOS DO USUÁRIO
+      // CARREGA DADOS DO USUÁRIO
       await context.read<UserProvider>().fetchCurrentUser();
 
       if (mounted) {
@@ -111,8 +111,14 @@ class _LoginPage extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
 
+      // Verifica se é erro de conexão ou outro erro durante o carregamento de dados
+      String errorMsg = FirebaseErrorTranslator.translateException(e);
+      if (errorMsg.isEmpty) {
+        errorMsg = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      }
+
       setState(() {
-        errorMessage = FirebaseErrorTranslator.translateException(e);
+        errorMessage = errorMsg;
       });
     } finally {
       if (mounted) {
@@ -153,16 +159,24 @@ class _LoginPage extends State<LoginPage> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        final translatedMessage = FirebaseErrorTranslator.translate(e.code);
-        errorMessage =
-            'Erro ao entrar com Google: ${translatedMessage.isEmpty ? (e.message ?? 'Erro desconhecido') : translatedMessage}';
-      });
+      if (mounted) {
+        setState(() {
+          final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+          errorMessage =
+              'Erro ao entrar com Google: ${translatedMessage.isEmpty ? (e.message ?? 'Erro desconhecido') : translatedMessage}';
+        });
+      }
     } catch (e) {
-      setState(() {
-        errorMessage =
-            'Erro ao entrar com Google: ${FirebaseErrorTranslator.translateException(e)}';
-      });
+      if (mounted) {
+        String errorMsg = FirebaseErrorTranslator.translateException(e);
+        if (errorMsg.isEmpty) {
+          errorMsg = 'Erro de conexão. Verifique sua internet e tente novamente.';
+        }
+
+        setState(() {
+          errorMessage = 'Erro ao entrar com Google: $errorMsg';
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

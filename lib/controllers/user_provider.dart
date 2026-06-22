@@ -27,6 +27,7 @@ class UserProvider with ChangeNotifier {
     } catch (e) {
       _currentUser = null;
       print(e.toString());
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
