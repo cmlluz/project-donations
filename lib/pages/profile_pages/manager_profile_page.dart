@@ -218,7 +218,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back,
                 color: ConstantsColors.blueShade900),
-            onPressed: () => GoRouter.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
       ),
