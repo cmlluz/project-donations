@@ -10,7 +10,12 @@ import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:go_router/go_router.dart';
 
 class FinalizeRegistrationPage extends StatefulWidget {
-  const FinalizeRegistrationPage({super.key});
+   final Map<String, dynamic> userData;
+
+  const FinalizeRegistrationPage({
+    super.key,
+    required this.userData,
+  });
 
   @override
   State<FinalizeRegistrationPage> createState() =>
@@ -46,11 +51,11 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
             await _storageService.uploadImage(_image!, 'profile_images');
       }
 
-      final Map<String, dynamic> userData = {
-        "bio": bioController.text.trim(),
-        "pixKey": pixKeyController.text.trim(),
-      };
-
+    final Map<String, dynamic> userData = {
+  ...widget.userData,
+  "bio": bioController.text.trim(),
+  "pixKey": pixKeyController.text.trim(),
+};
       if (uploadedImageUrl != null) {
         userData["profilePictureUrl"] = uploadedImageUrl;
       }

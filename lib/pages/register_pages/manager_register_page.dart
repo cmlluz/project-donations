@@ -116,8 +116,10 @@ class _ManagerRegisterPage
       // await apiService.createUser(userData);
 
       if (mounted) {
-        GoRouter.of(context)
-            .push('/finalizeRegistrationPage');
+       GoRouter.of(context).push(
+  '/finalizeRegistrationPage',
+  extra: userData,
+);
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;

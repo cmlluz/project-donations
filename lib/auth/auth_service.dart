@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:http/http.dart' as http;
 
 ValueNotifier<AuthService> authService =
     ValueNotifier(AuthService());
@@ -38,11 +40,12 @@ class AuthService {
     }
   }
 
-  Future<UserCredential> createAccount({
+Future<UserCredential> createAccount({
   required String email,
   required String password,
   String? name,
 }) async {
+
   final credential =
       await firebaseAuth
           .createUserWithEmailAndPassword(
@@ -58,18 +61,9 @@ class AuthService {
     await credential.user?.reload();
   }
 
-  // PEGA USUÁRIO ATUALIZADO
-  final updatedUser =
-      firebaseAuth.currentUser;
-
-  print(updatedUser?.displayName);
-
-  return await firebaseAuth
-      .signInWithEmailAndPassword(
-    email: email,
-    password: password,
-  );
+  return credential;
 }
+
 
   Future<void> signOut() async {
     await GoogleSignIn().signOut();
@@ -168,10 +162,21 @@ class AuthService {
     credential,
   );
 }
+final apiClient = ApiClient();
 
-      await user.delete();
+final response =
+    await apiClient.delete('users/me');
 
-      await signOut();
+if (response.statusCode != 204) {
+  throw Exception(
+    'Erro ao excluir usuário do banco.',
+  );
+}
+
+
+await user.delete();
+
+await signOut();
     } on FirebaseAuthException catch (e) {
       // SENHA ERRADA
       if (e.code == 'wrong-password' ||
@@ -266,4 +271,14 @@ await userCredential.user!.reload();
       rethrow;
     }
   }
+
+  Future<bool> userExists(String email) async {
+  final response = await http.get(
+    Uri.parse(
+      'http://10.0.2.2:8080/api/users/exists?email=$email',
+    ),
+  );
+
+  return response.body == 'true';
+}
 }

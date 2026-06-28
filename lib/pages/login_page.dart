@@ -73,7 +73,7 @@ class _LoginPage extends State<LoginPage> {
 await context
     .read<UserProvider>()
     .fetchCurrentUser();
-
+await context.read<UserProvider>().fetchCurrentUser();
 if (mounted) {
   GoRouter.of(context).go('/root');
 }

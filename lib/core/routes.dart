@@ -224,12 +224,14 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-          path: '/finalizeRegistrationPage',
-          name: RouteNames.finalizeRegistrationPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: FinalizeRegistrationPage(),
-          ),
-        ),
+  path: '/finalizeRegistrationPage',
+  builder: (context, state) {
+    return FinalizeRegistrationPage(
+      userData:
+          state.extra as Map<String, dynamic>,
+    );
+  },
+),
         GoRoute(
           path: '/favoritesPage',
           name: RouteNames.favoritesPage,
