@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:appdonationsgestor/auth/app_data.dart';
 import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/components/menu_button.dart';
 import 'package:appdonationsgestor/controllers/navigation_controller.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/core/routes.dart';
 import 'package:appdonationsgestor/pages/favorites_page.dart';
 import 'package:appdonationsgestor/pages/home_page.dart';
@@ -11,12 +13,11 @@ import 'package:appdonationsgestor/pages/search_pages/search_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/notification_service.dart';
+import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:appdonationsgestor/utils/firebase_error_translator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:appdonationsgestor/controllers/user_provider.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -27,12 +28,15 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   final NotificationService _notificationService = NotificationService();
+
   StreamSubscription? _notificationSubscription;
 
   @override
   void initState() {
     super.initState();
+
     NavigationController.currentIndex.addListener(_updateIndex);
+
     _initNotifications();
 
     _notificationSubscription =
@@ -43,7 +47,10 @@ class _RootPageState extends State<RootPage> {
     });
   }
 
-  void _handleNavigation(String type, Map<String, dynamic> data) {
+  void _handleNavigation(
+    String type,
+    Map<String, dynamic> data,
+  ) {
     final currentUserRole =
         authService.value.currentUser != null && context.mounted
             ? context.read<UserProvider>().currentUser?.role
@@ -51,33 +58,43 @@ class _RootPageState extends State<RootPage> {
 
     if (type == 'NEW_REQUEST') {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
-    } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+    } else if (type == 'REQUEST_APPROVED' ||
+        type == 'REQUEST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     } else if (type == 'POST_VALIDATION_PENDING') {
       if (currentUserRole == 'ROLE_ADMIN') {
         final String? itemId = data['itemId'];
         final String? itemType = data['itemType'];
+
         if (itemId != null && itemType != null) {
           GoRouter.of(context).pushNamed(
             RouteNames.allowPostPage,
-            extra: {'itemId': itemId, 'itemType': itemType},
+            extra: {
+              'itemId': itemId,
+              'itemType': itemType,
+            },
           );
         }
       }
-    } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
+    } else if (type == 'POST_APPROVED' ||
+        type == 'POST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     }
   }
 
   void _initNotifications() async {
     await Future.delayed(const Duration(seconds: 1));
-    _notificationService.initNotifications();
+
+    await _notificationService.initNotifications();
   }
 
   @override
   void dispose() {
-    NavigationController.currentIndex.removeListener(_updateIndex);
+    NavigationController.currentIndex
+        .removeListener(_updateIndex);
+
     _notificationSubscription?.cancel();
+
     super.dispose();
   }
 
@@ -101,17 +118,23 @@ class _RootPageState extends State<RootPage> {
     'assets/icons/logout_icon.png',
   ];
 
+  // LOGOUT
   void logout() async {
     try {
       await _notificationService.deleteToken();
-      await authService.value.signOut(context);
+
+      await authService.value.signOut();
+
       AppData.navBarCurrentIndexNotifier.value = 0;
       AppData.onboardingCurrentIndexNotifier.value = 0;
+
       if (context.mounted) {
         context.go('/');
       }
     } on FirebaseAuthException catch (e) {
-      final translatedMessage = FirebaseErrorTranslator.translate(e.code);
+      final translatedMessage =
+          FirebaseErrorTranslator.translate(e.code);
+
       final errorMsg = translatedMessage.isEmpty
           ? (e.message ?? 'Erro desconhecido ao fazer logout')
           : translatedMessage;
@@ -120,6 +143,18 @@ class _RootPageState extends State<RootPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMsg),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro inesperado ao fazer logout.',
+            ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -135,16 +170,11 @@ class _RootPageState extends State<RootPage> {
         index: NavigationController.currentIndex.value,
         children: pages,
       ),
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+      bottomNavigationBar:
+          AnimatedBottomNavigationBar.builder(
         itemCount: iconList.length,
-        tabBuilder: (index, isActive) {
-          final iconColor = isActive
-              ? ConstantsColors.blueShade900
-              : ConstantsColors.blueShade500;
-
-          return Image.asset(iconList[index], color: iconColor);
-        },
-        activeIndex: NavigationController.currentIndex.value,
+        activeIndex:
+            NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         scaleFactor: 1.0,
@@ -152,6 +182,16 @@ class _RootPageState extends State<RootPage> {
         splashSpeedInMilliseconds: 1,
         shadow: const Shadow(color: Colors.transparent),
         elevation: 0,
+        tabBuilder: (index, isActive) {
+          final iconColor = isActive
+              ? ConstantsColors.blueShade900
+              : ConstantsColors.blueShade500;
+
+          return Image.asset(
+            iconList[index],
+            color: iconColor,
+          );
+        },
         onTap: (index) {
           if (index == 2) {
             _showBottomMenu(context);
@@ -159,7 +199,8 @@ class _RootPageState extends State<RootPage> {
             _showLogoutMenu(context);
           } else {
             setState(() {
-              NavigationController.currentIndex.value = index;
+              NavigationController.currentIndex.value =
+                  index;
             });
           }
         },
@@ -167,10 +208,13 @@ class _RootPageState extends State<RootPage> {
     );
   }
 
+  // MENU INFERIOR
   void _showBottomMenu(BuildContext context) {
-    // Obtém o role do usuário logado
-    final userRole = context.read<UserProvider>().currentUser?.role;
-    final isManager = userRole == 'ROLE_MANAGER';
+    final userRole =
+        context.read<UserProvider>().currentUser?.role;
+
+    final bool isManager =
+        userRole == 'ROLE_MANAGER';
 
     showModalBottomSheet(
       context: context,
@@ -180,9 +224,15 @@ class _RootPageState extends State<RootPage> {
         return Container(
           decoration: const BoxDecoration(
             color: ConstantsColors.whiteShade700,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50),
+            ),
           ),
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+          padding: const EdgeInsets.only(
+            left: 15,
+            right: 15,
+            top: 15,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -196,7 +246,9 @@ class _RootPageState extends State<RootPage> {
                       style: const TextStyle(
                         fontSize: 20,
                         color: ConstantsColors.blueShade900,
-                      ).merge(TextStylesConstants.kinterSemiBold),
+                      ).merge(
+                        TextStylesConstants.kinterSemiBold,
+                      ),
                     ),
                   ),
                   Align(
@@ -204,53 +256,71 @@ class _RootPageState extends State<RootPage> {
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
-                        color: ConstantsColors.blueShade900,
+                        color:
+                            ConstantsColors.blueShade900,
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 24),
+
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceEvenly,
                 children: [
                   MenuButton(
-                    icon: Icons.volunteer_activism_outlined,
+                    icon:
+                        Icons.volunteer_activism_outlined,
                     label: 'Anunciar \n Necessidade',
                     onTap: () {
-                      GoRouter.of(context).push("/itemPostPage");
+                      GoRouter.of(context)
+                          .push("/itemPostPage");
+
                       Navigator.of(context).pop();
                     },
                   ),
+
                   MenuButton(
                     icon: Icons.text_snippet_rounded,
                     label: 'Criar \n publicação',
                     onTap: () {
-                      GoRouter.of(context).push("/postPage");
+                      GoRouter.of(context)
+                          .push("/postPage");
+
                       Navigator.of(context).pop();
                     },
                   ),
+
                   MenuButton(
                     icon: Icons.receipt_long_sharp,
                     label: 'Criar \n nota fiscal',
                     onTap: () {
-                      GoRouter.of(context).push("/notaFiscalPage");
+                      GoRouter.of(context)
+                          .push("/notaFiscalPage");
+
                       Navigator.of(context).pop();
                     },
                   ),
-                  // Mostrar botão de campanha apenas para gestores
+
                   if (isManager)
                     MenuButton(
                       icon: Icons.campaign_outlined,
                       label: 'Divulgar \n campanha',
                       onTap: () {
-                        GoRouter.of(context).push("/publishCampaign");
+                        GoRouter.of(context)
+                            .push("/publishCampaign");
+
                         Navigator.of(context).pop();
                       },
                     ),
                 ],
               ),
+
               const SizedBox(height: 24),
             ],
           ),
@@ -259,6 +329,7 @@ class _RootPageState extends State<RootPage> {
     );
   }
 
+  // MENU LOGOUT
   void _showLogoutMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -268,9 +339,15 @@ class _RootPageState extends State<RootPage> {
         return Container(
           decoration: const BoxDecoration(
             color: ConstantsColors.whiteShade700,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50),
+            ),
           ),
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
+          padding: const EdgeInsets.only(
+            left: 15,
+            right: 15,
+            top: 15,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -283,7 +360,8 @@ class _RootPageState extends State<RootPage> {
                     ),
                   ),
                 ),
-                margin: const EdgeInsets.symmetric(horizontal: 15),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 15),
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Stack(
                   alignment: Alignment.center,
@@ -295,70 +373,99 @@ class _RootPageState extends State<RootPage> {
                         style: const TextStyle(
                           fontSize: 16,
                           color: ConstantsColors.blueShade900,
-                        ).merge(TextStylesConstants.kinterSemiBold),
+                        ).merge(
+                          TextStylesConstants
+                              .kinterSemiBold,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 19),
+
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment:
+                    MainAxisAlignment.center,
                 children: [
                   Text(
                     'Tem certeza que deseja sair?',
                     style: TextStyle(
                       fontSize: 16,
-                      color: ConstantsColors.blueShade900.withOpacity(0.7),
-                    ).merge(TextStylesConstants.kinterRegular),
+                      color: ConstantsColors.blueShade900
+                          .withOpacity(0.7),
+                    ).merge(
+                      TextStylesConstants.kinterRegular,
+                    ),
                   ),
+
                   const SizedBox(height: 15),
+
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.whiteShade900,
+                          backgroundColor:
+                              ConstantsColors.whiteShade900,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius:
+                                BorderRadius.circular(15),
                             side: const BorderSide(
-                                color: ConstantsColors.blueShade900),
+                              color:
+                                  ConstantsColors.blueShade900,
+                            ),
                           ),
                         ),
                         child: Text(
                           'Cancelar',
                           style: const TextStyle(
-                            color: ConstantsColors.blueShade900,
+                            color:
+                                ConstantsColors.blueShade900,
                             fontSize: 16,
-                          ).merge(TextStylesConstants.kpoppinsMedium),
+                          ).merge(
+                            TextStylesConstants
+                                .kpoppinsMedium,
+                          ),
                         ),
                       ),
+
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
+
                           logout();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ConstantsColors.blueShade900,
+                          backgroundColor:
+                              ConstantsColors.blueShade900,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius:
+                                BorderRadius.circular(15),
                           ),
                         ),
                         child: Text(
                           'Sim, sair',
                           style: const TextStyle(
-                            color: ConstantsColors.whiteShade900,
+                            color:
+                                ConstantsColors.whiteShade900,
                             fontSize: 16,
-                          ).merge(TextStylesConstants.kpoppinsMedium),
+                          ).merge(
+                            TextStylesConstants
+                                .kpoppinsMedium,
+                          ),
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
+
               const SizedBox(height: 24),
             ],
           ),

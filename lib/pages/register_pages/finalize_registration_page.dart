@@ -60,7 +60,7 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
       }
 
       if (mounted) {
-        GoRouter.of(context).push('/confirmedRegistration');
+        context.go('/confirmedRegistration');
       }
     } catch (e) {
       if (mounted) {

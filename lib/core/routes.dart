@@ -258,9 +258,17 @@ class AppRountersConfiguration {
         GoRoute(
           path: '/confirmDeletionPage',
           name: RouteNames.confirmDeletionPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: ConfirmDeletionPage(),
-          ),
+          pageBuilder: (context, state) {
+          final data =
+              state.extra as Map<String, dynamic>;
+
+          return MaterialPage(
+            child: ConfirmDeletionPage(
+              email: data['email'],
+              password: data['password'],
+            ),
+          );
+          },
         ),
         GoRoute(
           path: '/deleteFeedbackPage',

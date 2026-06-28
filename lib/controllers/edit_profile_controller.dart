@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:appdonationsgestor/components/image_picker_sheet.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:appdonationsgestor/services/profile_services.dart';
 import 'package:appdonationsgestor/services/storage_service.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileController extends ChangeNotifier {
   final ProfileService _profileService = ProfileService();
@@ -30,12 +31,16 @@ class EditProfileController extends ChangeNotifier {
   String? _currentProfileImageUrl;
   String? get currentProfileImageUrl => _currentProfileImageUrl;
 
+  bool _disposed = false;
+
   EditProfileController() {
     loadCurrentUserData();
   }
 
   @override
   void dispose() {
+    _disposed = true;
+
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -43,22 +48,33 @@ class EditProfileController extends ChangeNotifier {
     bioController.dispose();
     currentPasswordController.dispose();
     newPasswordController.dispose();
+
     super.dispose();
   }
 
   Future<void> loadCurrentUserData() async {
     _setLoading(true);
+
     try {
       final data = await _profileService.loadUserData();
+
+      if (_disposed) return;
+
       nameController.text = data['name'] ?? '';
+
       emailController.text =
-          _profileService.currentUser?.email ?? data['email'] ?? '';
+          _profileService.currentUser?.email ??
+              data['email'] ??
+              '';
+
       phoneController.text = data['phone'] ?? '';
       pixController.text = data['pixKey'] ?? '';
       bioController.text = data['bio'] ?? '';
-      _currentProfileImageUrl = data['profilePictureUrl'];
+
+      _currentProfileImageUrl =
+          data['profilePictureUrl'];
     } catch (e) {
-      print("Erro ao carregar dados: $e");
+      debugPrint("Erro ao carregar dados: $e");
     } finally {
       _setLoading(false);
     }
@@ -70,11 +86,11 @@ class EditProfileController extends ChangeNotifier {
       builder: (context) {
         return ImagePickerOptionsSheet(
           onCameraTap: () {
-            pickImageFromGallery(ImageSource.camera);
+            pickImage(ImageSource.camera);
             Navigator.of(context).pop();
           },
           onGalleryTap: () {
-            pickImageFromGallery(ImageSource.gallery);
+            pickImage(ImageSource.gallery);
             Navigator.of(context).pop();
           },
         );
@@ -82,49 +98,71 @@ class EditProfileController extends ChangeNotifier {
     );
   }
 
-  Future<void> pickImageFromGallery(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(
+  Future<void> pickImage(ImageSource source) async {
+    final pickedFile = await picker.pickImage(
       source: source,
       maxWidth: 800,
       maxHeight: 800,
       imageQuality: 80,
     );
+
     if (pickedFile != null) {
       _selectedImage = File(pickedFile.path);
-      notifyListeners();
+
+      if (!_disposed) {
+        notifyListeners();
+      }
     }
   }
 
   void toggleShowPasswordFields(bool? value) {
     _showPasswordFields = value ?? false;
+
     if (!_showPasswordFields) {
       currentPasswordController.clear();
       newPasswordController.clear();
     }
-    notifyListeners();
+
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   Future<String?> updateProfile() async {
     _setLoading(true);
+
     try {
       final user = _profileService.currentUser!;
-      bool emailChanged = emailController.text.trim() != user.email;
-      bool passwordChanged = newPasswordController.text.isNotEmpty;
-      bool needsReauth = emailChanged || passwordChanged;
+
+      bool emailChanged =
+          emailController.text.trim() != user.email;
+
+      bool passwordChanged =
+          newPasswordController.text.isNotEmpty;
+
+      bool needsReauth =
+          emailChanged || passwordChanged;
 
       if (needsReauth) {
         if (currentPasswordController.text.isEmpty) {
           throw Exception(
-              'Senha atual é necessária para alterar email ou senha.');
+            'Senha atual é necessária para alterar email ou senha.',
+          );
         }
-        await _profileService
-            .reauthenticateUser(currentPasswordController.text.trim());
+
+        await _profileService.reauthenticateUser(
+          currentPasswordController.text.trim(),
+        );
       }
 
       String? uploadedImageUrl;
+
       if (_selectedImage != null) {
-        uploadedImageUrl = await _storageService.uploadImage(
-            _selectedImage!, 'profile_images');
+        uploadedImageUrl =
+            await _storageService.uploadImage(
+          _selectedImage!,
+          'profile_images',
+        );
       }
 
       final updatedData = <String, dynamic>{
@@ -132,20 +170,29 @@ class EditProfileController extends ChangeNotifier {
         'phone': phoneController.text.trim(),
         'pixKey': pixController.text.trim(),
         'bio': bioController.text.trim(),
-        if (uploadedImageUrl != null) 'profilePictureUrl': uploadedImageUrl,
+        if (uploadedImageUrl != null)
+          'profilePictureUrl': uploadedImageUrl,
       };
 
       if (emailChanged) {
-        await _profileService.updateAuthEmail(emailController.text.trim());
-        updatedData['email'] = emailController.text.trim();
+        await _profileService.updateAuthEmail(
+          emailController.text.trim(),
+        );
+
+        updatedData['email'] =
+            emailController.text.trim();
       }
 
-      await _profileService.updateUserProfileBackend(updatedData);
+      await _profileService.updateUserProfileBackend(
+        updatedData,
+      );
 
       if (passwordChanged) {
-        await _profileService
-            .updateAuthPassword(newPasswordController.text.trim());
+        await _profileService.updateAuthPassword(
+          newPasswordController.text.trim(),
+        );
       }
+
       return uploadedImageUrl;
     } catch (e) {
       rethrow;
@@ -155,6 +202,8 @@ class EditProfileController extends ChangeNotifier {
   }
 
   void _setLoading(bool value) {
+    if (_disposed) return;
+
     _isLoading = value;
     notifyListeners();
   }
