@@ -18,27 +18,37 @@ class AuthService {
       firebaseAuth.authStateChanges();
 
   Future<UserCredential> signIn({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      return await firebaseAuth
-          .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
-        throw FirebaseAuthException(
-          code: e.code,
-          message: 'Senha incorreta.',
-        );
-      }
+  required String email,
+  required String password,
+}) async {
 
-      rethrow;
-    }
+  final exists = await userExists(email);
+
+  if (!exists) {
+    throw FirebaseAuthException(
+      code: 'user-not-found',
+      message: 'Usuário não encontrado.',
+    );
   }
+
+  try {
+    return await firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  } on FirebaseAuthException catch (e) {
+
+    if (e.code == 'wrong-password' ||
+        e.code == 'invalid-credential') {
+      throw FirebaseAuthException(
+        code: 'wrong-password',
+        message: 'Senha incorreta.',
+      );
+    }
+
+    rethrow;
+  }
+}
 
 Future<UserCredential> createAccount({
   required String email,

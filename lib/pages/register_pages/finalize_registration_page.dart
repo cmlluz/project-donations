@@ -42,47 +42,54 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
   }
 
   Future<void> _updateProfile() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    try {
-      String? uploadedImageUrl;
-      if (_image != null) {
-        uploadedImageUrl =
-            await _storageService.uploadImage(_image!, 'profile_images');
-      }
+  try {
+    String? uploadedImageUrl;
+
+    if (_image != null) {
+      uploadedImageUrl = await _storageService.uploadImage(
+        _image!,
+        'profile_images',
+      );
+    }
 
     final Map<String, dynamic> userData = {
-  ...widget.userData,
-  "bio": bioController.text.trim(),
-  "pixKey": pixKeyController.text.trim(),
-};
-      if (uploadedImageUrl != null) {
-        userData["profilePictureUrl"] = uploadedImageUrl;
-      }
+      ...widget.userData,
+      "bio": bioController.text.trim(),
+      "pixKey": pixKeyController.text.trim(),
+    };
 
-      if (userData.isNotEmpty) {
-        await _profileService.updateUserProfileBackend(userData);
-      }
+    if (uploadedImageUrl != null) {
+      userData["profilePictureUrl"] = uploadedImageUrl;
+    }
 
-      if (mounted) {
-        context.go('/confirmedRegistration');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao finalizar cadastro: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    if (userData.isNotEmpty) {
+      await _profileService.updateUserProfileBackend(userData);
+    }
+
+    if (mounted) {
+      context.go('/confirmedRegistration');
+    }
+
+  } catch (e, s) {
+    print("ERRO: $e");
+    print("STACK: $s");
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao finalizar cadastro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
