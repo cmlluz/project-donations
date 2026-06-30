@@ -1,7 +1,9 @@
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/profile_services.dart';
 import 'package:appdonationsgestor/services/storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -41,7 +43,7 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
     }
   }
 
-  Future<void> _updateProfile() async {
+Future<void> _updateProfile() async {
   setState(() => _isLoading = true);
 
   try {
@@ -66,6 +68,10 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
 
     if (userData.isNotEmpty) {
       await _profileService.updateUserProfileBackend(userData);
+    }
+
+    if (mounted) {
+      await context.read<UserProvider>().fetchCurrentUser();
     }
 
     if (mounted) {
