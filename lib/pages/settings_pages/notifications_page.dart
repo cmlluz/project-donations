@@ -56,9 +56,55 @@ class _NotificationsPage extends State<NotificationsPage> {
   }
 
   void _loadApiNotifications() {
+    _refreshNotifications();
+  }
+
+  Future<void> _refreshNotifications() async {
     _notificationValidityCache.clear(); // Limpar cache ao recarregar
+
+    await _clearResolvedRequestNotifications();
+
+    if (!mounted) return;
+
     _apiNotificationsFuture = _notificationApiService.getMyNotifications();
     setState(() {});
+  }
+
+  Future<void> _clearResolvedRequestNotifications() async {
+    try {
+      final notifications = await _notificationApiService.getMyNotifications();
+
+      for (final notification in notifications) {
+        await _deleteResolvedRequestNotification(notification);
+      }
+    } catch (e) {
+      print('Erro ao limpar notificações de solicitação resolvida: $e');
+    }
+  }
+
+  Future<void> _deleteResolvedRequestNotification(
+      NotificationModel notification) async {
+    if (notification.dataPayload == null) return;
+
+    try {
+      final data =
+          jsonDecode(notification.dataPayload!) as Map<String, dynamic>;
+      final type = data['type'];
+
+      if (type != 'REQUEST_APPROVED' && type != 'REQUEST_REJECTED') {
+        return;
+      }
+
+      final payloadNotificationId = data['notificationId'];
+      final int notificationIdToDelete = payloadNotificationId is int
+          ? payloadNotificationId
+          : int.tryParse(payloadNotificationId?.toString() ?? '') ??
+              notification.id;
+
+      await _notificationApiService.deleteNotification(notificationIdToDelete);
+    } catch (_) {
+      // ignora payload inválido
+    }
   }
 
   String _formatRelativeTime(DateTime dateTime) {
@@ -160,6 +206,7 @@ class _NotificationsPage extends State<NotificationsPage> {
       if (type == 'NEW_REQUEST') {
         GoRouter.of(context).goNamed(RouteNames.pendingRequests);
       } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+        await _deleteResolvedRequestNotification(notif);
         GoRouter.of(context).goNamed(RouteNames.hystoryPage);
       } else if (type == 'POST_VALIDATION_PENDING') {
         final String? itemId = data['itemId'];
