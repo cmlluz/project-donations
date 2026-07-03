@@ -39,6 +39,23 @@ class AppSearchController with ChangeNotifier {
     _favoriteApiService = FavoriteApiService(_apiClient);
   }
 
+  List<PublicUser> _parsePublicUsers(dynamic decodedBody) {
+    final List<dynamic> usersJson = decodedBody is Map<String, dynamic>
+        ? (decodedBody['content'] as List<dynamic>? ?? const <dynamic>[])
+        : (decodedBody as List<dynamic>? ?? const <dynamic>[]);
+
+    return usersJson
+        .whereType<Map<String, dynamic>>()
+        .map((item) => PublicUser.fromJson(item))
+        .toList();
+  }
+
+  bool _isInstitutionRole(String role) {
+    final normalizedRole = role.trim().toUpperCase();
+    return normalizedRole.contains('INSTITUTION') ||
+        normalizedRole.contains('GESTOR');
+  }
+
   void updateCampaigns(List<Campaign> campaigns) {
     _externalCampaigns = campaigns;
     _refreshItems();
@@ -66,8 +83,8 @@ class AppSearchController with ChangeNotifier {
 
       final usersFuture = _apiClient.get('users').then((response) {
         if (response.statusCode == 200) {
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-          return body.map((item) => PublicUser.fromJson(item)).toList();
+          final decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+          return _parsePublicUsers(decodedBody);
         }
         return <PublicUser>[];
       });
@@ -152,21 +169,19 @@ class AppSearchController with ChangeNotifier {
             postStatus: 'ATIVO',
             quantity: 0,
           )),
-      ...users
-          .where((u) => u.role == 'ROLE_INSTITUTION' || u.role == 'ROLE_GESTOR')
-          .map((u) => SearchItem(
-                id: u.firebaseUid.hashCode,
-                title: u.name,
-                description: u.bio ?? u.email,
-                imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
-                category: SearchCategory.instituicao,
-                institution: u.name,
-                date: DateTime.now(),
-                postStatus: 'ATIVO',
-                quantity: 0,
-                firebaseUid: u.firebaseUid,
-                authorUid: u.firebaseUid,
-              )),
+      ...users.where((u) => _isInstitutionRole(u.role)).map((u) => SearchItem(
+            id: u.firebaseUid.hashCode,
+            title: u.name,
+            description: u.bio ?? u.email,
+            imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
+            category: SearchCategory.instituicao,
+            institution: u.name,
+            date: DateTime.now(),
+            postStatus: 'ATIVO',
+            quantity: 0,
+            firebaseUid: u.firebaseUid,
+            authorUid: u.firebaseUid,
+          )),
     ];
   }
 
@@ -182,8 +197,8 @@ class AppSearchController with ChangeNotifier {
 
       final usersFuture = _apiClient.get('users').then((response) {
         if (response.statusCode == 200) {
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-          return body.map((item) => PublicUser.fromJson(item)).toList();
+          final decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+          return _parsePublicUsers(decodedBody);
         }
         return <PublicUser>[];
       });
