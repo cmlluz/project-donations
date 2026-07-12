@@ -98,119 +98,59 @@ Future<UserCredential> createAccount({
     await currentUser!.reload();
   }
 
-  Future<void> deleteAccount({
-    String? email,
-    String? password,
-  }) async {
-    final user = currentUser;
+ Future<void> deleteAccount({
+  String? email,
+  String? password,
+}) async {
+  final user = currentUser;
 
-    if (user == null) {
-      throw FirebaseAuthException(
-        code: 'user-not-found',
-        message: 'Usuário não encontrado.',
-      );
-    }
-
-    final providers =
-        user.providerData.map((e) => e.providerId);
-
-    try {
-      // LOGIN EMAIL/SENHA
-      if (providers.contains('password')) {
-        if (email == null ||
-            password == null ||
-            password.isEmpty) {
-          throw FirebaseAuthException(
-            code: 'missing-credentials',
-            message:
-                'Senha obrigatória para excluir a conta.',
-          );
-        }
-
-        final credential =
-            EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-
-        await user
-            .reauthenticateWithCredential(
-          credential,
-        );
-      }
-
-      else if (providers.contains('google.com')) {
-  final GoogleSignIn googleSignIn =
-      GoogleSignIn();
-
-  // FORÇA ESCOLHER CONTA NOVAMENTE
-  await googleSignIn.signOut();
-
-  final googleUser =
-      await googleSignIn.signIn();
-
-  if (googleUser == null) {
+  if (user == null) {
     throw FirebaseAuthException(
-      code: 'google-sign-in-cancelled',
-      message:
-          'Login com Google cancelado.',
+      code: 'user-not-found',
+      message: 'Usuário não encontrado.',
     );
   }
 
-  final googleAuth =
-      await googleUser.authentication;
+  final providers = user.providerData.map((e) => e.providerId);
 
-  final credential =
-      GoogleAuthProvider.credential(
-    accessToken:
-        googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
+  try {
+    if (providers.contains('password') && password != null && email != null) {
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
 
-  await user
-      .reauthenticateWithCredential(
-    credential,
-  );
-}
-final apiClient = ApiClient();
-
-final response =
-    await apiClient.delete('users/me');
-
-if (response.statusCode != 204) {
-  throw Exception(
-    'Erro ao excluir usuário do banco.',
-  );
-}
-
-
-await user.delete();
-
-await signOut();
-    } on FirebaseAuthException catch (e) {
-      // SENHA ERRADA
-      if (e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
-        throw Exception('Senha incorreta.');
-      }
-
-      if (e.code ==
-          'google-sign-in-cancelled') {
-        throw Exception(
-          'Confirmação com Google cancelada.',
-        );
-      }
-
-      if (e.code == 'requires-recent-login') {
-        throw Exception(
-          'Faça login novamente para continuar.',
-        );
-      }
-
-      rethrow;
+      await user.reauthenticateWithCredential(credential);
     }
-  }
 
+
+    final apiClient = ApiClient();
+    final response = await apiClient.delete('users/me');
+
+    if (response.statusCode != 204) {
+      throw Exception(
+        'Erro ao excluir usuário do banco.',
+      );
+    }
+
+    await user.delete();
+
+    await signOut();
+
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+      throw Exception('Senha incorreta.');
+    }
+
+    if (e.code == 'requires-recent-login') {
+      throw Exception(
+        'Sessão expirada. Por segurança, faça login novamente antes de excluir a conta.',
+      );
+    }
+
+    rethrow;
+  }
+}
   // ALTERAR SENHA
   Future<void>
       resetPasswordFromCurrentPassword({
@@ -290,5 +230,30 @@ await userCredential.user!.reload();
   );
 
   return response.body == 'true';
+}
+Future<bool> verifyPassword(String email, String password) async {
+  final user = currentUser;
+  if (user == null) return false;
+  if (password.isEmpty) return false;
+
+  try {
+    final credential = EmailAuthProvider.credential(
+      email: email.trim(),
+      password: password,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'too-many-requests') {
+      throw Exception(
+        'Ops, muitas tentativas seguidas! Por segurança, aguarde um momento antes de tentar de novo',
+      );
+    }
+    
+    return false;
+  } catch (_) {
+    return false;
+  }
 }
 }
