@@ -36,7 +36,7 @@ class PaginatedResponse<T> {
 }
 
 class ApiClient {
-  final String _baseUrl = "http://10.0.2.2:8080/api";
+  final String _baseUrl = "http://192.168.1.7:8080/api";
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<Map<String, String>> _getAuthHeaders() async {
