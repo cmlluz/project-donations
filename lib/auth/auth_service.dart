@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:http/http.dart' as http;
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
@@ -16,6 +17,15 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    final exists = await userExists(email);
+
+    if (!exists) {
+      throw FirebaseAuthException(
+        code: 'user-not-found',
+        message: 'O email inserido não existe.',
+      );
+    }
+
     try {
       return await firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -209,5 +219,15 @@ class AuthService {
     } catch (_) {
       return false;
     }
+  }
+
+  Future<bool> userExists(String email) async {
+    final response = await http.get(
+      Uri.parse(
+        'http://192.168.1.7:8080/api/users/exists?email=$email',
+      ),
+    );
+
+    return response.body == 'true';
   }
 }

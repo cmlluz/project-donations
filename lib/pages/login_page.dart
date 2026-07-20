@@ -84,7 +84,7 @@ class _LoginPage extends State<LoginPage> {
           break;
 
         case 'user-not-found':
-          message = 'Usuário não encontrado.';
+          message = 'O email inserido não existe.';
           break;
 
         case 'invalid-email':
