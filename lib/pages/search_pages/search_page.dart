@@ -144,19 +144,20 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       preferredSize: const Size.fromHeight(kToolbarHeight + 20),
       child: Container(
         decoration: BoxDecoration(
-          color: ConstantsColors.whiteShade700,
+          color: const Color.fromRGBO(252, 251, 248, 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 2),
-              blurRadius: 4,
+              color: Colors.black.withOpacity(0.25),
+                offset: const Offset(0, 1),
+                blurRadius: 2,
+                spreadRadius: 0,
             ),
           ],
         ),
         child: SafeArea(
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: 21.0, vertical: 15.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
