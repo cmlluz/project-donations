@@ -47,9 +47,9 @@ class ProfileService {
     );
 
     if (response.statusCode != 200) {
-      print("Erro ao atualizar perfil: ${response.body}");
-      throw Exception('Falha ao atualizar o perfil no backend.');
-    }
+  print("Erro Status [${response.statusCode}] ao atualizar perfil: ${response.body}");
+  throw Exception('Falha ao atualizar o perfil no backend.');
+}
   }
 
   Future<String> uploadProfileImage(File imageFile) async {

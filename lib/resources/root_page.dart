@@ -118,50 +118,51 @@ class _RootPageState extends State<RootPage> {
     'assets/icons/logout_icon.png',
   ];
 
-  // LOGOUT
-  void logout() async {
-    try {
-      await _notificationService.deleteToken();
+void logout() async {
+  try {
+    await _notificationService.deleteToken();
 
-      await authService.value.signOut();
+    context.read<UserProvider>().clearUser();
 
-      AppData.navBarCurrentIndexNotifier.value = 0;
-      AppData.onboardingCurrentIndexNotifier.value = 0;
+    await authService.value.signOut();
 
-      if (context.mounted) {
-        context.go('/');
-      }
-    } on FirebaseAuthException catch (e) {
-      final translatedMessage =
-          FirebaseErrorTranslator.translate(e.code);
+    AppData.navBarCurrentIndexNotifier.value = 0;
+    AppData.onboardingCurrentIndexNotifier.value = 0;
 
-      final errorMsg = translatedMessage.isEmpty
-          ? (e.message ?? 'Erro desconhecido ao fazer logout')
-          : translatedMessage;
+    if (context.mounted) {
+      context.go('/');
+    }
+  }on FirebaseAuthException catch (e) {
+    final translatedMessage =
+        FirebaseErrorTranslator.translate(e.code);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMsg),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
+    final errorMsg = translatedMessage.isEmpty
+        ? (e.message ?? 'Erro desconhecido ao fazer logout')
+        : translatedMessage;
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMsg),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro inesperado ao fazer logout.',
           ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro inesperado ao fazer logout.',
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
