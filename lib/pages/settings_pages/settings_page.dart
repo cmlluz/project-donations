@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/resources/constant_colors.dart';
+import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
@@ -166,6 +167,23 @@ class _SettingsPage extends State<SettingsPage> {
               title: 'Deletar conta',
               textColor: ConstantsColors.redShade800,
               onTap: () {
+                final user = authService.value.currentUser;
+                final providers =
+                    user?.providerData.map((e) => e.providerId).toSet() ?? {};
+                final isGoogleOnly = providers.contains('google.com') &&
+                    !providers.contains('password');
+
+                if (isGoogleOnly) {
+                  GoRouter.of(context).pushNamed(
+                    'confirmDeletionPage',
+                    extra: {
+                      'email': user?.email ?? '',
+                      'password': '',
+                    },
+                  );
+                  return;
+                }
+
                 GoRouter.of(context).pushNamed('deleteAccountPage');
               },
             ),
