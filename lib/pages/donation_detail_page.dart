@@ -448,14 +448,27 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     ),
                     title: Text(request.solicitante.name,
                         style: TextStylesConstants.kpoppinsMedium),
-                    subtitle: Text("Status: ${request.status}"),
-                    trailing: request.status == 'APROVADO'
-                        ? SelectableText(
-                            request.confirmationCode ?? "SEM COD",
-                            style: TextStylesConstants.kpoppinsBold
-                                .copyWith(color: ConstantsColors.blueShade900),
-                          )
-                        : null,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Status: ${request.status}"),
+                        Text(
+                          [
+                            if (request.status == 'APROVADO')
+                              'Código: ${request.confirmationCode ?? "SEM COD"}',
+                            'Contato: ${request.solicitante.email}',
+                            if (request.solicitante.phone != null &&
+                                request.solicitante.phone!.isNotEmpty)
+                              'Telefone: ${request.solicitante.phone}',
+                          ].join(' | '),
+                        ),
+                        if (request.status == 'APROVADO')
+                          Text(
+                            'Informações de contato de ${request.solicitante.name}: ${request.solicitante.email}${request.solicitante.phone != null && request.solicitante.phone!.isNotEmpty ? ' | Telefone: ${request.solicitante.phone}' : ''}',
+                          ),
+                      ],
+                    ),
+                    trailing: null,
                   ),
                 );
               },
