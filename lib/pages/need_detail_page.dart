@@ -180,6 +180,48 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     }
   }
 
+  Future<bool> _confirmShareContactData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey.shade200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          title: const Text(
+            'Compartilhar informações?',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: Text(
+            'Você concorda em compartilhar suas informações de contato para que ${widget.need.authorName} possa entrar em contato e a entrega possa ocorrer?',
+            style: const TextStyle(color: Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade700,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Concordo'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
+  }
+
   String _traduzirPostStatus(String status) {
     switch (status) {
       case 'DISPONIVEL':
@@ -327,7 +369,12 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                                 _hasRequestedItem ||
                                 _isCheckingExistingRequest
                             ? null
-                            : _submitRequest,
+                            : () async {
+                                final confirmed =
+                                    await _confirmShareContactData();
+                                if (!confirmed) return;
+                                _submitRequest();
+                              },
                         child: _isLoadingRequest || _isCheckingExistingRequest
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
