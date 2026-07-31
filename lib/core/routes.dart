@@ -33,6 +33,7 @@ import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/pending_requests_page.dart';
 import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
+import 'package:appdonationsgestor/pages/concluded_posts_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -71,6 +72,7 @@ class RouteNames {
   static const String pendingRequests = "pendingRequests";
   static const String allowPostPage = "allowPostPage";
   static const String confirmDonationPage = "confirmDonationPage";
+  static const String concludedPostsPage = "concludedPostsPage";
 }
 
 class AppRountersConfiguration {
@@ -112,6 +114,15 @@ class AppRountersConfiguration {
             final int requestId = state.extra as int;
             return MaterialPage(
               child: ConfirmDonationPage(requestId: requestId),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/concludedPostsPage',
+          name: RouteNames.concludedPostsPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: ConcludedPostsPage(),
             );
           },
         ),
@@ -224,14 +235,13 @@ class AppRountersConfiguration {
           },
         ),
         GoRoute(
-  path: '/finalizeRegistrationPage',
-  builder: (context, state) {
-    return FinalizeRegistrationPage(
-      userData:
-          state.extra as Map<String, dynamic>,
-    );
-  },
-),
+          path: '/finalizeRegistrationPage',
+          builder: (context, state) {
+            return FinalizeRegistrationPage(
+              userData: state.extra as Map<String, dynamic>,
+            );
+          },
+        ),
         GoRoute(
           path: '/favoritesPage',
           name: RouteNames.favoritesPage,

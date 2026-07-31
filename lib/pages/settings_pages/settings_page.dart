@@ -123,6 +123,12 @@ class _SettingsPage extends State<SettingsPage> {
                 GoRouter.of(context).pushNamed('editProfilePage');
               },
             ),
+            _buildSettingOption(
+              title: 'Posts Concluídos',
+              onTap: () {
+                GoRouter.of(context).pushNamed('concludedPostsPage');
+              },
+            ),
             // _buildSettingOption(
             //   title: 'Vincular a Conta',
             //   onTap: () {
