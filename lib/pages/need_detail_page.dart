@@ -233,6 +233,10 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     context.push('/confirmDonationPage', extra: _approvedRequestId);
   }
 
+  String _confirmedQuantityLabel() {
+    return 'Quantidade que já foi doada:';
+  }
+
   String _traduzirPostStatus(String status) {
     switch (status) {
       case 'DISPONIVEL':
@@ -472,6 +476,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Status: ${request.status}"),
+                        if (request.status == 'APROVADO' &&
+                            request.confirmedQuantity != null)
+                          Text(
+                            '${_confirmedQuantityLabel()} ${request.confirmedQuantity}',
+                          ),
                         Text(
                           [
                             if (request.status == 'APROVADO')

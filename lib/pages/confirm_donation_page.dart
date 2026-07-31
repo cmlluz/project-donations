@@ -41,11 +41,26 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
       return;
     }
 
+    final confirmedQuantity = int.tryParse(_quantityController.text.trim());
+    if (confirmedQuantity == null || confirmedQuantity <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Por favor, informe uma quantidade válida maior que zero.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
       await _requestApiService.deliverRequest(
-          widget.requestId, _codeController.text.trim());
+        widget.requestId,
+        _codeController.text.trim(),
+        confirmedQuantity,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -154,7 +169,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Quantidade entregue (Opcional)',
+                  'Quantidade entregue / recebida',
                   style: TextStyle(
                     color: ConstantsColors.blackShade900,
                     fontWeight: FontWeight.bold,
@@ -168,6 +183,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
                 controller: _quantityController,
                 keyboardType: TextInputType.number,
                 labelColor: ConstantsColors.whiteShade700,
+                maxLength: 9,
               ),
               const SizedBox(height: 40),
               Center(

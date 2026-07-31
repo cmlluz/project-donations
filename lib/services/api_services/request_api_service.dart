@@ -47,13 +47,15 @@ class RequestApiService {
     }
   }
 
-  Future<Request> deliverRequest(int requestId, String code) async {
+  Future<Request> deliverRequest(
+      int requestId, String code, int confirmedQuantity) async {
     final response = await _apiClient.post(
       'requests/$requestId/deliver',
       body: {
         'donationId': null,
         'needId': null,
         'code': code,
+        'confirmedQuantity': confirmedQuantity,
       },
     );
 
