@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class NeedDetailPage extends StatefulWidget {
   final Need need;
@@ -35,6 +36,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
   bool _hasRequestedItem = false;
+  bool _hasApprovedRequest = false;
+  int? _approvedRequestId;
   bool _isCheckingExistingRequest = true;
   late bool _actualOwnerView;
 
@@ -76,6 +79,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
       if (mounted && existingRequest.need?.id == widget.need.id) {
         setState(() {
           _hasRequestedItem = true;
+          _hasApprovedRequest = existingRequest.status == 'APROVADO';
+          _approvedRequestId = _hasApprovedRequest ? existingRequest.id : null;
           _isCheckingExistingRequest = false;
         });
       } else {
@@ -222,6 +227,12 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     return confirmed ?? false;
   }
 
+  void _openConfirmationPage() {
+    if (_approvedRequestId == null) return;
+
+    context.push('/confirmDonationPage', extra: _approvedRequestId);
+  }
+
   String _traduzirPostStatus(String status) {
     switch (status) {
       case 'DISPONIVEL':
@@ -356,9 +367,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                       height: 50,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _hasRequestedItem
-                              ? Colors.grey
-                              : ConstantsColors.blueShade900,
+                          backgroundColor: _hasApprovedRequest
+                              ? Colors.green.shade700
+                              : (_hasRequestedItem
+                                  ? Colors.grey
+                                  : ConstantsColors.blueShade900),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -366,10 +379,15 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                         ),
                         onPressed: _isLoadingRequest ||
                                 !isDisponivel ||
-                                _hasRequestedItem ||
-                                _isCheckingExistingRequest
+                                _isCheckingExistingRequest ||
+                                (_hasRequestedItem && !_hasApprovedRequest)
                             ? null
                             : () async {
+                                if (_hasApprovedRequest) {
+                                  _openConfirmationPage();
+                                  return;
+                                }
+
                                 final confirmed =
                                     await _confirmShareContactData();
                                 if (!confirmed) return;
@@ -379,12 +397,14 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
                             : Text(
-                                _hasRequestedItem
-                                    ? "Interesse Registrado"
-                                    : isDisponivel
-                                        ? "Quero Doar"
-                                        : _traduzirPostStatus(
-                                            widget.need.postStatus),
+                                _hasApprovedRequest
+                                    ? "Inserir o Código"
+                                    : _hasRequestedItem
+                                        ? "Interesse Registrado"
+                                        : isDisponivel
+                                            ? "Quero Doar"
+                                            : _traduzirPostStatus(
+                                                widget.need.postStatus),
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),
