@@ -4,6 +4,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:appdonationsgestor/auth/app_data.dart';
 import 'package:appdonationsgestor/auth/auth_service.dart';
 import 'package:appdonationsgestor/components/menu_button.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/core/routes.dart';
@@ -58,8 +59,7 @@ class _RootPageState extends State<RootPage> {
 
     if (type == 'NEW_REQUEST') {
       GoRouter.of(context).goNamed(RouteNames.pendingRequests);
-    } else if (type == 'REQUEST_APPROVED' ||
-        type == 'REQUEST_REJECTED') {
+    } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     } else if (type == 'POST_VALIDATION_PENDING') {
       if (currentUserRole == 'ROLE_ADMIN') {
@@ -76,8 +76,7 @@ class _RootPageState extends State<RootPage> {
           );
         }
       }
-    } else if (type == 'POST_APPROVED' ||
-        type == 'POST_REJECTED') {
+    } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
       GoRouter.of(context).goNamed(RouteNames.hystoryPage);
     }
   }
@@ -90,8 +89,7 @@ class _RootPageState extends State<RootPage> {
 
   @override
   void dispose() {
-    NavigationController.currentIndex
-        .removeListener(_updateIndex);
+    NavigationController.currentIndex.removeListener(_updateIndex);
 
     _notificationSubscription?.cancel();
 
@@ -118,51 +116,51 @@ class _RootPageState extends State<RootPage> {
     'assets/icons/logout_icon.png',
   ];
 
-void logout() async {
-  try {
-    await _notificationService.deleteToken();
+  void logout() async {
+    try {
+      await _notificationService.deleteToken();
 
-    context.read<UserProvider>().clearUser();
+      context.read<UserProvider>().clearUser();
+      context.read<FavoriteController>().clearFavorites();
 
-    await authService.value.signOut();
+      await authService.value.signOut();
 
-    AppData.navBarCurrentIndexNotifier.value = 0;
-    AppData.onboardingCurrentIndexNotifier.value = 0;
+      AppData.navBarCurrentIndexNotifier.value = 0;
+      AppData.onboardingCurrentIndexNotifier.value = 0;
 
-    if (context.mounted) {
-      context.go('/');
-    }
-  }on FirebaseAuthException catch (e) {
-    final translatedMessage =
-        FirebaseErrorTranslator.translate(e.code);
+      if (context.mounted) {
+        context.go('/');
+      }
+    } on FirebaseAuthException catch (e) {
+      final translatedMessage = FirebaseErrorTranslator.translate(e.code);
 
-    final errorMsg = translatedMessage.isEmpty
-        ? (e.message ?? 'Erro desconhecido ao fazer logout')
-        : translatedMessage;
+      final errorMsg = translatedMessage.isEmpty
+          ? (e.message ?? 'Erro desconhecido ao fazer logout')
+          : translatedMessage;
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro inesperado ao fazer logout.',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
           ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro inesperado ao fazer logout.',
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +169,9 @@ void logout() async {
         index: NavigationController.currentIndex.value,
         children: pages,
       ),
-      bottomNavigationBar:
-          AnimatedBottomNavigationBar.builder(
+      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
         itemCount: iconList.length,
-        activeIndex:
-            NavigationController.currentIndex.value,
+        activeIndex: NavigationController.currentIndex.value,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
         scaleFactor: 1.0,
@@ -200,8 +196,7 @@ void logout() async {
             _showLogoutMenu(context);
           } else {
             setState(() {
-              NavigationController.currentIndex.value =
-                  index;
+              NavigationController.currentIndex.value = index;
             });
           }
         },
@@ -211,11 +206,9 @@ void logout() async {
 
   // MENU INFERIOR
   void _showBottomMenu(BuildContext context) {
-    final userRole =
-        context.read<UserProvider>().currentUser?.role;
+    final userRole = context.read<UserProvider>().currentUser?.role;
 
-    final bool isManager =
-        userRole == 'ROLE_MANAGER';
+    final bool isManager = userRole == 'ROLE_MANAGER';
 
     showModalBottomSheet(
       context: context,
@@ -257,8 +250,7 @@ void logout() async {
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
-                        color:
-                            ConstantsColors.blueShade900,
+                        color: ConstantsColors.blueShade900,
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -267,61 +259,49 @@ void logout() async {
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
-
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   MenuButton(
-                    icon:
-                        Icons.volunteer_activism_outlined,
+                    icon: Icons.volunteer_activism_outlined,
                     label: 'Anunciar \n Necessidade',
                     onTap: () {
-                      GoRouter.of(context)
-                          .push("/itemPostPage");
+                      GoRouter.of(context).push("/itemPostPage");
 
                       Navigator.of(context).pop();
                     },
                   ),
-
                   MenuButton(
                     icon: Icons.text_snippet_rounded,
                     label: 'Criar \n publicação',
                     onTap: () {
-                      GoRouter.of(context)
-                          .push("/postPage");
+                      GoRouter.of(context).push("/postPage");
 
                       Navigator.of(context).pop();
                     },
                   ),
-
                   MenuButton(
                     icon: Icons.receipt_long_sharp,
                     label: 'Criar \n nota fiscal',
                     onTap: () {
-                      GoRouter.of(context)
-                          .push("/notaFiscalPage");
+                      GoRouter.of(context).push("/notaFiscalPage");
 
                       Navigator.of(context).pop();
                     },
                   ),
-
                   if (isManager)
                     MenuButton(
                       icon: Icons.campaign_outlined,
                       label: 'Divulgar \n campanha',
                       onTap: () {
-                        GoRouter.of(context)
-                            .push("/publishCampaign");
+                        GoRouter.of(context).push("/publishCampaign");
 
                         Navigator.of(context).pop();
                       },
                     ),
                 ],
               ),
-
               const SizedBox(height: 24),
             ],
           ),
@@ -361,8 +341,7 @@ void logout() async {
                     ),
                   ),
                 ),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 15),
+                margin: const EdgeInsets.symmetric(horizontal: 15),
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Stack(
                   alignment: Alignment.center,
@@ -375,67 +354,53 @@ void logout() async {
                           fontSize: 16,
                           color: ConstantsColors.blueShade900,
                         ).merge(
-                          TextStylesConstants
-                              .kinterSemiBold,
+                          TextStylesConstants.kinterSemiBold,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 19),
-
               Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Tem certeza que deseja sair?',
                     style: TextStyle(
                       fontSize: 16,
-                      color: ConstantsColors.blueShade900
-                          .withOpacity(0.7),
+                      color: ConstantsColors.blueShade900.withOpacity(0.7),
                     ).merge(
                       TextStylesConstants.kinterRegular,
                     ),
                   ),
-
                   const SizedBox(height: 15),
-
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              ConstantsColors.whiteShade900,
+                          backgroundColor: ConstantsColors.whiteShade900,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15),
                             side: const BorderSide(
-                              color:
-                                  ConstantsColors.blueShade900,
+                              color: ConstantsColors.blueShade900,
                             ),
                           ),
                         ),
                         child: Text(
                           'Cancelar',
                           style: const TextStyle(
-                            color:
-                                ConstantsColors.blueShade900,
+                            color: ConstantsColors.blueShade900,
                             fontSize: 16,
                           ).merge(
-                            TextStylesConstants
-                                .kpoppinsMedium,
+                            TextStylesConstants.kpoppinsMedium,
                           ),
                         ),
                       ),
-
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -443,22 +408,18 @@ void logout() async {
                           logout();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              ConstantsColors.blueShade900,
+                          backgroundColor: ConstantsColors.blueShade900,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         child: Text(
                           'Sim, sair',
                           style: const TextStyle(
-                            color:
-                                ConstantsColors.whiteShade900,
+                            color: ConstantsColors.whiteShade900,
                             fontSize: 16,
                           ).merge(
-                            TextStylesConstants
-                                .kpoppinsMedium,
+                            TextStylesConstants.kpoppinsMedium,
                           ),
                         ),
                       ),
@@ -466,7 +427,6 @@ void logout() async {
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
             ],
           ),

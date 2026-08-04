@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/auth/auth_service.dart';
+import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -31,6 +32,12 @@ class _LoginPage extends State<LoginPage> {
   bool isLoading = false;
 
   bool showSlowMessage = false;
+
+  Future<void> _refreshFavorites() async {
+    final favoriteController = context.read<FavoriteController>();
+    favoriteController.clearFavorites();
+    await favoriteController.loadFavorites();
+  }
 
   @override
   void dispose() {
@@ -68,6 +75,7 @@ class _LoginPage extends State<LoginPage> {
 
       // CARREGA DADOS DO USUÁRIO
       await context.read<UserProvider>().fetchCurrentUser();
+      await _refreshFavorites();
 
       if (mounted) {
         GoRouter.of(context).go('/root');
@@ -153,6 +161,7 @@ class _LoginPage extends State<LoginPage> {
         }
 
         await context.read<UserProvider>().fetchCurrentUser();
+        await _refreshFavorites();
 
         if (mounted) {
           GoRouter.of(context).push('/root');
@@ -170,7 +179,8 @@ class _LoginPage extends State<LoginPage> {
       if (mounted) {
         String errorMsg = FirebaseErrorTranslator.translateException(e);
         if (errorMsg.isEmpty) {
-          errorMsg = 'Erro de conexão. Verifique sua internet e tente novamente.';
+          errorMsg =
+              'Erro de conexão. Verifique sua internet e tente novamente.';
         }
 
         setState(() {
