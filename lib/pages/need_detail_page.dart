@@ -69,14 +69,14 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     try {
       final sentRequests = await _requestApiService.getMySentRequests();
 
-      final existingRequest = sentRequests.firstWhere(
-        (request) =>
-            request.need?.id == widget.need.id &&
-            (request.status == 'PENDENTE' || request.status == 'APROVADO'),
-        orElse: () => sentRequests.first,
-      );
+      final activeRequests = sentRequests
+          .where((request) =>
+              request.need?.id == widget.need.id &&
+              (request.status == 'PENDENTE' || request.status == 'APROVADO'))
+          .toList();
 
-      if (mounted && existingRequest.need?.id == widget.need.id) {
+      if (mounted && activeRequests.isNotEmpty) {
+        final existingRequest = activeRequests.first;
         setState(() {
           _hasRequestedItem = true;
           _hasApprovedRequest = existingRequest.status == 'APROVADO';
@@ -86,6 +86,9 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
       } else {
         if (mounted) {
           setState(() {
+            _hasRequestedItem = false;
+            _hasApprovedRequest = false;
+            _approvedRequestId = null;
             _isCheckingExistingRequest = false;
           });
         }
@@ -93,6 +96,9 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     } catch (e) {
       if (mounted) {
         setState(() {
+          _hasRequestedItem = false;
+          _hasApprovedRequest = false;
+          _approvedRequestId = null;
           _isCheckingExistingRequest = false;
         });
       }
