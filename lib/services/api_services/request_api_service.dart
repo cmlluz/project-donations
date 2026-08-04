@@ -62,8 +62,9 @@ class RequestApiService {
     if (response.statusCode == 200) {
       return Request.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      print("Erro ${response.statusCode}: ${response.body}");
-      throw Exception('Falha ao confirmar entrega');
+      final responseBody = utf8.decode(response.bodyBytes).trim();
+      print("Erro ${response.statusCode}: $responseBody");
+      throw Exception('Erro ${response.statusCode}: $responseBody');
     }
   }
 

@@ -224,7 +224,7 @@ class AuthService {
   Future<bool> userExists(String email) async {
     final response = await http.get(
       Uri.parse(
-        'http://192.168.1.7:8080/api/users/exists?email=$email',
+        'http://192.168.1.3:8080/api/users/exists?email=$email',
       ),
     );
 

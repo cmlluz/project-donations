@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class ProfileService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final String _baseUrl = 'http://192.168.1.7:8080/api';
+  final String _baseUrl = 'http://192.168.1.3:8080/api';
 
   User? get currentUser => _auth.currentUser;
 
