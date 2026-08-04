@@ -335,9 +335,9 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
       case 'DISPONIVEL':
         return 'Disponível';
       case 'PENDENTE_APROVACAO':
-        return 'Em Análise';
+        return 'Pendente de aprovação';
       case 'CONCLUIDO':
-        return 'Entregue';
+        return 'Concluído';
       case 'REJEITADO':
         return 'Rejeitado';
       default:

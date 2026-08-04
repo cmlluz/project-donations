@@ -333,9 +333,9 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
       case 'DISPONIVEL':
         return 'Disponível';
       case 'PENDENTE_APROVACAO':
-        return 'Em Análise';
+        return 'Pendente de aprovação';
       case 'CONCLUIDO':
-        return 'Finalizada';
+        return 'Concluída';
       case 'REJEITADO':
         return 'Rejeitada';
       default:
