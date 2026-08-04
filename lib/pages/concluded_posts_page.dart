@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/components/card_item.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -18,12 +19,22 @@ class ConcludedPostsPage extends StatefulWidget {
 class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
   late final PostApiService _postApiService;
   late Future<List<PostModel>> _postsFuture;
+  late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
     super.initState();
     _postApiService = PostApiService(ApiClient());
     _postsFuture = _postApiService.getConcludedPosts();
+    _postsRefreshListener = _refresh;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
+  }
+
+  @override
+  void dispose() {
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
   }
 
   Future<void> _refresh() async {

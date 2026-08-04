@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
@@ -23,11 +24,44 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
   final ApiClient _apiClient = ApiClient();
   late final RequestApiService _requestApiService;
   bool _isLoading = false;
+  bool _isLoadingTargetQuantity = true;
+  int? _targetQuantity;
 
   @override
   void initState() {
     super.initState();
     _requestApiService = RequestApiService(_apiClient);
+    _loadTargetQuantity();
+  }
+
+  Future<void> _loadTargetQuantity() async {
+    try {
+      final sentRequests = await _requestApiService.getMySentRequests();
+      final request = sentRequests.firstWhere(
+        (item) => item.id == widget.requestId,
+      );
+
+      if (mounted) {
+        setState(() {
+          _targetQuantity =
+              request.donation?.quantity ?? request.need?.quantity;
+          _isLoadingTargetQuantity = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _targetQuantity = null;
+          _isLoadingTargetQuantity = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar dados da solicitação: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _confirmDelivery() async {
@@ -53,6 +87,28 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
       return;
     }
 
+    if (_targetQuantity == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível validar a quantidade do post.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (confirmedQuantity > _targetQuantity!) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'A quantidade informada não pode ser maior que a quantidade pretendida ($_targetQuantity).',
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -63,6 +119,7 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
       );
 
       if (mounted) {
+        NavigationController.postsRefreshToken.value++;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Entrega confirmada com sucesso!'),
@@ -185,6 +242,21 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
                 labelColor: ConstantsColors.whiteShade700,
                 maxLength: 9,
               ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _isLoadingTargetQuantity
+                      ? 'Carregando quantidade pretendida...'
+                      : 'Quantidade pretendida: ${_targetQuantity ?? "indisponível"}',
+                  style: TextStylesConstants.kinterRegular.merge(
+                    const TextStyle(
+                      fontSize: 13,
+                      color: ConstantsColors.greyShade600,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 40),
               Center(
                 child: CustomButton(
@@ -193,7 +265,9 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
                   text: 'Confirmar doação',
                   color: ConstantsColors.blueShade900,
                   textColor: ConstantsColors.whiteShade900,
-                  onPressed: _isLoading ? null : _confirmDelivery,
+                  onPressed: _isLoading || _isLoadingTargetQuantity
+                      ? null
+                      : _confirmDelivery,
                 ),
               ),
               const SizedBox(height: 10),
