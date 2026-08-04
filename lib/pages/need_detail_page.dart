@@ -2,9 +2,11 @@ import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
@@ -30,16 +32,21 @@ class NeedDetailPage extends StatefulWidget {
 class _NeedDetailPageState extends State<NeedDetailPage> {
   late final FavoriteApiService _favoriteApiService;
   late final RequestApiService _requestApiService;
+  late final NeedApiService _needApiService;
   final ApiClient _apiClient = ApiClient();
 
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
+  bool _isLoadingItemData = true;
   bool _hasRequestedItem = false;
   bool _hasApprovedRequest = false;
   int? _approvedRequestId;
   bool _isCheckingExistingRequest = true;
   late bool _actualOwnerView;
+  late Need _need;
+  int _confirmedQuantity = 0;
+  late final VoidCallback _postsRefreshListener;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -48,6 +55,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     super.initState();
     _favoriteApiService = FavoriteApiService(_apiClient);
     _requestApiService = RequestApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
+    _need = widget.need;
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isNeedFavorite(widget.need.id);
 
@@ -56,12 +65,88 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
         ?.firebaseUid;
     _actualOwnerView = widget.isOwnerView ||
         (currentUserUid != null && widget.need.authorUid == currentUserUid);
+    _postsRefreshListener = _reloadItemData;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
+    _reloadItemData();
+  }
 
-    if (_actualOwnerView) {
-      _requestsFuture =
-          _requestApiService.getRequestsForItem(needId: widget.need.id);
-    } else {
-      _checkExistingRequest();
+  @override
+  void dispose() {
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
+  }
+
+  int _sumConfirmedQuantity(List<Request> requests) {
+    return requests
+        .where((request) =>
+            request.status == 'APROVADO' || request.status == 'ENTREGUE')
+        .fold<int>(
+          0,
+          (total, request) => total + (request.confirmedQuantity ?? 0),
+        );
+  }
+
+  Future<void> _reloadItemData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingItemData = true;
+      _isCheckingExistingRequest = true;
+    });
+
+    try {
+      final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+          .currentUser
+          ?.firebaseUid;
+
+      final latestNeed =
+          await _needApiService.getNeedById(widget.need.id.toString());
+      final itemRequests = await _requestApiService.getRequestsForItem(
+        needId: latestNeed.id,
+      );
+      final sentRequests = await _requestApiService.getMySentRequests();
+
+      final activeRequests = sentRequests
+          .where((request) =>
+              request.need?.id == latestNeed.id &&
+              (request.status == 'PENDENTE' || request.status == 'APROVADO'))
+          .toList();
+
+      if (!mounted) return;
+
+      setState(() {
+        _need = latestNeed;
+        _confirmedQuantity = _sumConfirmedQuantity(itemRequests);
+        _requestsFuture = Future.value(itemRequests);
+        _actualOwnerView = widget.isOwnerView ||
+            (currentUserUid != null && latestNeed.authorUid == currentUserUid);
+
+        if (activeRequests.isNotEmpty) {
+          final existingRequest = activeRequests.first;
+          _hasRequestedItem = true;
+          _hasApprovedRequest = existingRequest.status == 'APROVADO';
+          _approvedRequestId = _hasApprovedRequest ? existingRequest.id : null;
+        } else {
+          _hasRequestedItem = false;
+          _hasApprovedRequest = false;
+          _approvedRequestId = null;
+        }
+
+        _isCheckingExistingRequest = false;
+        _isLoadingItemData = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _requestsFuture = _requestApiService.getRequestsForItem(
+          needId: widget.need.id,
+        );
+        _confirmedQuantity = 0;
+        _isLoadingItemData = false;
+        _isCheckingExistingRequest = false;
+      });
     }
   }
 
@@ -206,7 +291,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
             style: TextStyle(color: Colors.black87),
           ),
           content: Text(
-            'Você concorda em compartilhar suas informações de contato para que ${widget.need.authorName} possa entrar em contato e a entrega possa ocorrer?',
+            'Você concorda em compartilhar suas informações de contato para que ${_need.authorName} possa entrar em contato e a entrega possa ocorrer?',
             style: const TextStyle(color: Colors.black87),
           ),
           actions: [
@@ -261,8 +346,8 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   @override
   Widget build(BuildContext context) {
     final formattedDate =
-        DateFormat('dd/MM/yyyy').format(widget.need.date ?? DateTime.now());
-    final bool isDisponivel = widget.need.postStatus == 'DISPONIVEL';
+        DateFormat('dd/MM/yyyy').format(_need.date ?? DateTime.now());
+    final bool isDisponivel = _need.postStatus == 'DISPONIVEL';
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -277,13 +362,12 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: widget.need.imageUrl != null &&
-                          widget.need.imageUrl!.isNotEmpty
+                  child: _need.imageUrl != null && _need.imageUrl!.isNotEmpty
                       ? ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                               bottom: Radius.circular(25)),
                           child: Image.network(
-                            widget.need.imageUrl!,
+                            _need.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.broken_image,
@@ -330,7 +414,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.need.title,
+                    _need.title,
                     style: const TextStyle(
                             fontSize: 26, fontWeight: FontWeight.bold)
                         .merge(TextStylesConstants.kinterSemiBold),
@@ -344,13 +428,25 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                   ListTile(
                     leading: const CircleAvatar(child: Icon(Icons.business)),
                     title: Text(
-                      widget.need.authorName,
+                      _need.authorName,
                       style: const TextStyle(
                               fontSize: 18, color: ConstantsColors.blueShade900)
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
-                    subtitle: Text(
-                        'Status: ${_traduzirPostStatus(widget.need.postStatus)} | Quantidade: ${widget.need.quantity}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Status: ${_traduzirPostStatus(_need.postStatus)}',
+                        ),
+                        Text(
+                          'Quantidade declarada: ${_need.quantity}',
+                        ),
+                        Text(
+                          'Quantidade já doada: $_confirmedQuantity',
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -362,14 +458,16 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: Text(
-                      widget.need.description,
+                      _need.description,
                       style: const TextStyle(
                               fontSize: 16, color: ConstantsColors.greyShade600)
                           .merge(TextStylesConstants.kpoppinsMedium),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (_actualOwnerView)
+                  if (_isLoadingItemData)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_actualOwnerView)
                     _buildOwnerView()
                   else
                     SizedBox(
@@ -414,7 +512,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                                         : isDisponivel
                                             ? "Quero Doar"
                                             : _traduzirPostStatus(
-                                                widget.need.postStatus),
+                                                _need.postStatus),
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -80,6 +81,7 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
         await _clearRelatedNewRequestNotifications(requestId: request.id);
 
         if (mounted) {
+          NavigationController.postsRefreshToken.value++;
           await showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -137,6 +139,8 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
             ),
           );
         }
+
+        NavigationController.postsRefreshToken.value++;
       }
     } catch (e) {
       if (mounted) {

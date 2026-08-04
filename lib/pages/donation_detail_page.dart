@@ -1,9 +1,11 @@
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
@@ -30,16 +32,21 @@ class DonationDetailPage extends StatefulWidget {
 class _DonationDetailPageState extends State<DonationDetailPage> {
   late final FavoriteApiService _favoriteApiService;
   late final RequestApiService _requestApiService;
+  late final DonationApiService _donationApiService;
   final ApiClient _apiClient = ApiClient();
 
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
+  bool _isLoadingItemData = true;
   bool _hasRequestedItem = false;
   bool _hasApprovedRequest = false;
   int? _approvedRequestId;
   bool _isCheckingExistingRequest = true;
   late bool _actualOwnerView;
+  late Donation _donation;
+  int _confirmedQuantity = 0;
+  late final VoidCallback _postsRefreshListener;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -48,6 +55,8 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     super.initState();
     _favoriteApiService = FavoriteApiService(_apiClient);
     _requestApiService = RequestApiService(_apiClient);
+    _donationApiService = DonationApiService(_apiClient);
+    _donation = widget.donation;
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isDonationFavorite(widget.donation.id);
 
@@ -57,11 +66,89 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
     _actualOwnerView = widget.isOwnerView ||
         (currentUserUid != null &&
             widget.donation.donatorUid == currentUserUid);
-    if (_actualOwnerView) {
-      _requestsFuture =
-          _requestApiService.getRequestsForItem(donationId: widget.donation.id);
-    } else {
-      _checkExistingRequest();
+    _postsRefreshListener = _reloadItemData;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
+    _reloadItemData();
+  }
+
+  @override
+  void dispose() {
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
+  }
+
+  int _sumConfirmedQuantity(List<Request> requests) {
+    return requests
+        .where((request) =>
+            request.status == 'APROVADO' || request.status == 'ENTREGUE')
+        .fold<int>(
+          0,
+          (total, request) => total + (request.confirmedQuantity ?? 0),
+        );
+  }
+
+  Future<void> _reloadItemData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingItemData = true;
+      _isCheckingExistingRequest = true;
+    });
+
+    try {
+      final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+          .currentUser
+          ?.firebaseUid;
+
+      final latestDonation = await _donationApiService
+          .getDonationById(widget.donation.id.toString());
+      final itemRequests = await _requestApiService.getRequestsForItem(
+        donationId: latestDonation.id,
+      );
+      final sentRequests = await _requestApiService.getMySentRequests();
+
+      final activeRequests = sentRequests
+          .where((request) =>
+              request.donation?.id == latestDonation.id &&
+              (request.status == 'PENDENTE' || request.status == 'APROVADO'))
+          .toList();
+
+      if (!mounted) return;
+
+      setState(() {
+        _donation = latestDonation;
+        _confirmedQuantity = _sumConfirmedQuantity(itemRequests);
+        _requestsFuture = Future.value(itemRequests);
+        _actualOwnerView = widget.isOwnerView ||
+            (currentUserUid != null &&
+                latestDonation.donatorUid == currentUserUid);
+
+        if (activeRequests.isNotEmpty) {
+          final existingRequest = activeRequests.first;
+          _hasRequestedItem = true;
+          _hasApprovedRequest = existingRequest.status == 'APROVADO';
+          _approvedRequestId = _hasApprovedRequest ? existingRequest.id : null;
+        } else {
+          _hasRequestedItem = false;
+          _hasApprovedRequest = false;
+          _approvedRequestId = null;
+        }
+
+        _isCheckingExistingRequest = false;
+        _isLoadingItemData = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _requestsFuture = _requestApiService.getRequestsForItem(
+          donationId: widget.donation.id,
+        );
+        _confirmedQuantity = 0;
+        _isLoadingItemData = false;
+        _isCheckingExistingRequest = false;
+      });
     }
   }
 
@@ -206,7 +293,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
             style: TextStyle(color: Colors.black87),
           ),
           content: Text(
-            'Você concorda em compartilhar suas informações de contato para que ${widget.donation.donatorName} possa entrar em contato e a entrega possa ocorrer?',
+            'Você concorda em compartilhar suas informações de contato para que ${_donation.donatorName} possa entrar em contato e a entrega possa ocorrer?',
             style: const TextStyle(color: Colors.black87),
           ),
           actions: [
@@ -261,8 +348,8 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
   @override
   Widget build(BuildContext context) {
     final formattedDate =
-        DateFormat('dd/MM/yyyy').format(widget.donation.date ?? DateTime.now());
-    final bool isDisponivel = widget.donation.postStatus == 'DISPONIVEL';
+        DateFormat('dd/MM/yyyy').format(_donation.date ?? DateTime.now());
+    final bool isDisponivel = _donation.postStatus == 'DISPONIVEL';
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -277,13 +364,13 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: widget.donation.imageUrl != null &&
-                          widget.donation.imageUrl!.isNotEmpty
+                  child: _donation.imageUrl != null &&
+                          _donation.imageUrl!.isNotEmpty
                       ? ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                               bottom: Radius.circular(25)),
                           child: Image.network(
-                            widget.donation.imageUrl!,
+                            _donation.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.broken_image,
@@ -330,7 +417,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.donation.title,
+                    _donation.title,
                     style: const TextStyle(
                             fontSize: 26, fontWeight: FontWeight.bold)
                         .merge(TextStylesConstants.kinterSemiBold),
@@ -344,13 +431,25 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                   ListTile(
                     leading: const CircleAvatar(child: Icon(Icons.business)),
                     title: Text(
-                      widget.donation.donatorName,
+                      _donation.donatorName,
                       style: const TextStyle(
                               fontSize: 18, color: ConstantsColors.blueShade900)
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
-                    subtitle: Text(
-                        'Status: ${_traduzirPostStatus(widget.donation.postStatus)} | Quantidade: ${widget.donation.quantity}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Status: ${_traduzirPostStatus(_donation.postStatus)}',
+                        ),
+                        Text(
+                          'Quantidade declarada: ${_donation.quantity}',
+                        ),
+                        Text(
+                          'Quantidade já recebida: $_confirmedQuantity',
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -362,14 +461,16 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: Text(
-                      widget.donation.description,
+                      _donation.description,
                       style: const TextStyle(
                               fontSize: 16, color: ConstantsColors.greyShade600)
                           .merge(TextStylesConstants.kpoppinsMedium),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (_actualOwnerView)
+                  if (_isLoadingItemData)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_actualOwnerView)
                     _buildOwnerView()
                   else
                     SizedBox(
@@ -414,7 +515,7 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                                         : isDisponivel
                                             ? "Quero Receber"
                                             : _traduzirPostStatus(
-                                                widget.donation.postStatus),
+                                                _donation.postStatus),
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),

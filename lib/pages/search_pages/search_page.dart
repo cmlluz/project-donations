@@ -7,6 +7,7 @@ import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/controllers/donation_controller.dart';
 import 'package:appdonationsgestor/controllers/need_controller.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/pages/search_pages/filter_pages/generic_filter_page.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
   late AppSearchController _searchControllerProvider;
+  late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
@@ -29,6 +31,12 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     _tabController = TabController(length: 5, vsync: this);
     _searchControllerProvider = AppSearchController();
     _searchControllerProvider.loadItems();
+    _postsRefreshListener = () {
+      if (mounted) {
+        _searchControllerProvider.loadItems();
+      }
+    };
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
 
     // Conecta com os Controllers para receber atualizações em tempo real
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -106,6 +114,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 
     _tabController.dispose();
     _searchController.dispose();
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
     _searchControllerProvider.dispose();
     super.dispose();
   }
@@ -148,9 +158,9 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.25),
-                offset: const Offset(0, 1),
-                blurRadius: 2,
-                spreadRadius: 0,
+              offset: const Offset(0, 1),
+              blurRadius: 2,
+              spreadRadius: 0,
             ),
           ],
         ),
