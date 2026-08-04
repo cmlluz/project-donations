@@ -31,6 +31,18 @@ class NeedApiService {
     }
   }
 
+  Future<List<Need>> getMyConcludedNeeds() async {
+    final response = await _apiClient.get('needs/me/concluded');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Need.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar minhas necessidades concluídas.');
+    }
+  }
+
   Future<Need> getNeedById(String id) async {
     final response = await _apiClient.get('needs/$id');
 

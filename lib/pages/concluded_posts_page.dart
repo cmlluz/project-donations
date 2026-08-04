@@ -58,34 +58,32 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
 
   Future<List<_ConcludedItem>> _loadConcludedItems() async {
     final results = await Future.wait([
-      _donationApiService.getMyDonations(),
-      _needApiService.getMyNeeds(),
+      _donationApiService.getMyConcludedDonations(),
+      _needApiService.getMyConcludedNeeds(),
     ]);
 
     final donations = results[0] as List<Donation>;
     final needs = results[1] as List<Need>;
 
-    final concludedDonations =
-        donations.where((item) => item.postStatus == 'CONCLUIDO').map(
-              (item) => _ConcludedItem(
-                type: 'DOAÇÃO',
-                id: item.id,
-                title: item.title,
-                quantity: item.quantity,
-                imageUrl: item.imageUrl,
-              ),
-            );
+    final concludedDonations = donations.map(
+      (item) => _ConcludedItem(
+        type: 'DOAÇÃO',
+        id: item.id,
+        title: item.title,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+      ),
+    );
 
-    final concludedNeeds =
-        needs.where((item) => item.postStatus == 'CONCLUIDO').map(
-              (item) => _ConcludedItem(
-                type: 'NECESSIDADE',
-                id: item.id,
-                title: item.title,
-                quantity: item.quantity,
-                imageUrl: item.imageUrl,
-              ),
-            );
+    final concludedNeeds = needs.map(
+      (item) => _ConcludedItem(
+        type: 'NECESSIDADE',
+        id: item.id,
+        title: item.title,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+      ),
+    );
 
     return [...concludedDonations, ...concludedNeeds];
   }
