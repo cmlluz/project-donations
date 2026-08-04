@@ -64,6 +64,45 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
     }
   }
 
+  String _buildDeliveryErrorMessage(Object error) {
+    final message = error.toString().toLowerCase();
+
+    if (message.contains('código') ||
+        message.contains('codigo') ||
+        message.contains('code') ||
+        message.contains('confirm') ||
+        message.contains('senha')) {
+      return 'O código informado não confere com o código de confirmação desta solicitação.';
+    }
+
+    if (message.contains('quantidade') ||
+        message.contains('quantity') ||
+        message.contains('quantity')) {
+      return 'A quantidade informada não foi aceita pelo sistema. Verifique se ela está dentro do limite permitido.';
+    }
+
+    if (message.contains('já') &&
+        (message.contains('conclu') ||
+            message.contains('confirm') ||
+            message.contains('finaliz'))) {
+      return 'Esta solicitação já foi concluída e não pode ser confirmada novamente.';
+    }
+
+    if (message.contains('403') || message.contains('401')) {
+      return 'Você não tem permissão para confirmar esta solicitação.';
+    }
+
+    if (message.contains('404')) {
+      return 'Não encontramos esta solicitação. Ela pode ter sido removida ou finalizada.';
+    }
+
+    if (message.contains('409')) {
+      return 'Esta solicitação já mudou de status. Atualize a tela e tente novamente.';
+    }
+
+    return 'Não foi possível confirmar a entrega. Verifique o código e a quantidade informada.';
+  }
+
   Future<void> _confirmDelivery() async {
     if (_codeController.text.isEmpty || _codeController.text.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -132,9 +171,8 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao confirmar entrega: $e'),
-            backgroundColor: Colors.red,
-          ),
+              content: Text(_buildDeliveryErrorMessage(e)),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
