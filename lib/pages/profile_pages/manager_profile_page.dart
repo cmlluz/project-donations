@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
@@ -43,6 +44,7 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
   late final CampaignController _campaignController;
 
   Future<Map<String, dynamic>>? _historyFuture;
+  late final VoidCallback _postsRefreshListener;
 
   List<Donation>? _cachedDonations;
   List<Need>? _cachedNeeds;
@@ -61,6 +63,8 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
         Provider.of<CampaignController>(context, listen: false);
 
     _campaignController.addListener(_refreshHistory);
+    _postsRefreshListener = _refreshHistory;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
 
     _loadHistory();
   }
@@ -75,6 +79,14 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
       _clearCache();
       _loadHistory();
     }
+  }
+
+  @override
+  void dispose() {
+    _campaignController.removeListener(_refreshHistory);
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
   }
 
   bool _isCampaignCacheValid() {
@@ -585,9 +597,5 @@ class _ManagerProfilePageState extends State<ManagerProfilePage> {
     );
   }
 
-  @override
-  void dispose() {
-    _campaignController.removeListener(_refreshHistory);
-    super.dispose();
-  }
+
 }

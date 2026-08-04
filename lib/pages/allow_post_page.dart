@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
@@ -37,6 +38,8 @@ class _AllowPostPageState extends State<AllowPostPage> {
   String _description = '';
   String _authorName = '';
   String _imageUrl = 'assets/donations.jpg';
+  String _status = '';
+  int _quantity = 0;
 
   @override
   void initState() {
@@ -60,12 +63,16 @@ class _AllowPostPageState extends State<AllowPostPage> {
         _description = item.description;
         _authorName = item.donatorName;
         _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
+        _status = item.postStatus;
+        _quantity = item.quantity;
       } else if (widget.itemType == "NEED") {
         Need item = await _needApiService.getNeedById(widget.itemId);
         _title = item.title;
         _description = item.description;
         _authorName = item.authorName;
         _imageUrl = item.imageUrl ?? 'assets/donations.jpg';
+        _status = item.postStatus;
+        _quantity = item.quantity;
       } else if (widget.itemType == "POST") {
         int postId = int.parse(widget.itemId);
         final item = await _postApiService.getPostById(postId);
@@ -74,6 +81,8 @@ class _AllowPostPageState extends State<AllowPostPage> {
         _description = item.caption;
         _authorName = item.authorName;
         _imageUrl = item.imageUrl;
+        _status = item.postStatus;
+        _quantity = 0;
       } else {
         throw Exception("Tipo de item desconhecido: ${widget.itemType}");
       }
@@ -114,6 +123,7 @@ class _AllowPostPageState extends State<AllowPostPage> {
       }
 
       if (mounted) {
+        NavigationController.postsRefreshToken.value++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -157,6 +167,24 @@ class _AllowPostPageState extends State<AllowPostPage> {
   }
 
   Widget _buildContent() {
+    String translatedStatus;
+    switch (_status) {
+      case 'DISPONIVEL':
+        translatedStatus = 'Disponível';
+        break;
+      case 'PENDENTE_APROVACAO':
+        translatedStatus = 'Em Análise';
+        break;
+      case 'CONCLUIDO':
+        translatedStatus = 'Concluído';
+        break;
+      case 'REJEITADO':
+        translatedStatus = 'Rejeitado';
+        break;
+      default:
+        translatedStatus = _status;
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
       child: Column(
@@ -208,6 +236,19 @@ class _AllowPostPageState extends State<AllowPostPage> {
                 fontSize: 16,
                 color: ConstantsColors.blueShade900,
               ).merge(TextStylesConstants.kinterSemiBold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Status: $translatedStatus | Quantidade: $_quantity',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: ConstantsColors.greyShade600,
+                ).merge(TextStylesConstants.kpoppinsRegular),
+              ),
             ),
           ),
           const SizedBox(height: 16),
