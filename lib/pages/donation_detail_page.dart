@@ -450,7 +450,15 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                   child: Text("Nenhuma solicitação para este item."));
             }
 
-            final requests = snapshot.data!;
+            final requests = snapshot.data!
+                .where((request) => request.status != 'REJEITADO')
+                .toList();
+
+            if (requests.isEmpty) {
+              return const Center(
+                  child: Text("Nenhuma solicitação para este item."));
+            }
+
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -491,10 +499,6 @@ class _DonationDetailPageState extends State<DonationDetailPage> {
                               'Telefone: ${request.solicitante.phone}',
                           ].join(' | '),
                         ),
-                        if (request.status == 'APROVADO')
-                          Text(
-                            'Informações de contato de ${request.solicitante.name}: ${request.solicitante.email}${request.solicitante.phone != null && request.solicitante.phone!.isNotEmpty ? ' | Telefone: ${request.solicitante.phone}' : ''}',
-                          ),
                       ],
                     ),
                     trailing: null,
