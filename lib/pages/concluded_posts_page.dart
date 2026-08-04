@@ -1,13 +1,29 @@
-import 'package:appdonationsgestor/components/card_item.dart';
+import 'package:appdonationsgestor/components/profile_components/history_card.dart';
 import 'package:appdonationsgestor/controllers/navigation_controller.dart';
-import 'package:appdonationsgestor/models/post_model.dart';
-import 'package:appdonationsgestor/pages/post_detail_page.dart';
+import 'package:appdonationsgestor/models/donation_model.dart';
+import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+class _ConcludedItem {
+  final String type;
+  final int id;
+  final String title;
+  final int quantity;
+  final String? imageUrl;
+
+  const _ConcludedItem({
+    required this.type,
+    required this.id,
+    required this.title,
+    required this.quantity,
+    required this.imageUrl,
+  });
+}
 
 class ConcludedPostsPage extends StatefulWidget {
   const ConcludedPostsPage({super.key});
@@ -17,15 +33,18 @@ class ConcludedPostsPage extends StatefulWidget {
 }
 
 class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
-  late final PostApiService _postApiService;
-  late Future<List<PostModel>> _postsFuture;
+  late final DonationApiService _donationApiService;
+  late final NeedApiService _needApiService;
+  late Future<List<_ConcludedItem>> _postsFuture;
   late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
     super.initState();
-    _postApiService = PostApiService(ApiClient());
-    _postsFuture = _postApiService.getConcludedPosts();
+    final apiClient = ApiClient();
+    _donationApiService = DonationApiService(apiClient);
+    _needApiService = NeedApiService(apiClient);
+    _postsFuture = _loadConcludedItems();
     _postsRefreshListener = _refresh;
     NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
   }
@@ -37,9 +56,43 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
     super.dispose();
   }
 
+  Future<List<_ConcludedItem>> _loadConcludedItems() async {
+    final results = await Future.wait([
+      _donationApiService.getMyDonations(),
+      _needApiService.getMyNeeds(),
+    ]);
+
+    final donations = results[0] as List<Donation>;
+    final needs = results[1] as List<Need>;
+
+    final concludedDonations =
+        donations.where((item) => item.postStatus == 'CONCLUIDO').map(
+              (item) => _ConcludedItem(
+                type: 'DOAÇÃO',
+                id: item.id,
+                title: item.title,
+                quantity: item.quantity,
+                imageUrl: item.imageUrl,
+              ),
+            );
+
+    final concludedNeeds =
+        needs.where((item) => item.postStatus == 'CONCLUIDO').map(
+              (item) => _ConcludedItem(
+                type: 'NECESSIDADE',
+                id: item.id,
+                title: item.title,
+                quantity: item.quantity,
+                imageUrl: item.imageUrl,
+              ),
+            );
+
+    return [...concludedDonations, ...concludedNeeds];
+  }
+
   Future<void> _refresh() async {
     setState(() {
-      _postsFuture = _postApiService.getConcludedPosts();
+      _postsFuture = _loadConcludedItems();
     });
   }
 
@@ -69,7 +122,7 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
           color: ConstantsColors.whiteShade900,
           child: RefreshIndicator(
             onRefresh: _refresh,
-            child: FutureBuilder<List<PostModel>>(
+            child: FutureBuilder<List<_ConcludedItem>>(
               future: _postsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -98,21 +151,11 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
                     final post = posts[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 29.0),
-                      child: CardItem(
-                        title: post.authorName,
-                        subtitle: post.caption,
-                        avatarUrl: post.authorPhoto ??
-                            'https://via.placeholder.com/150',
-                        date: DateFormat('dd MMM, yyyy').format(post.createdAt),
-                        imageAsset: post.imageUrl,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PostDetailPage(post: post),
-                            ),
-                          );
-                        },
+                      child: HistoryCard(
+                        titulo: '${post.type} #${post.id} - ${post.title}',
+                        quantidade: post.quantity,
+                        imagem: post.imageUrl,
+                        onTap: () {},
                       ),
                     );
                   },
