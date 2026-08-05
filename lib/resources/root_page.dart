@@ -265,7 +265,7 @@ class _RootPageState extends State<RootPage> {
                 children: [
                   MenuButton(
                     icon: Icons.volunteer_activism_outlined,
-                    label: 'Anunciar \n Necessidade',
+                    label: 'Criar \n Anúncio',
                     onTap: () {
                       GoRouter.of(context).push("/itemPostPage");
 
@@ -274,7 +274,7 @@ class _RootPageState extends State<RootPage> {
                   ),
                   MenuButton(
                     icon: Icons.text_snippet_rounded,
-                    label: 'Criar \n publicação',
+                    label: 'Criar \n Publicação',
                     onTap: () {
                       GoRouter.of(context).push("/postPage");
 
@@ -283,7 +283,7 @@ class _RootPageState extends State<RootPage> {
                   ),
                   MenuButton(
                     icon: Icons.receipt_long_sharp,
-                    label: 'Criar \n nota fiscal',
+                    label: 'Criar \n Nota Fiscal',
                     onTap: () {
                       GoRouter.of(context).push("/notaFiscalPage");
 
