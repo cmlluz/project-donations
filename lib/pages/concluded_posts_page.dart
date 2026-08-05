@@ -1,9 +1,11 @@
-import 'package:appdonationsgestor/components/profile_components/history_card.dart';
+import 'package:appdonationsgestor/components/card_item.dart';
 import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/pages/donation_detail_page.dart';
+import 'package:appdonationsgestor/pages/need_detail_page.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
@@ -11,18 +13,22 @@ import 'package:flutter/material.dart';
 
 class _ConcludedItem {
   final String type;
-  final int id;
   final String title;
   final int quantity;
   final String? imageUrl;
+  final Donation? donation;
+  final Need? need;
 
   const _ConcludedItem({
     required this.type,
-    required this.id,
     required this.title,
     required this.quantity,
     required this.imageUrl,
+    this.donation,
+    this.need,
   });
+
+  bool get isDonation => donation != null;
 }
 
 class ConcludedPostsPage extends StatefulWidget {
@@ -68,20 +74,20 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
     final concludedDonations = donations.map(
       (item) => _ConcludedItem(
         type: 'DOAÇÃO',
-        id: item.id,
         title: item.title,
         quantity: item.quantity,
         imageUrl: item.imageUrl,
+        donation: item,
       ),
     );
 
     final concludedNeeds = needs.map(
       (item) => _ConcludedItem(
         type: 'NECESSIDADE',
-        id: item.id,
         title: item.title,
         quantity: item.quantity,
         imageUrl: item.imageUrl,
+        need: item,
       ),
     );
 
@@ -149,11 +155,36 @@ class _ConcludedPostsPageState extends State<ConcludedPostsPage> {
                     final post = posts[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 29.0),
-                      child: HistoryCard(
-                        titulo: '${post.type} #${post.id} - ${post.title}',
-                        quantidade: post.quantity,
-                        imagem: post.imageUrl,
-                        onTap: () {},
+                      child: CardItem(
+                        title: post.title,
+                        subtitle: '${post.type} • Qtd: ${post.quantity}',
+                        date: 'Concluído',
+                        imageAsset: post.imageUrl?.isNotEmpty == true
+                            ? post.imageUrl!
+                            : 'assets/donations.jpg',
+                        onTap: () {
+                          if (post.isDonation && post.donation != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DonationDetailPage(
+                                  donation: post.donation!,
+                                  isOwnerView: true,
+                                ),
+                              ),
+                            );
+                          } else if (post.need != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NeedDetailPage(
+                                  need: post.need!,
+                                  isOwnerView: true,
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     );
                   },
