@@ -83,6 +83,29 @@ class NeedController with ChangeNotifier {
     }
   }
 
+  void updateNeedStatus(int needId, String postStatus) {
+    final index = _needs.indexWhere((need) => need.id == needId);
+    if (index == -1) return;
+
+    final currentNeed = _needs[index];
+    _needs[index] = Need(
+      id: currentNeed.id,
+      title: currentNeed.title,
+      description: currentNeed.description,
+      date: currentNeed.date,
+      category: currentNeed.category,
+      quantity: currentNeed.quantity,
+      postStatus: postStatus,
+      authorName: currentNeed.authorName,
+      authorUid: currentNeed.authorUid,
+      imageUrl: currentNeed.imageUrl,
+      isFavorite: currentNeed.isFavorite,
+    );
+
+    _applyCurrentFilter();
+    notifyListeners();
+  }
+
   // Filtra necessidades por texto
   void searchNeeds(String query) {
     _searchQuery = query;

@@ -1,5 +1,6 @@
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
-import 'package:appdonationsgestor/controllers/navigation_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/custom_button.dart';
@@ -7,6 +8,7 @@ import 'package:appdonationsgestor/components/custom_text_field.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class ConfirmDonationPage extends StatefulWidget {
   final int requestId;
@@ -151,21 +153,39 @@ class _ConfirmDonationPageState extends State<ConfirmDonationPage> {
     setState(() => _isLoading = true);
 
     try {
-      await _requestApiService.deliverRequest(
+      final deliveredRequest = await _requestApiService.deliverRequest(
         widget.requestId,
         _codeController.text.trim(),
         confirmedQuantity,
       );
 
       if (mounted) {
-        NavigationController.postsRefreshToken.value++;
+        final donationController = context.read<DonationController>();
+        final needController = context.read<NeedController>();
+
+        if (deliveredRequest.donation != null) {
+          donationController.updateDonationStatus(
+            deliveredRequest.donation!.id,
+            deliveredRequest.donation!.postStatus,
+          );
+        }
+
+        if (deliveredRequest.need != null) {
+          needController.updateNeedStatus(
+            deliveredRequest.need!.id,
+            deliveredRequest.need!.postStatus,
+          );
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Entrega confirmada com sucesso!'),
             backgroundColor: Colors.green,
           ),
         );
-        context.go('/root');
+        if (mounted) {
+          context.pop(true);
+        }
       }
     } catch (e) {
       if (mounted) {

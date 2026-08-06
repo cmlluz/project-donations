@@ -85,6 +85,30 @@ class DonationController with ChangeNotifier {
     }
   }
 
+  void updateDonationStatus(int donationId, String postStatus) {
+    final index =
+        _donations.indexWhere((donation) => donation.id == donationId);
+    if (index == -1) return;
+
+    final currentDonation = _donations[index];
+    _donations[index] = Donation(
+      id: currentDonation.id,
+      title: currentDonation.title,
+      description: currentDonation.description,
+      date: currentDonation.date,
+      category: currentDonation.category,
+      quantity: currentDonation.quantity,
+      postStatus: postStatus,
+      donatorName: currentDonation.donatorName,
+      donatorUid: currentDonation.donatorUid,
+      imageUrl: currentDonation.imageUrl,
+      isFavorite: currentDonation.isFavorite,
+    );
+
+    _applyCurrentFilter();
+    notifyListeners();
+  }
+
   // Filtra doações por texto
   void searchDonations(String query) {
     _searchQuery = query;
