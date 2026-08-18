@@ -206,9 +206,9 @@ class _RootPageState extends State<RootPage> {
 
   // MENU INFERIOR
   void _showBottomMenu(BuildContext context) {
-    final userRole = context.read<UserProvider>().currentUser?.role;
+    // final userRole = context.read<UserProvider>().currentUser?.role;
 
-    final bool isManager = userRole == 'ROLE_MANAGER';
+    // final bool isManager = userRole == 'ROLE_MANAGER';
 
     showModalBottomSheet(
       context: context,
@@ -290,16 +290,16 @@ class _RootPageState extends State<RootPage> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  if (isManager)
-                    MenuButton(
-                      icon: Icons.campaign_outlined,
-                      label: 'Divulgar \n campanha',
-                      onTap: () {
-                        GoRouter.of(context).push("/publishCampaign");
+                  // if (isManager)
+                  MenuButton(
+                    icon: Icons.campaign_outlined,
+                    label: 'Divulgar \n campanha',
+                    onTap: () {
+                      GoRouter.of(context).push("/publishCampaign");
 
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
