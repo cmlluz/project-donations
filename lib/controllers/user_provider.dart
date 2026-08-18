@@ -27,18 +27,24 @@ class UserProvider with ChangeNotifier {
     } catch (e) {
       _currentUser = null;
       print(e.toString());
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void updateLocalUserData(
-      {String? name, String? bio, String? profilePictureUrl}) {
+  void updateLocalUserData({
+    String? name,
+    String? bio,
+    String? pixKey,
+    String? profilePictureUrl,
+  }) {
     if (_currentUser != null) {
       _currentUser = _currentUser!.copyWith(
         name: name,
         bio: bio,
+        pixKey: pixKey, 
         profilePictureUrl: profilePictureUrl,
       );
       notifyListeners();

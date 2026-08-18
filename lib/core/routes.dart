@@ -21,7 +21,7 @@ import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/con
 import 'package:appdonationsgestor/pages/settings_pages/delete_account_pages/delete_feedback_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/edit_profile_page.dart';
 import 'package:appdonationsgestor/pages/settings_pages/notifications_page.dart';
-import 'package:appdonationsgestor/pages/settings_pages/link_manager_page.dart';
+// import 'package:appdonationsgestor/pages/settings_pages/link_manager_page.dart';
 import 'package:appdonationsgestor/pages/hystory_page.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/pages/register_pages/registration_confirmed.dart';
@@ -33,6 +33,7 @@ import 'package:appdonationsgestor/pages/feedback_page.dart';
 import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/pending_requests_page.dart';
 import 'package:appdonationsgestor/pages/confirm_donation_page.dart';
+import 'package:appdonationsgestor/pages/concluded_posts_page.dart';
 
 class RouteNames {
   static const String legalEntitiesLogin = "legalEntitiesLogin";
@@ -64,13 +65,14 @@ class RouteNames {
   static const String notaFiscalPage = "notaFiscalPage";
   static const String feedbackPage = "feedback";
   static const String notificationsPage = "notificationsPage";
-  static const String linkManagerPage = "linkManagerPage";
+  // static const String linkManagerPage = "linkManagerPage";
   static const String publishCampaign = "publishCampaign";
   static const String campaignEditPage = "campaignEditPage";
   static const String campaignDetailsPage = "campaignDetailsPage";
   static const String pendingRequests = "pendingRequests";
   static const String allowPostPage = "allowPostPage";
   static const String confirmDonationPage = "confirmDonationPage";
+  static const String concludedPostsPage = "concludedPostsPage";
 }
 
 class AppRountersConfiguration {
@@ -112,6 +114,15 @@ class AppRountersConfiguration {
             final int requestId = state.extra as int;
             return MaterialPage(
               child: ConfirmDonationPage(requestId: requestId),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/concludedPostsPage',
+          name: RouteNames.concludedPostsPage,
+          pageBuilder: (context, state) {
+            return const MaterialPage(
+              child: ConcludedPostsPage(),
             );
           },
         ),
@@ -225,10 +236,11 @@ class AppRountersConfiguration {
         ),
         GoRoute(
           path: '/finalizeRegistrationPage',
-          name: RouteNames.finalizeRegistrationPage,
-          pageBuilder: (context, state) => const MaterialPage(
-            child: FinalizeRegistrationPage(),
-          ),
+          builder: (context, state) {
+            return FinalizeRegistrationPage(
+              userData: state.extra as Map<String, dynamic>,
+            );
+          },
         ),
         GoRoute(
           path: '/favoritesPage',
@@ -259,15 +271,14 @@ class AppRountersConfiguration {
           path: '/confirmDeletionPage',
           name: RouteNames.confirmDeletionPage,
           pageBuilder: (context, state) {
-          final data =
-              state.extra as Map<String, dynamic>;
+            final data = state.extra as Map<String, dynamic>;
 
-          return MaterialPage(
-            child: ConfirmDeletionPage(
-              email: data['email'],
-              password: data['password'],
-            ),
-          );
+            return MaterialPage(
+              child: ConfirmDeletionPage(
+                email: data['email'],
+                password: data['password'],
+              ),
+            );
           },
         ),
         GoRoute(
@@ -296,16 +307,17 @@ class AppRountersConfiguration {
           name: RouteNames.postDetailPage,
           pageBuilder: (context, state) {
             final postData = state.extra as PostModel?;
-            
+
             // Fallback atualizado para o novo PostModel
             final post = postData ??
                 PostModel(
                   id: 0, // Agora é int
-                  caption: 'Não foi possível carregar os dados do post.', // Antiga description
+                  caption:
+                      'Não foi possível carregar os dados do post.', // Antiga description
                   imageUrl: 'assets/donations.jpg',
                   authorUid: '',
-                  authorName: 'Sistema', 
-                  authorPhoto: 'assets/profile_default.png', 
+                  authorName: 'Sistema',
+                  authorPhoto: 'assets/profile_default.png',
                   createdAt: DateTime.now(),
                   postStatus: 'DISPONIVEL',
                 );
@@ -371,15 +383,15 @@ class AppRountersConfiguration {
             );
           },
         ),
-        GoRoute(
-          path: '/linkManagerPage',
-          name: RouteNames.linkManagerPage,
-          pageBuilder: (context, state) {
-            return const MaterialPage(
-              child: LinkManagerPage(),
-            );
-          },
-        ),
+        // GoRoute(
+        //   path: '/linkManagerPage',
+        //   name: RouteNames.linkManagerPage,
+        //   pageBuilder: (context, state) {
+        //     return const MaterialPage(
+        //       child: LinkManagerPage(),
+        //     );
+        //   },
+        // ),
         GoRoute(
           path: '/feedback',
           name: RouteNames.feedbackPage,

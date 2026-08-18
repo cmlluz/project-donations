@@ -31,6 +31,18 @@ class DonationApiService {
     }
   }
 
+  Future<List<Donation>> getMyConcludedDonations() async {
+    final response = await _apiClient.get('donations/me/concluded');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => Donation.fromJson(item)).toList();
+    } else {
+      print("Erro ${response.statusCode}: ${response.body}");
+      throw Exception('Falha ao carregar minhas doações concluídas.');
+    }
+  }
+
   Future<Donation> getDonationById(String id) async {
     final response = await _apiClient.get('donations/$id');
 

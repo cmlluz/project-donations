@@ -39,8 +39,35 @@ class AppSearchController with ChangeNotifier {
     _favoriteApiService = FavoriteApiService(_apiClient);
   }
 
+  List<PublicUser> _parsePublicUsers(dynamic decodedBody) {
+    final List<dynamic> usersJson = decodedBody is Map<String, dynamic>
+        ? (decodedBody['content'] as List<dynamic>? ?? const <dynamic>[])
+        : (decodedBody as List<dynamic>? ?? const <dynamic>[]);
+
+    return usersJson
+        .whereType<Map<String, dynamic>>()
+        .map((item) => PublicUser.fromJson(item))
+        .toList();
+  }
+
+  bool _isInstitutionRole(String role) {
+    final normalizedRole = role.trim().toUpperCase();
+    return normalizedRole.contains('INSTITUTION') ||
+        normalizedRole.contains('GESTOR');
+  }
+
   void updateCampaigns(List<Campaign> campaigns) {
     _externalCampaigns = campaigns;
+    _refreshItems();
+  }
+
+  void updateDonations(List<Donation> donations) {
+    // Atualiza a lista interna e reconstrói os itens
+    _refreshItems();
+  }
+
+  void updateNeeds(List<Need> needs) {
+    // Atualiza a lista interna e reconstrói os itens
     _refreshItems();
   }
 
@@ -56,8 +83,8 @@ class AppSearchController with ChangeNotifier {
 
       final usersFuture = _apiClient.get('users').then((response) {
         if (response.statusCode == 200) {
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-          return body.map((item) => PublicUser.fromJson(item)).toList();
+          final decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+          return _parsePublicUsers(decodedBody);
         }
         return <PublicUser>[];
       });
@@ -106,12 +133,12 @@ class AppSearchController with ChangeNotifier {
             id: n.id,
             title: n.title,
             description: n.description,
-            // CORREÇÃO: Usa a imagem da API ou fallback
             imageUrl: (n.imageUrl != null && n.imageUrl!.isNotEmpty)
                 ? n.imageUrl!
                 : 'assets/donations.png',
             category: SearchCategory.necessidade,
             institution: n.authorName,
+            authorUid: n.authorUid,
             date: n.date ?? DateTime.now(),
             postStatus: n.postStatus,
             quantity: n.quantity,
@@ -120,12 +147,12 @@ class AppSearchController with ChangeNotifier {
             id: d.id,
             title: d.title,
             description: d.description,
-            // CORREÇÃO: Usa a imagem da API ou fallback
             imageUrl: (d.imageUrl != null && d.imageUrl!.isNotEmpty)
                 ? d.imageUrl!
                 : 'assets/donations.png',
             category: SearchCategory.doacao,
             institution: d.donatorName,
+            authorUid: d.donatorUid,
             date: d.date ?? DateTime.now(),
             postStatus: d.postStatus,
             quantity: d.quantity,
@@ -142,20 +169,19 @@ class AppSearchController with ChangeNotifier {
             postStatus: 'ATIVO',
             quantity: 0,
           )),
-      ...users
-          .where((u) => u.role == 'ROLE_INSTITUTION' || u.role == 'ROLE_GESTOR')
-          .map((u) => SearchItem(
-                id: u.firebaseUid.hashCode,
-                title: u.name,
-                description: u.bio ?? u.email,
-                imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
-                category: SearchCategory.instituicao,
-                institution: u.name,
-                date: DateTime.now(),
-                postStatus: 'ATIVO',
-                quantity: 0,
-                firebaseUid: u.firebaseUid,
-              )),
+      ...users.where((u) => _isInstitutionRole(u.role)).map((u) => SearchItem(
+            id: u.firebaseUid.hashCode,
+            title: u.name,
+            description: u.bio ?? u.email,
+            imageUrl: u.profilePictureUrl ?? 'assets/instituicao.png',
+            category: SearchCategory.instituicao,
+            institution: u.name,
+            date: DateTime.now(),
+            postStatus: 'ATIVO',
+            quantity: 0,
+            firebaseUid: u.firebaseUid,
+            authorUid: u.firebaseUid,
+          )),
     ];
   }
 
@@ -171,8 +197,8 @@ class AppSearchController with ChangeNotifier {
 
       final usersFuture = _apiClient.get('users').then((response) {
         if (response.statusCode == 200) {
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-          return body.map((item) => PublicUser.fromJson(item)).toList();
+          final decodedBody = jsonDecode(utf8.decode(response.bodyBytes));
+          return _parsePublicUsers(decodedBody);
         }
         return <PublicUser>[];
       });

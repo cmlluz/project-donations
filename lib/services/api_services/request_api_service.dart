@@ -47,21 +47,24 @@ class RequestApiService {
     }
   }
 
-  Future<Request> deliverRequest(int requestId, String code) async {
+  Future<Request> deliverRequest(
+      int requestId, String code, int confirmedQuantity) async {
     final response = await _apiClient.post(
       'requests/$requestId/deliver',
       body: {
         'donationId': null,
         'needId': null,
         'code': code,
+        'confirmedQuantity': confirmedQuantity,
       },
     );
 
     if (response.statusCode == 200) {
       return Request.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      print("Erro ${response.statusCode}: ${response.body}");
-      throw Exception('Falha ao confirmar entrega');
+      final responseBody = utf8.decode(response.bodyBytes).trim();
+      print("Erro ${response.statusCode}: $responseBody");
+      throw Exception('Erro ${response.statusCode}: $responseBody');
     }
   }
 

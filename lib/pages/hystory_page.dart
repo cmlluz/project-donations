@@ -1,4 +1,5 @@
 import 'package:appdonationsgestor/core/routes.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
@@ -22,12 +23,22 @@ class _HystoryPage extends State<HystoryPage> {
   late final RequestApiService _requestApiService;
   final ApiClient _apiClient = ApiClient();
   late Future<List<Request>> _myRequestsFuture;
+  late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
     super.initState();
     _requestApiService = RequestApiService(_apiClient);
+    _postsRefreshListener = _loadMyRequests;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
     _loadMyRequests();
+  }
+
+  @override
+  void dispose() {
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
   }
 
   void _loadMyRequests() {

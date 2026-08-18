@@ -18,6 +18,17 @@ class PostApiService {
     }
   }
 
+  Future<List<PostModel>> getConcludedPosts() async {
+    final response = await _apiClient.get('posts/me/concluded');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      return body.map((dynamic item) => PostModel.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar posts concluídos.');
+    }
+  }
+
   Future<List<PostModel>> getPostsByAuthor(String authorUid) async {
     final response = await _apiClient.get('posts/author/$authorUid');
 
@@ -40,14 +51,8 @@ class PostApiService {
   }
 
   Future<void> updatePostCaption(int id, String caption) async {
-    final response = await _apiClient.put(
-      'posts/$id', 
-      body: {
-        'caption': caption,
-        'imageUrl': '', 
-        'favorited': false
-      }
-    );
+    final response = await _apiClient.put('posts/$id',
+        body: {'caption': caption, 'imageUrl': '', 'favorited': false});
 
     if (response.statusCode != 200) {
       throw Exception('Falha ao atualizar post.');
@@ -75,7 +80,7 @@ class PostApiService {
       throw Exception('Falha ao rejeitar post.');
     }
   }
-  
+
   Future<PostModel> getPostById(int id) async {
     final response = await _apiClient.get('posts/$id');
 

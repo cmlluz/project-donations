@@ -118,6 +118,7 @@ class _InstitutionRegisterPage
         "role": "ROLE_INSTITUTION",
       };
 
+
       // CRIAR CONTA FIREBASE
       final credential =
           await authService.value.createAccount(
@@ -125,6 +126,7 @@ class _InstitutionRegisterPage
         password:
             passwordController.text.trim(),
       );
+      
 
       // ATUALIZAR DISPLAY NAME
       await credential.user?.updateDisplayName(
@@ -138,9 +140,10 @@ class _InstitutionRegisterPage
       // await apiService.createUser(userData);
 
       if (mounted) {
-        GoRouter.of(context).push(
-          '/finalizeRegistrationPage',
-        );
+       GoRouter.of(context).push(
+  '/finalizeRegistrationPage',
+  extra: userData,
+);
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;

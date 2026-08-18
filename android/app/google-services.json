@@ -12,7 +12,52 @@
           "package_name": "com.example.appdonationsgestor"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "933781600794-8lmvr2dkot1aqbas01nm89cibod4g78j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "3105a6abb4cf9915f2c72fbd7239f5091fab642d"
+          }
+        },
+        {
+          "client_id": "933781600794-bdjlfbt35va8kc4rfsh684lblc797m17.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "b068ec398b0808f673175608f742bdf05bf1a619"
+          }
+        },
+        {
+          "client_id": "933781600794-cbg7le071k1lcmk9akf2uvkqu9g87ouj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "163716d119c25586f3abe3e2ad894cf397840942"
+          }
+        },
+        {
+          "client_id": "933781600794-i7p484k5e2sv9ebp132me6kmce5pn7u0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "265058241fdc90a909d3421dadc2e87364969187"
+          }
+        },
+        {
+          "client_id": "933781600794-jql6pq3t0o0hjbi08lcijt0a6138g6ol.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appdonationsgestor",
+            "certificate_hash": "6f7c05d149f3e0714044321b17c00928e4940aa7"
+          }
+        },
+        {
+          "client_id": "933781600794-i8a9ba9rbuqqelec0oab1nr8njo9n5dm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBfYvCpclS1_1uhZokspvd0r6Q9SoZUbQo"
@@ -20,7 +65,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933781600794-i8a9ba9rbuqqelec0oab1nr8njo9n5dm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "933781600794-i3tphqkaoupi1b94h5kv26junl2rrs02.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appdonationsgestor"
+              }
+            }
+          ]
         }
       }
     }

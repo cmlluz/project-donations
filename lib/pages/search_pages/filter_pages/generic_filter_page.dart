@@ -1,12 +1,15 @@
 import 'package:appdonationsgestor/models/donation_model.dart';
 import 'package:appdonationsgestor/pages/donation_detail_page.dart';
 import 'package:appdonationsgestor/pages/need_detail_page.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/components/image_card.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/models/need_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:appdonationsgestor/pages/profile_pages/institution_profile_page.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class GenericFilterPage extends StatelessWidget {
   final SearchCategory category;
@@ -22,7 +25,11 @@ class GenericFilterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredItems = _getFilteredItems();
+    final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+        .currentUser
+        ?.firebaseUid;
+
+    final filteredItems = _getFilteredItems(currentUserUid);
 
     if (filteredItems.isEmpty) {
       return const Center(
@@ -56,8 +63,16 @@ class GenericFilterPage extends StatelessWidget {
     );
   }
 
-  List<SearchItem> _getFilteredItems() {
+  List<SearchItem> _getFilteredItems(String? currentUserUid) {
     var filtered = items;
+
+    if (currentUserUid != null) {
+      filtered = filtered.where((item) {
+        if (item.category == SearchCategory.instituicao) return true;
+
+        return item.authorUid != currentUserUid;
+      }).toList();
+    }
 
     if (category != SearchCategory.todos) {
       filtered = filtered.where((item) => item.category == category).toList();
@@ -98,7 +113,7 @@ class GenericFilterPage extends StatelessWidget {
                 child: AbsorbPointer(
                   child: ImageCard(
                     imageUrl: item.imageUrl,
-                    isNetworkImage: isNetwork, // Importante!
+                    isNetworkImage: isNetwork,
                     title: _getCardTitle(item),
                     onTap: null,
                   ),
@@ -144,15 +159,17 @@ class GenericFilterPage extends StatelessWidget {
   void _navigateToDetail(BuildContext context, SearchItem item) {
     if (item.category == SearchCategory.necessidade) {
       final need = Need(
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          authorName: item.institution,
-          category: item.category.toString(),
-          quantity: item.quantity,
-          postStatus: item.postStatus,
-          date: item.date,
-          imageUrl: item.imageUrl); // Passando a imagem
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        authorName: item.institution,
+        authorUid: item.authorUid,
+        category: item.category.toString(),
+        quantity: item.quantity,
+        postStatus: item.postStatus,
+        date: item.date,
+        imageUrl: item.imageUrl,
+      );
 
       Navigator.push(
         context,
@@ -162,15 +179,18 @@ class GenericFilterPage extends StatelessWidget {
       );
     } else if (item.category == SearchCategory.doacao) {
       final donation = Donation(
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          donatorName: item.institution,
-          category: item.category.toString(),
-          quantity: item.quantity,
-          postStatus: item.postStatus,
-          date: item.date,
-          imageUrl: item.imageUrl); // Passando a imagem
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        donatorName: item.institution,
+        donatorUid: item.authorUid,
+        category: item.category.toString(),
+        quantity: item.quantity,
+        postStatus: item.postStatus,
+        date: item.date,
+        imageUrl: item.imageUrl,
+      );
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -181,18 +201,26 @@ class GenericFilterPage extends StatelessWidget {
       GoRouter.of(context).push('/campaignDetails/${item.id}');
     } else if (item.category == SearchCategory.instituicao) {
       if (item.firebaseUid != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InstitutionProfilePage(
-              userId: item.firebaseUid!,
-              userName: item.title,
-              userEmail: item.description.contains('@') ? item.description : '',
-              userImageUrl: item.imageUrl,
-              isInitiallyFavorite: false,
+        final currentUser =
+            Provider.of<UserProvider>(context, listen: false).currentUser;
+        if (currentUser != null &&
+            currentUser.firebaseUid == item.firebaseUid) {
+          GoRouter.of(context).pushNamed('managerProfilePage');
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InstitutionProfilePage(
+                userId: item.firebaseUid!,
+                userName: item.title,
+                userEmail:
+                    item.description.contains('@') ? item.description : '',
+                userImageUrl: item.imageUrl,
+                isInitiallyFavorite: false,
+              ),
             ),
-          ),
-        );
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -5,7 +5,7 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 class CardItem extends StatelessWidget {
   final String title;
   final String? subtitle;
-  final String avatarUrl;
+  final String? avatarUrl;
   final String date;
   final String imageAsset;
   final VoidCallback? onTap;
@@ -14,7 +14,7 @@ class CardItem extends StatelessWidget {
     Key? key,
     required this.title,
     this.subtitle,
-    required this.avatarUrl,
+    this.avatarUrl,
     required this.date,
     required this.imageAsset,
     this.onTap,
@@ -85,12 +85,13 @@ class CardItem extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: NetworkImage(avatarUrl),
-                  onBackgroundImageError: (_, __) {},
-                ),
+                if (avatarUrl != null && avatarUrl!.isNotEmpty)
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: NetworkImage(avatarUrl!),
+                    onBackgroundImageError: (_, __) {},
+                  ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(

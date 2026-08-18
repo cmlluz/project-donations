@@ -4,6 +4,7 @@ import 'package:appdonationsgestor/models/post_model.dart';
 import 'package:appdonationsgestor/pages/post_detail_page.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +22,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final PostApiService _postApiService;
   late Future<List<PostModel>> _postsFuture;
+  late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
     super.initState();
     _postApiService = PostApiService(ApiClient());
     _postsFuture = _postApiService.getPosts();
+    _postsRefreshListener = _refresh;
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
+  }
+
+  @override
+  void dispose() {
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
+    super.dispose();
   }
 
   Future<void> _refresh() async {
@@ -69,35 +80,40 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () =>
-                        GoRouter.of(context).pushNamed("managerProfilePage"),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      minimumSize: Size.zero,
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundImage: profileImage,
-                        ),
-                        const SizedBox(width: 11.0),
-                        Text(
-                          'Olá, $userName 👋',
-                          style: const TextStyle(
-                            color: ConstantsColors.blueShade900,
-                            fontSize: 20,
-                          ).merge(TextStylesConstants.kpoppinsRegular),
-                        ),
-                      ],
+                  Flexible(
+                    child: TextButton(
+                      onPressed: () =>
+                          GoRouter.of(context).pushNamed("managerProfilePage"),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundImage: profileImage,
+                          ),
+                          const SizedBox(width: 11.0),
+                          Expanded(
+                            child: Text(
+                              'Olá, $userName 👋',
+                              style: const TextStyle(
+                                color: ConstantsColors.blueShade900,
+                                fontSize: 20,
+                              ).merge(TextStylesConstants.kpoppinsRegular),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 15.0),
                   IconButton(
-                    onPressed: () {
-                      GoRouter.of(context).pushNamed("notificationsPage");
-                    },
+                    onPressed: () =>
+                        GoRouter.of(context).pushNamed("notificationsPage"),
                     icon: Image.asset("assets/icons/notification_icon.png"),
                   ),
                 ],

@@ -35,49 +35,60 @@ class CustomButton extends StatefulWidget {
 class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
+    final bool isDisabled = widget.onPressed == null && widget.route.isEmpty;
+
     return SizedBox(
       height: widget.height,
       width: widget.width,
       child: ElevatedButton(
-        onPressed: () {
-          if (widget.onPressed != null) {
-            widget.onPressed!();
-          } else if (widget.route.isNotEmpty) {
-            if (widget.hasMensage == true) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: ConstantsColors.blueShade900,
-                  behavior: SnackBarBehavior.floating,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  content: Text(widget.mensage ?? ''),
-                ),
-              );
-              GoRouter.of(context).go(widget.route);
-            } else {
-              GoRouter.of(context).go(widget.route);
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('No route provided')),
-            );
-          }
-        },
+        onPressed: isDisabled
+            ? null
+            : () {
+                if (widget.onPressed != null) {
+                  widget.onPressed!();
+                } else if (widget.route.isNotEmpty) {
+                  if (widget.hasMensage == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: ConstantsColors.blueShade900,
+                        behavior: SnackBarBehavior.floating,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                        ),
+                        content: Text(widget.mensage ?? ''),
+                      ),
+                    );
+                    GoRouter.of(context).go(widget.route);
+                  } else {
+                    GoRouter.of(context).go(widget.route);
+                  }
+                }
+              },
         style: ElevatedButton.styleFrom(
-          backgroundColor: widget.color ?? ConstantsColors.blueShade900,
+          backgroundColor: isDisabled
+              ? Colors.grey
+              : (widget.color ?? ConstantsColors.blueShade900),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        child: Text(
-          widget.text,
-          style: TextStyle(
-            fontFamily: 'Poppins-Bold',
-            color: widget.textColor ?? Colors.white,
-            fontSize: widget.fontSize ?? 18,
-          ),
-        ),
+        child: isDisabled
+            ? SizedBox(
+                width: widget.fontSize ?? 18,
+                height: widget.fontSize ?? 18,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                widget.text,
+                style: TextStyle(
+                  fontFamily: 'Poppins-Bold',
+                  color: widget.textColor ?? Colors.white,
+                  fontSize: widget.fontSize ?? 18,
+                ),
+              ),
       ),
     );
   }

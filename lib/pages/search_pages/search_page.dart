@@ -5,6 +5,9 @@ import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/controllers/search_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/components/search_item.dart';
 import 'package:appdonationsgestor/pages/search_pages/filter_pages/generic_filter_page.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +23,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
   late AppSearchController _searchControllerProvider;
+  late final VoidCallback _postsRefreshListener;
 
   @override
   void initState() {
@@ -27,23 +31,53 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     _tabController = TabController(length: 5, vsync: this);
     _searchControllerProvider = AppSearchController();
     _searchControllerProvider.loadItems();
+    _postsRefreshListener = () {
+      if (mounted) {
+        _searchControllerProvider.loadItems();
+      }
+    };
+    NavigationController.postsRefreshToken.addListener(_postsRefreshListener);
 
-    // Conecta com o CampaignController para receber atualizações
+    // Conecta com os Controllers para receber atualizações em tempo real
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final campaignController =
           Provider.of<CampaignController>(context, listen: false);
-      _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+      final donationController =
+          Provider.of<DonationController>(context, listen: false);
+      final needController =
+          Provider.of<NeedController>(context, listen: false);
 
-      // Adiciona listener para atualizar quando campanhas mudarem
+      // Atualiza com dados iniciais
+      _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+      _searchControllerProvider.updateDonations(donationController.donations);
+      _searchControllerProvider.updateNeeds(needController.needs);
+
+      // Listeners para atualizações em tempo real
       campaignController.addListener(() {
-        _searchControllerProvider.updateCampaigns(campaignController.campaigns);
+        if (mounted) {
+          _searchControllerProvider
+              .updateCampaigns(campaignController.campaigns);
+        }
+      });
+
+      donationController.addListener(() {
+        if (mounted) {
+          _searchControllerProvider
+              .updateDonations(donationController.donations);
+        }
+      });
+
+      needController.addListener(() {
+        if (mounted) {
+          _searchControllerProvider.updateNeeds(needController.needs);
+        }
       });
     });
   }
 
   @override
   void dispose() {
-    // Remove listener do CampaignController se ainda estiver montado
+    // Remove listeners se ainda estiver montado
     if (mounted) {
       try {
         final campaignController =
@@ -55,10 +89,33 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       } catch (e) {
         // Ignora erro se o Provider não estiver mais disponível
       }
+
+      try {
+        final donationController =
+            Provider.of<DonationController>(context, listen: false);
+        donationController.removeListener(() {
+          _searchControllerProvider
+              .updateDonations(donationController.donations);
+        });
+      } catch (e) {
+        // Ignora erro se o Provider não estiver mais disponível
+      }
+
+      try {
+        final needController =
+            Provider.of<NeedController>(context, listen: false);
+        needController.removeListener(() {
+          _searchControllerProvider.updateNeeds(needController.needs);
+        });
+      } catch (e) {
+        // Ignora erro se o Provider não estiver mais disponível
+      }
     }
 
     _tabController.dispose();
     _searchController.dispose();
+    NavigationController.postsRefreshToken
+        .removeListener(_postsRefreshListener);
     _searchControllerProvider.dispose();
     super.dispose();
   }
@@ -97,46 +154,54 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       preferredSize: const Size.fromHeight(kToolbarHeight + 20),
       child: Container(
         decoration: BoxDecoration(
-          color: ConstantsColors.whiteShade700,
+          color: const Color.fromRGBO(252, 251, 248, 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 2),
-              blurRadius: 4,
+              color: Colors.black.withOpacity(0.25),
+              offset: const Offset(0, 1),
+              blurRadius: 2,
+              spreadRadius: 0,
             ),
           ],
         ),
         child: SafeArea(
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: 21.0, vertical: 15.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
-                  onPressed: () =>
-                      GoRouter.of(context).pushNamed("managerProfilePage"),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundImage: profileImage,
-                      ),
-                      const SizedBox(width: 11.0),
-                      Text(
-                        'Olá, $userName 👋',
-                        style: const TextStyle(
-                          color: ConstantsColors.blueShade900,
-                          fontSize: 20,
-                        ).merge(TextStylesConstants.kpoppinsRegular),
-                      ),
-                    ],
+                Flexible(
+                  child: TextButton(
+                    onPressed: () =>
+                        GoRouter.of(context).pushNamed("managerProfilePage"),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundImage: profileImage,
+                        ),
+                        const SizedBox(width: 11.0),
+                        Expanded(
+                          child: Text(
+                            'Olá, $userName 👋',
+                            style: const TextStyle(
+                              color: ConstantsColors.blueShade900,
+                              fontSize: 20,
+                            ).merge(TextStylesConstants.kpoppinsRegular),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 15.0),
                 IconButton(
                   onPressed: () =>
                       GoRouter.of(context).pushNamed("notificationsPage"),

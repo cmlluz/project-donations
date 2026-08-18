@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:appdonationsgestor/controllers/navigation_controller.dart';
 import 'package:appdonationsgestor/models/request_model.dart';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
@@ -60,9 +61,8 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
               ? payloadNotificationId
               : int.tryParse(payloadNotificationId?.toString() ?? '') ?? n.id;
 
-          await _notificationApiService.markAsRead(notificationIdToClear);
-
-          // Pra deletar: await _notificationApiService.deleteNotification(notificationIdToClear);
+          await _notificationApiService
+              .deleteNotification(notificationIdToClear);
         } catch (_) {
           // ignora payload inválido
         }
@@ -81,13 +81,41 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
         await _clearRelatedNewRequestNotifications(requestId: request.id);
 
         if (mounted) {
+          NavigationController.postsRefreshToken.value++;
           await showDialog(
             context: context,
             builder: (context) => AlertDialog(
+              backgroundColor: Colors.grey.shade200,
               title: const Text("Solicitação Aprovada!"),
-              // testar
-              content: SelectableText(
-                  "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}\n\nEste código também está disponível na página da sua publicação no seu perfil."),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SelectableText(
+                    "Compartilhe este código com o solicitante para confirmar a entrega:\n\n${approvedRequest.confirmationCode}",
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Informações de contato de ${request.solicitante.name}:',
+                    style: TextStylesConstants.kpoppinsSemiBold,
+                  ),
+                  const SizedBox(height: 6),
+                  SelectableText(
+                    [
+                      if (request.solicitante.phone != null &&
+                          request.solicitante.phone!.isNotEmpty)
+                        'Telefone: ${request.solicitante.phone}',
+                      'Email: ${request.solicitante.email}',
+                      '',
+                      'Combine a entrega/recebimento fora do app com cautela.',
+                    ].join('\n'),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Estas informações também estão disponíveis na página da sua publicação no seu perfil.',
+                  ),
+                ],
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -111,6 +139,8 @@ class _PendingRequestsPageState extends State<PendingRequestsPage> {
             ),
           );
         }
+
+        NavigationController.postsRefreshToken.value++;
       }
     } catch (e) {
       if (mounted) {

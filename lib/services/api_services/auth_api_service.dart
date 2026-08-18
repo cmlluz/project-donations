@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class AuthApiService {
@@ -23,7 +24,30 @@ class AuthApiService {
     }
   }
 
-  Future<void> deleteUser() async {
+  Future<void> verifyPassword(String password) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || user.email == null) {
+      throw Exception("Usuário não autenticado.");
+    }
+
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        throw Exception("A senha inserida está incorreta.");
+      } else {
+        throw Exception("Erro ao validar senha: ${e.message}");
+      }
+    }
+  }
+
+  Future<void> deleteUser(String password) async {
     try {
       final response = await _apiClient.delete('users/me');
 

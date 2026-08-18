@@ -9,13 +9,15 @@ import 'package:provider/provider.dart';
 import 'package:appdonationsgestor/controllers/favorite_controller.dart';
 import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/controllers/campaign_controller.dart';
+import 'package:appdonationsgestor/controllers/donation_controller.dart';
+import 'package:appdonationsgestor/controllers/need_controller.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(
-  RemoteMessage message,                                           
+  RemoteMessage message,
 ) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -127,6 +129,12 @@ class _AppInitializationState extends State<AppInitialization> {
             ),
             ChangeNotifierProvider(
               create: (context) => CampaignController(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => DonationController(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => NeedController(),
             ),
           ],
           child: const MyApp(),

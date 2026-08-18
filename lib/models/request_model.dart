@@ -11,6 +11,7 @@ class Request {
   final String status;
   final DateTime createdAt;
   final String? confirmationCode;
+  final int? confirmedQuantity;
 
   Request({
     required this.id,
@@ -21,6 +22,7 @@ class Request {
     required this.status,
     required this.createdAt,
     this.confirmationCode,
+    this.confirmedQuantity,
   });
 
   factory Request.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Request {
       status: json['status'],
       createdAt: DateTime.parse(json['createdAt']),
       confirmationCode: json['confirmationCode'],
+      confirmedQuantity: json['confirmedQuantity'],
     );
   }
 }

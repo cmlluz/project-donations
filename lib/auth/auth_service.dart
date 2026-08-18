@@ -1,35 +1,40 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:appdonationsgestor/services/api_services/api_client.dart';
+import 'package:http/http.dart' as http;
 
-ValueNotifier<AuthService> authService =
-    ValueNotifier(AuthService());
+ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
 class AuthService {
-  final FirebaseAuth firebaseAuth =
-      FirebaseAuth.instance;
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  User? get currentUser =>
-      firebaseAuth.currentUser;
+  User? get currentUser => firebaseAuth.currentUser;
 
-  Stream<User?> get authStateChanges =>
-      firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
   Future<UserCredential> signIn({
     required String email,
     required String password,
   }) async {
+    final exists = await userExists(email);
+
+    if (!exists) {
+      throw FirebaseAuthException(
+        code: 'user-not-found',
+        message: 'O email inserido não existe.',
+      );
+    }
+
     try {
-      return await firebaseAuth
-          .signInWithEmailAndPassword(
+      return await firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
         throw FirebaseAuthException(
-          code: e.code,
+          code: 'wrong-password',
           message: 'Senha incorreta.',
         );
       }
@@ -39,37 +44,25 @@ class AuthService {
   }
 
   Future<UserCredential> createAccount({
-  required String email,
-  required String password,
-  String? name,
-}) async {
-  final credential =
-      await firebaseAuth
-          .createUserWithEmailAndPassword(
-    email: email,
-    password: password,
-  );
-
-  if (name != null && name.trim().isNotEmpty) {
-    await credential.user?.updateDisplayName(
-      name.trim(),
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    final credential = await firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
 
-    await credential.user?.reload();
+    if (name != null && name.trim().isNotEmpty) {
+      await credential.user?.updateDisplayName(
+        name.trim(),
+      );
+
+      await credential.user?.reload();
+    }
+
+    return credential;
   }
-
-  // PEGA USUÁRIO ATUALIZADO
-  final updatedUser =
-      firebaseAuth.currentUser;
-
-  print(updatedUser?.displayName);
-
-  return await firebaseAuth
-      .signInWithEmailAndPassword(
-    email: email,
-    password: password,
-  );
-}
 
   Future<void> signOut() async {
     await GoogleSignIn().signOut();
@@ -88,8 +81,7 @@ class AuthService {
   Future<void> updateUsername({
     required String username,
   }) async {
-    await currentUser!
-        .updateDisplayName(username);
+    await currentUser!.updateDisplayName(username);
 
     await currentUser!.reload();
   }
@@ -107,88 +99,38 @@ class AuthService {
       );
     }
 
-    final providers =
-        user.providerData.map((e) => e.providerId);
+    final providers = user.providerData.map((e) => e.providerId);
 
     try {
-      // LOGIN EMAIL/SENHA
-      if (providers.contains('password')) {
-        if (email == null ||
-            password == null ||
-            password.isEmpty) {
-          throw FirebaseAuthException(
-            code: 'missing-credentials',
-            message:
-                'Senha obrigatória para excluir a conta.',
-          );
-        }
-
-        final credential =
-            EmailAuthProvider.credential(
+      if (providers.contains('password') && password != null && email != null) {
+        final credential = EmailAuthProvider.credential(
           email: email,
           password: password,
         );
 
-        await user
-            .reauthenticateWithCredential(
-          credential,
-        );
+        await user.reauthenticateWithCredential(credential);
       }
 
-      else if (providers.contains('google.com')) {
-  final GoogleSignIn googleSignIn =
-      GoogleSignIn();
+      final apiClient = ApiClient();
+      final response = await apiClient.delete('users/me');
 
-  // FORÇA ESCOLHER CONTA NOVAMENTE
-  await googleSignIn.signOut();
-
-  final googleUser =
-      await googleSignIn.signIn();
-
-  if (googleUser == null) {
-    throw FirebaseAuthException(
-      code: 'google-sign-in-cancelled',
-      message:
-          'Login com Google cancelado.',
-    );
-  }
-
-  final googleAuth =
-      await googleUser.authentication;
-
-  final credential =
-      GoogleAuthProvider.credential(
-    accessToken:
-        googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-
-  await user
-      .reauthenticateWithCredential(
-    credential,
-  );
-}
+      if (response.statusCode != 204) {
+        throw Exception(
+          'Erro ao excluir usuário do banco.',
+        );
+      }
 
       await user.delete();
 
       await signOut();
     } on FirebaseAuthException catch (e) {
-      // SENHA ERRADA
-      if (e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
         throw Exception('Senha incorreta.');
-      }
-
-      if (e.code ==
-          'google-sign-in-cancelled') {
-        throw Exception(
-          'Confirmação com Google cancelada.',
-        );
       }
 
       if (e.code == 'requires-recent-login') {
         throw Exception(
-          'Faça login novamente para continuar.',
+          'Sessão expirada. Por segurança, faça login novamente antes de excluir a conta.',
         );
       }
 
@@ -197,73 +139,95 @@ class AuthService {
   }
 
   // ALTERAR SENHA
-  Future<void>
-      resetPasswordFromCurrentPassword({
+  Future<void> resetPasswordFromCurrentPassword({
     required String currentPassword,
     required String newPassword,
     required String email,
   }) async {
-    final credential =
-        EmailAuthProvider.credential(
+    final credential = EmailAuthProvider.credential(
       email: email,
       password: currentPassword,
     );
 
-    await currentUser!
-        .reauthenticateWithCredential(
+    await currentUser!.reauthenticateWithCredential(
       credential,
     );
 
-    await currentUser!
-        .updatePassword(newPassword);
+    await currentUser!.updatePassword(newPassword);
 
     await currentUser!.reload();
   }
 
   // LOGIN COM GOOGLE
-  Future<UserCredential?> loginWithGoogle() async {
+  Future<Map<String, dynamic>?> loginWithGoogle(BuildContext context) async {
     try {
-      final googleUser =
-          await GoogleSignIn().signIn();
+      final googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) return null;
 
-      final googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
-      final credential =
-          GoogleAuthProvider.credential(
+      final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
-        accessToken:
-            googleAuth.accessToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      final userCredential =
-          await firebaseAuth
-              .signInWithCredential(
+      final userCredential = await firebaseAuth.signInWithCredential(
         credential,
       );
 
-      if (userCredential.user != null &&
-          (userCredential
-                      .user!.displayName ==
-                  null ||
-              userCredential
-                  .user!.displayName!
-                  .isEmpty)) {
-      await userCredential.user!
-    .updateDisplayName(
-  googleUser.displayName ?? '',
-);
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-await userCredential.user!.reload();
+      if (userCredential.user != null &&
+          (userCredential.user!.displayName == null ||
+              userCredential.user!.displayName!.isEmpty)) {
+        await userCredential.user!.updateDisplayName(
+          googleUser.displayName ?? '',
+        );
+
+        await userCredential.user!.reload();
       }
 
-      return userCredential;
+      return {'isNewUser': isNewUser};
     } catch (e) {
       print(e.toString());
-
       rethrow;
     }
+  }
+
+  Future<bool> verifyPassword(String email, String password) async {
+    final user = currentUser;
+    if (user == null) return false;
+    if (password.isEmpty) return false;
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: email.trim(),
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'too-many-requests') {
+        throw Exception(
+          'Ops, muitas tentativas seguidas! Por segurança, aguarde um momento antes de tentar de novo',
+        );
+      }
+
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> userExists(String email) async {
+    final response = await http.get(
+      Uri.parse(
+        'http://192.168.1.2:8080/api/users/exists?email=$email',
+      ),
+    );
+
+    return response.body == 'true';
   }
 }

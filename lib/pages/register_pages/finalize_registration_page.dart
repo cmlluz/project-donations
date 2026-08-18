@@ -1,7 +1,9 @@
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/profile_services.dart';
 import 'package:appdonationsgestor/services/storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:appdonationsgestor/resources/constant_colors.dart';
@@ -10,7 +12,12 @@ import 'package:appdonationsgestor/components/custom_button.dart';
 import 'package:go_router/go_router.dart';
 
 class FinalizeRegistrationPage extends StatefulWidget {
-  const FinalizeRegistrationPage({super.key});
+   final Map<String, dynamic> userData;
+
+  const FinalizeRegistrationPage({
+    super.key,
+    required this.userData,
+  });
 
   @override
   State<FinalizeRegistrationPage> createState() =>
@@ -36,48 +43,59 @@ class _FinalizeRegistrationPageState extends State<FinalizeRegistrationPage> {
     }
   }
 
-  Future<void> _updateProfile() async {
-    setState(() => _isLoading = true);
+Future<void> _updateProfile() async {
+  setState(() => _isLoading = true);
 
-    try {
-      String? uploadedImageUrl;
-      if (_image != null) {
-        uploadedImageUrl =
-            await _storageService.uploadImage(_image!, 'profile_images');
-      }
+  try {
+    String? uploadedImageUrl;
 
-      final Map<String, dynamic> userData = {
-        "bio": bioController.text.trim(),
-        "pixKey": pixKeyController.text.trim(),
-      };
+    if (_image != null) {
+      uploadedImageUrl = await _storageService.uploadImage(
+        _image!,
+        'profile_images',
+      );
+    }
 
-      if (uploadedImageUrl != null) {
-        userData["profilePictureUrl"] = uploadedImageUrl;
-      }
+    final Map<String, dynamic> userData = {
+      ...widget.userData,
+      "bio": bioController.text.trim(),
+      "pixKey": pixKeyController.text.trim(),
+    };
 
-      if (userData.isNotEmpty) {
-        await _profileService.updateUserProfileBackend(userData);
-      }
+    if (uploadedImageUrl != null) {
+      userData["profilePictureUrl"] = uploadedImageUrl;
+    }
 
-      if (mounted) {
-        context.go('/confirmedRegistration');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao finalizar cadastro: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    if (userData.isNotEmpty) {
+      await _profileService.updateUserProfileBackend(userData);
+    }
+
+    if (mounted) {
+      await context.read<UserProvider>().fetchCurrentUser();
+    }
+
+    if (mounted) {
+      context.go('/confirmedRegistration');
+    }
+
+  } catch (e, s) {
+    print("ERRO: $e");
+    print("STACK: $s");
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao finalizar cadastro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

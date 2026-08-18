@@ -71,13 +71,13 @@ class UserType extends StatelessWidget {
                   onPressed: () =>
                       GoRouter.of(context).push('/institutionRegisterPage'),
                 ),
-                const SizedBox(height: 15),
-                CustomButton(
-                    height: 50,
-                    width: 300,
-                    text: 'Gestor',
-                    onPressed: () =>
-                        GoRouter.of(context).push('/gestorRegisterPage')),
+                // const SizedBox(height: 15),
+                // CustomButton(
+                //     height: 50,
+                //     width: 300,
+                //     text: 'Gestor',
+                //     onPressed: () =>
+                //         GoRouter.of(context).push('/gestorRegisterPage')),
                 const SizedBox(height: 40),
               ],
             ),

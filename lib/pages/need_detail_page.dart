@@ -6,10 +6,13 @@ import 'package:appdonationsgestor/resources/constant_colors.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/favorites_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
 import 'package:appdonationsgestor/services/api_services/request_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:appdonationsgestor/controllers/user_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class NeedDetailPage extends StatefulWidget {
   final Need need;
@@ -28,13 +31,18 @@ class NeedDetailPage extends StatefulWidget {
 class _NeedDetailPageState extends State<NeedDetailPage> {
   late final FavoriteApiService _favoriteApiService;
   late final RequestApiService _requestApiService;
+  late final NeedApiService _needApiService;
   final ApiClient _apiClient = ApiClient();
+  late String _currentPostStatus;
 
   late bool _isFavorite;
   bool _isLoadingFavorite = false;
   bool _isLoadingRequest = false;
   bool _hasRequestedItem = false;
+  bool _hasApprovedRequest = false;
+  int? _approvedRequestId;
   bool _isCheckingExistingRequest = true;
+  late bool _actualOwnerView;
 
   Future<List<Request>>? _requestsFuture;
 
@@ -43,14 +51,21 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     super.initState();
     _favoriteApiService = FavoriteApiService(_apiClient);
     _requestApiService = RequestApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
+    _currentPostStatus = widget.need.postStatus;
     _isFavorite = Provider.of<FavoriteController>(context, listen: false)
         .isNeedFavorite(widget.need.id);
 
-    if (widget.isOwnerView) {
+    final currentUserUid = Provider.of<UserProvider>(context, listen: false)
+        .currentUser
+        ?.firebaseUid;
+    _actualOwnerView = widget.isOwnerView ||
+        (currentUserUid != null && widget.need.authorUid == currentUserUid);
+
+    if (_actualOwnerView) {
       _requestsFuture =
           _requestApiService.getRequestsForItem(needId: widget.need.id);
     } else {
-      // Verificar se já existe solicitação PENDENTE ou APROVADO
       _checkExistingRequest();
     }
   }
@@ -59,30 +74,36 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     try {
       final sentRequests = await _requestApiService.getMySentRequests();
 
-      // Verificar se já existe solicitação para esta necessidade com status PENDENTE ou APROVADO
-      final existingRequest = sentRequests.firstWhere(
-        (request) =>
-            request.need?.id == widget.need.id &&
-            (request.status == 'PENDENTE' || request.status == 'APROVADO'),
-        orElse: () => sentRequests.first, // dummy, vamos verificar se encontrou
-      );
+      final activeRequests = sentRequests
+          .where((request) =>
+              request.need?.id == widget.need.id &&
+              (request.status == 'PENDENTE' || request.status == 'APROVADO'))
+          .toList();
 
-      if (mounted && existingRequest.need?.id == widget.need.id) {
+      if (mounted && activeRequests.isNotEmpty) {
+        final existingRequest = activeRequests.first;
         setState(() {
           _hasRequestedItem = true;
+          _hasApprovedRequest = existingRequest.status == 'APROVADO';
+          _approvedRequestId = _hasApprovedRequest ? existingRequest.id : null;
           _isCheckingExistingRequest = false;
         });
       } else {
         if (mounted) {
           setState(() {
+            _hasRequestedItem = false;
+            _hasApprovedRequest = false;
+            _approvedRequestId = null;
             _isCheckingExistingRequest = false;
           });
         }
       }
     } catch (e) {
-      print('Erro ao verificar solicitações existentes: $e');
       if (mounted) {
         setState(() {
+          _hasRequestedItem = false;
+          _hasApprovedRequest = false;
+          _approvedRequestId = null;
           _isCheckingExistingRequest = false;
         });
       }
@@ -175,6 +196,79 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
     }
   }
 
+  Future<bool> _confirmShareContactData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey.shade200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          title: const Text(
+            'Compartilhar informações?',
+            style: TextStyle(color: Colors.black87),
+          ),
+          content: Text(
+            'Você concorda em compartilhar suas informações de contato para que ${widget.need.authorName} possa entrar em contato e a entrega possa ocorrer?',
+            style: const TextStyle(color: Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade700,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Concordo'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
+  }
+
+  Future<void> _refreshNeedStatus() async {
+    try {
+      final updatedNeed =
+          await _needApiService.getNeedById(widget.need.id.toString());
+      if (mounted) {
+        setState(() {
+          _currentPostStatus = updatedNeed.postStatus;
+        });
+      }
+    } catch (_) {
+      // Ignora falha de atualização de status.
+    }
+  }
+
+  Future<void> _openConfirmationPage() async {
+    if (_approvedRequestId == null) return;
+
+    final result = await context.push<bool?>(
+      '/confirmDonationPage',
+      extra: _approvedRequestId,
+    );
+
+    if (result == true && mounted) {
+      await _refreshNeedStatus();
+    }
+  }
+
+  String _confirmedQuantityLabel() {
+    return 'Quantidade que já foi doada:';
+  }
+
   String _traduzirPostStatus(String status) {
     switch (status) {
       case 'DISPONIVEL':
@@ -182,7 +276,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
       case 'PENDENTE_APROVACAO':
         return 'Em Análise';
       case 'CONCLUIDO':
-        return 'Finalizada';
+        return 'Concluído';
       case 'REJEITADO':
         return 'Rejeitada';
       default:
@@ -194,7 +288,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
   Widget build(BuildContext context) {
     final formattedDate =
         DateFormat('dd/MM/yyyy').format(widget.need.date ?? DateTime.now());
-    final bool isDisponivel = widget.need.postStatus == 'DISPONIVEL';
+    final bool isDisponivel = _currentPostStatus == 'DISPONIVEL';
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -236,7 +330,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                 ),
-                if (!widget.isOwnerView)
+                if (!_actualOwnerView)
                   Positioned(
                     top: 50,
                     right: 16,
@@ -282,7 +376,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                           .merge(TextStylesConstants.kinterSemiBold),
                     ),
                     subtitle: Text(
-                        'Status: ${_traduzirPostStatus(widget.need.postStatus)} | Quantidade: ${widget.need.quantity}'),
+                        'Status: ${_traduzirPostStatus(_currentPostStatus)} | Quantidade: ${widget.need.quantity}'),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -301,7 +395,7 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (widget.isOwnerView)
+                  if (_actualOwnerView)
                     _buildOwnerView()
                   else
                     SizedBox(
@@ -309,9 +403,11 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                       height: 50,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _hasRequestedItem
-                              ? Colors.grey
-                              : ConstantsColors.blueShade900,
+                          backgroundColor: _hasApprovedRequest
+                              ? Colors.green.shade700
+                              : (_hasRequestedItem
+                                  ? Colors.grey
+                                  : ConstantsColors.blueShade900),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -319,20 +415,32 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                         ),
                         onPressed: _isLoadingRequest ||
                                 !isDisponivel ||
-                                _hasRequestedItem ||
-                                _isCheckingExistingRequest
+                                _isCheckingExistingRequest ||
+                                (_hasRequestedItem && !_hasApprovedRequest)
                             ? null
-                            : _submitRequest,
+                            : () async {
+                                if (_hasApprovedRequest) {
+                                  _openConfirmationPage();
+                                  return;
+                                }
+
+                                final confirmed =
+                                    await _confirmShareContactData();
+                                if (!confirmed) return;
+                                _submitRequest();
+                              },
                         child: _isLoadingRequest || _isCheckingExistingRequest
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
                             : Text(
-                                _hasRequestedItem
-                                    ? "Interesse Registrado"
-                                    : isDisponivel
-                                        ? "Quero Doar"
-                                        : _traduzirPostStatus(
-                                            widget.need.postStatus),
+                                _hasApprovedRequest
+                                    ? "Inserir o Código"
+                                    : _hasRequestedItem
+                                        ? "Interesse Registrado"
+                                        : isDisponivel
+                                            ? "Quero Doar"
+                                            : _traduzirPostStatus(
+                                                _currentPostStatus),
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),
@@ -374,7 +482,15 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                   child: Text("Nenhuma solicitação para este item."));
             }
 
-            final requests = snapshot.data!;
+            final requests = snapshot.data!
+                .where((request) => request.status != 'REJEITADO')
+                .toList();
+
+            if (requests.isEmpty) {
+              return const Center(
+                  child: Text("Nenhuma solicitação para este item."));
+            }
+
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -396,14 +512,28 @@ class _NeedDetailPageState extends State<NeedDetailPage> {
                     ),
                     title: Text(request.solicitante.name,
                         style: TextStylesConstants.kpoppinsMedium),
-                    subtitle: Text("Status: ${request.status}"),
-                    trailing: request.status == 'APROVADO'
-                        ? SelectableText(
-                            request.confirmationCode ?? "SEM COD",
-                            style: TextStylesConstants.kpoppinsBold
-                                .copyWith(color: ConstantsColors.blueShade900),
-                          )
-                        : null,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Status: ${request.status}"),
+                        if (request.status == 'APROVADO' &&
+                            request.confirmedQuantity != null)
+                          Text(
+                            '${_confirmedQuantityLabel()} ${request.confirmedQuantity}',
+                          ),
+                        Text(
+                          [
+                            if (request.status == 'APROVADO')
+                              'Código: ${request.confirmationCode ?? "SEM COD"}',
+                            'Contato: ${request.solicitante.email}',
+                            if (request.solicitante.phone != null &&
+                                request.solicitante.phone!.isNotEmpty)
+                              'Telefone: ${request.solicitante.phone}',
+                          ].join(' | '),
+                        ),
+                      ],
+                    ),
+                    trailing: null,
                   ),
                 );
               },

@@ -7,7 +7,8 @@ class Donation {
   final int quantity;
   final String postStatus;
   final String donatorName;
-  final String? imageUrl; // Novo campo
+  final String? donatorUid;
+  final String? imageUrl;
   bool isFavorite;
 
   Donation({
@@ -19,6 +20,7 @@ class Donation {
     required this.quantity,
     required this.postStatus,
     required this.donatorName,
+    this.donatorUid,
     this.imageUrl,
     this.isFavorite = false,
   });
@@ -33,6 +35,7 @@ class Donation {
       quantity: json['quantity'] ?? 0,
       postStatus: json['postStatus'] ?? 'PENDENTE_APROVACAO',
       donatorName: json['donatorName'] ?? 'Doador anônimo',
+      donatorUid: json['donatorUid'],
       imageUrl: json['imageUrl'],
     );
   }

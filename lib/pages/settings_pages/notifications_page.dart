@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:appdonationsgestor/resources/text_styles.dart';
 import 'package:appdonationsgestor/services/api_services/api_client.dart';
 import 'package:appdonationsgestor/services/api_services/notification_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/donation_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/needs_api_service.dart';
+import 'package:appdonationsgestor/services/api_services/post_api_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,13 +24,21 @@ class _NotificationsPage extends State<NotificationsPage> {
   bool notificationsEnabled = true;
 
   late final NotificationApiService _notificationApiService;
+  late final DonationApiService _donationApiService;
+  late final NeedApiService _needApiService;
+  late final PostApiService _postApiService;
   final ApiClient _apiClient = ApiClient();
   late Future<List<NotificationModel>> _apiNotificationsFuture;
+
+  final Map<int, bool> _notificationValidityCache = {};
 
   @override
   void initState() {
     super.initState();
     _notificationApiService = NotificationApiService(_apiClient);
+    _donationApiService = DonationApiService(_apiClient);
+    _needApiService = NeedApiService(_apiClient);
+    _postApiService = PostApiService(_apiClient);
     _checkNotificationSettings();
     _loadApiNotifications();
   }
@@ -45,8 +56,55 @@ class _NotificationsPage extends State<NotificationsPage> {
   }
 
   void _loadApiNotifications() {
+    _refreshNotifications();
+  }
+
+  Future<void> _refreshNotifications() async {
+    _notificationValidityCache.clear(); // Limpar cache ao recarregar
+
+    await _clearResolvedRequestNotifications();
+
+    if (!mounted) return;
+
     _apiNotificationsFuture = _notificationApiService.getMyNotifications();
     setState(() {});
+  }
+
+  Future<void> _clearResolvedRequestNotifications() async {
+    try {
+      final notifications = await _notificationApiService.getMyNotifications();
+
+      for (final notification in notifications) {
+        await _deleteResolvedRequestNotification(notification);
+      }
+    } catch (e) {
+      print('Erro ao limpar notificações de solicitação resolvida: $e');
+    }
+  }
+
+  Future<void> _deleteResolvedRequestNotification(
+      NotificationModel notification) async {
+    if (notification.dataPayload == null) return;
+
+    try {
+      final data =
+          jsonDecode(notification.dataPayload!) as Map<String, dynamic>;
+      final type = data['type'];
+
+      if (type != 'REQUEST_APPROVED' && type != 'REQUEST_REJECTED') {
+        return;
+      }
+
+      final payloadNotificationId = data['notificationId'];
+      final int notificationIdToDelete = payloadNotificationId is int
+          ? payloadNotificationId
+          : int.tryParse(payloadNotificationId?.toString() ?? '') ??
+              notification.id;
+
+      await _notificationApiService.deleteNotification(notificationIdToDelete);
+    } catch (_) {
+      // ignora payload inválido
+    }
   }
 
   String _formatRelativeTime(DateTime dateTime) {
@@ -65,6 +123,63 @@ class _NotificationsPage extends State<NotificationsPage> {
       return "Ontem às ${DateFormat('HH:mm').format(dateTime)}";
     } else {
       return DateFormat('dd/MM/yy \'às\' HH:mm').format(dateTime);
+    }
+  }
+
+  Future<bool> _isNotificationStillValid(NotificationModel notif) async {
+    if (_notificationValidityCache.containsKey(notif.id)) {
+      return _notificationValidityCache[notif.id]!;
+    }
+
+    if (notif.dataPayload == null) {
+      _notificationValidityCache[notif.id] = true;
+      return true;
+    }
+
+    try {
+      Map<String, dynamic> data = jsonDecode(notif.dataPayload!);
+      final type = data['type'] as String?;
+
+      bool isValid = true;
+
+      if (type == 'POST_VALIDATION_PENDING') {
+        final String? itemId = data['itemId'];
+        final String? itemType = data['itemType'];
+
+        if (itemId == null || itemType == null) {
+          isValid = false;
+        } else {
+          try {
+            if (itemType == 'DONATION') {
+              final donation =
+                  await _donationApiService.getDonationById(itemId);
+              isValid = donation.postStatus == 'PENDENTE_APROVACAO';
+            } else if (itemType == 'NEED') {
+              final need = await _needApiService.getNeedById(itemId);
+              isValid = need.postStatus == 'PENDENTE_APROVACAO';
+            } else if (itemType == 'POST') {
+              final post = await _postApiService.getPostById(int.parse(itemId));
+              isValid = post.postStatus == 'PENDENTE_APROVACAO';
+            }
+          } catch (e) {
+            print("Erro ao verificar status do item: $e");
+            isValid = false;
+          }
+        }
+      } else if (type == 'NEW_REQUEST') {
+        isValid = true;
+      } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+        isValid = false;
+      } else if (type == 'POST_APPROVED' || type == 'POST_REJECTED') {
+        isValid = false;
+      }
+
+      _notificationValidityCache[notif.id] = isValid;
+      return isValid;
+    } catch (e) {
+      print("Erro ao validar notificação: $e");
+      _notificationValidityCache[notif.id] = true;
+      return true;
     }
   }
 
@@ -91,6 +206,7 @@ class _NotificationsPage extends State<NotificationsPage> {
       if (type == 'NEW_REQUEST') {
         GoRouter.of(context).goNamed(RouteNames.pendingRequests);
       } else if (type == 'REQUEST_APPROVED' || type == 'REQUEST_REJECTED') {
+        await _deleteResolvedRequestNotification(notif);
         GoRouter.of(context).goNamed(RouteNames.hystoryPage);
       } else if (type == 'POST_VALIDATION_PENDING') {
         final String? itemId = data['itemId'];
@@ -197,75 +313,115 @@ class _NotificationsPage extends State<NotificationsPage> {
   }
 
   Widget buildApiNotification(NotificationModel notif) {
-    return GestureDetector(
-      onTap: () => _onNotificationTapped(notif),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: notif.isRead
-              ? ConstantsColors.whiteShade700
-              : ConstantsColors.blueShade400.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "•",
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: notif.isRead
-                        ? Colors.grey.shade400
-                        : ConstantsColors.blueShade900,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    notif.title,
-                    style: const TextStyle(
-                      color: ConstantsColors.blueShade900,
-                      fontSize: 17,
-                    ).merge(TextStylesConstants.kinterBold),
-                  ),
+    return FutureBuilder<bool>(
+      future: _isNotificationStillValid(notif),
+      builder: (context, snapshot) {
+        bool isExpired = false;
+        if (snapshot.hasData) {
+          isExpired = !snapshot.data!;
+        }
+
+        return GestureDetector(
+          onTap: isExpired
+              ? () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Esta notificação já foi resolvida'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              : () => _onNotificationTapped(notif),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: isExpired
+                  ? ConstantsColors.whiteShade700.withOpacity(0.6)
+                  : notif.isRead
+                      ? ConstantsColors.whiteShade700
+                      : ConstantsColors.blueShade400.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isExpired ? 0.05 : 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 18.0),
-              child: Text(
-                _formatRelativeTime(notif.createdAt),
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 10,
-                ).merge(TextStylesConstants.kinterRegular),
+            child: Opacity(
+              opacity: isExpired ? 0.6 : 1.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "•",
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: isExpired
+                              ? Colors.grey.shade400
+                              : notif.isRead
+                                  ? Colors.grey.shade400
+                                  : ConstantsColors.blueShade900,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          notif.title,
+                          style: TextStyle(
+                            color: isExpired
+                                ? Colors.grey
+                                : ConstantsColors.blueShade900,
+                            fontSize: 17,
+                            decoration:
+                                isExpired ? TextDecoration.lineThrough : null,
+                          ).merge(TextStylesConstants.kinterBold),
+                        ),
+                      ),
+                      if (isExpired)
+                        Tooltip(
+                          message: 'Esta notificação já foi resolvida',
+                          child: Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey.shade400,
+                            size: 18,
+                          ),
+                        ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18.0),
+                    child: Text(
+                      _formatRelativeTime(notif.createdAt),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                      ).merge(TextStylesConstants.kinterRegular),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18.0),
+                    child: Text(
+                      notif.body,
+                      style: const TextStyle(
+                        color: ConstantsColors.blueShade900,
+                        fontSize: 14,
+                      ).merge(TextStylesConstants.kinterRegular),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 18.0),
-              child: Text(
-                notif.body,
-                style: const TextStyle(
-                  color: ConstantsColors.blueShade900,
-                  fontSize: 14,
-                ).merge(TextStylesConstants.kinterRegular),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
